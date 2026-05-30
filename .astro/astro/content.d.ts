@@ -169,6 +169,13 @@ declare module 'astro:content' {
   collection: "blog";
   data: any
 } & { render(): Render[".md"] };
+"ode-ot-computational-biology.md": {
+	id: "ode-ot-computational-biology.md";
+  slug: "ode-ot-computational-biology";
+  body: string;
+  collection: "blog";
+  data: any
+} & { render(): Render[".md"] };
 "react-19-features.md": {
 	id: "react-19-features.md";
   slug: "react-19-features";
