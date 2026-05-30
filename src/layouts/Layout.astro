@@ -15,7 +15,7 @@ interface Props {
 const {
   title = 'YMLL Blog',
   description = '探索技术与设计的交汇点，记录成长与思考',
-  image = '/og-image.png',
+  image,
   type = 'website',
   publishedTime,
   updatedTime,
@@ -24,7 +24,7 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImage = getImageURL(image);
+const ogImage = image ? getImageURL(image) : getPageURL('/favicon.svg');
 const siteURL = getPageURL('');
 
 // 生成 JSON-LD

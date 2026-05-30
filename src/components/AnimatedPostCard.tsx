@@ -9,6 +9,7 @@ interface AnimatedPostCardProps {
   image?: string;
   readingTime?: string;
   index?: number;
+  base?: string;
 }
 
 export default function AnimatedPostCard({
@@ -20,6 +21,7 @@ export default function AnimatedPostCard({
   image,
   readingTime,
   index = 0,
+  base = '',
 }: AnimatedPostCardProps) {
   const formattedDate = new Date(date).toLocaleDateString('zh-CN', {
     year: 'numeric',
@@ -78,7 +80,7 @@ export default function AnimatedPostCard({
 
         {/* Title */}
         <h3 className="text-lg font-bold text-stone-900 mb-3 group-hover:text-emerald-600 transition-colors duration-300">
-          <a href={`/blog/${slug}`} className="relative z-10">
+          <a href={`${base}/blog/${slug}`} className="relative z-10">
             {title}
           </a>
         </h3>

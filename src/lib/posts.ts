@@ -2,26 +2,6 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type BlogPost = CollectionEntry<'blog'>;
 
-const SITE_URL = 'https://yanmengli123.github.io';
-const BASE_PATH = '/ymllblog';
-
-/**
- * 获取页面的完整 URL
- */
-export function getPageURL(path: string): string {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `${SITE_URL}${BASE_PATH}${cleanPath}`;
-}
-
-/**
- * 获取图片的完整 URL
- */
-export function getImageURL(imagePath: string): string {
-  if (imagePath.startsWith('http')) return imagePath;
-  const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
-  return `${SITE_URL}${BASE_PATH}${cleanPath}`;
-}
-
 /**
  * 获取所有博客文章（包括草稿）
  */
