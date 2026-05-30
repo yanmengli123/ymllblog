@@ -1,0 +1,47 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const tags = [
+  { name: 'Astro', count: 5 },
+  { name: 'React', count: 8 },
+  { name: 'TypeScript', count: 6 },
+  { name: 'Tailwind', count: 4 },
+  { name: '前端', count: 12 },
+  { name: '技术', count: 10 },
+  { name: '设计', count: 3 },
+  { name: 'CSS', count: 7 },
+  { name: 'JavaScript', count: 9 },
+  { name: 'Node.js', count: 4 },
+];
+---
+
+<Layout title="YMLL Blog - 标签">
+  <Header />
+
+  <main class="pt-16">
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h1 class="text-3xl font-bold text-text dark:text-text-dark mb-2">标签</h1>
+      <p class="text-text-muted dark:text-gray-400 mb-10">共 {tags.length} 个标签</p>
+
+      <div class="flex flex-wrap gap-4">
+        {tags.map(tag => (
+          <a
+            href={`/tags/${tag.name}`}
+            class="group flex items-center gap-2 px-4 py-2 bg-surface dark:bg-surface-dark rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+          >
+            <span class="text-lg font-medium text-text dark:text-text-dark group-hover:text-primary transition-colors">
+              {tag.name}
+            </span>
+            <span class="text-sm text-text-muted bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
+              {tag.count}
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

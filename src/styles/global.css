@@ -1,0 +1,121 @@
+/* 自然风格全局样式 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #2D5A27;
+    --color-secondary: #8B7355;
+    --color-background: #FEFDFB;
+    --color-surface: #FFFFFF;
+    --color-text: #1C1917;
+    --color-text-muted: #78716C;
+  }
+
+  .dark {
+    --color-primary: #4ADE80;
+    --color-secondary: #A8A29E;
+    --color-background: #0C0A09;
+    --color-surface: #1C1917;
+    --color-text: #FAFAF9;
+    --color-text-muted: #A8A29E;
+  }
+}
+
+@layer components {
+  .prose {
+    @apply max-w-none text-text dark:text-text-dark;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    @apply font-bold text-text dark:text-text-dark mt-8 mb-4;
+  }
+
+  .prose h1 {
+    @apply text-3xl;
+  }
+
+  .prose h2 {
+    @apply text-2xl;
+  }
+
+  .prose h3 {
+    @apply text-xl;
+  }
+
+  .prose p {
+    @apply mb-4 leading-relaxed;
+  }
+
+  .prose a {
+    @apply text-primary dark:text-primary-400 underline decoration-primary/30 hover:decoration-primary transition-colors;
+  }
+
+  .prose ul,
+  .prose ol {
+    @apply mb-4 pl-6;
+  }
+
+  .prose li {
+    @apply mb-2;
+  }
+
+  .prose ul li {
+    @apply list-disc;
+  }
+
+  .prose ol li {
+    @apply list-decimal;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary pl-4 italic my-4 text-text-muted;
+  }
+
+  .prose code {
+    @apply bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+
+  .prose pre {
+    @apply bg-gray-900 dark:bg-gray-950 text-gray-100 p-4 rounded-lg overflow-x-auto my-4;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .prose img {
+    @apply rounded-lg my-4;
+  }
+
+  .prose hr {
+    @apply border-gray-200 dark:border-gray-800 my-8;
+  }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-600;
+}
+
+/* 选择文字颜色 */
+::selection {
+  @apply bg-primary/20 text-primary;
+}

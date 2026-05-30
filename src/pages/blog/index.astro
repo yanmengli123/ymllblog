@@ -1,0 +1,77 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import AnimatedPostCard from '../../components/AnimatedPostCard';
+
+const allPosts = [
+  {
+    title: '欢迎来到 YMLL Blog',
+    description: '这是一个使用 Astro + Tailwind CSS + Framer Motion 构建的企业级个人博客。',
+    date: '2024-01-15',
+    tags: ['博客', '技术'],
+    slug: 'welcome',
+    readingTime: '2 分钟',
+  },
+  {
+    title: 'Astro 岛屿架构详解',
+    description: '深入了解 Astro 的岛屿架构，以及如何用它构建高性能网站。',
+    date: '2024-01-10',
+    tags: ['Astro', '前端'],
+    slug: 'astro-islands',
+    readingTime: '5 分钟',
+  },
+  {
+    title: 'Tailwind CSS 最佳实践',
+    description: '掌握 Tailwind CSS 的设计系统和组件化开发技巧。',
+    date: '2024-01-05',
+    tags: ['CSS', 'Tailwind'],
+    slug: 'tailwind-best-practices',
+    readingTime: '4 分钟',
+  },
+  {
+    title: 'React Hooks 深入理解',
+    description: '从原理到实践，全面掌握 React Hooks 的使用技巧。',
+    date: '2023-12-28',
+    tags: ['React', '前端'],
+    slug: 'react-hooks',
+    readingTime: '6 分钟',
+  },
+  {
+    title: 'TypeScript 高级类型体操',
+    description: '探索 TypeScript 类型系统的强大能力，提升代码类型安全。',
+    date: '2023-12-20',
+    tags: ['TypeScript', '类型'],
+    slug: 'typescript-advanced-types',
+    readingTime: '7 分钟',
+  },
+];
+---
+
+<Layout title="YMLL Blog - 博客">
+  <Header />
+
+  <main class="pt-16">
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h1 class="text-3xl font-bold text-text dark:text-text-dark mb-2">博客文章</h1>
+      <p class="text-text-muted dark:text-gray-400 mb-10">共 {allPosts.length} 篇文章</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {allPosts.map((post, index) => (
+          <AnimatedPostCard
+            client:load
+            title={post.title}
+            description={post.description}
+            date={post.date}
+            tags={post.tags}
+            slug={post.slug}
+            readingTime={post.readingTime}
+            index={index}
+          />
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

@@ -1,0 +1,105 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const skills = [
+  { name: 'Astro', level: 90 },
+  { name: 'React', level: 85 },
+  { name: 'TypeScript', level: 80 },
+  { name: 'Tailwind CSS', level: 95 },
+  { name: 'Node.js', level: 75 },
+  { name: 'Git', level: 85 },
+];
+
+const experiences = [
+  {
+    period: '2023 - 至今',
+    title: '全栈开发工程师',
+    company: '自由职业',
+    description: '专注于现代 Web 技术栈，为企业和个人提供高质量的网站和应用开发服务。',
+  },
+  {
+    period: '2021 - 2023',
+    title: '前端开发工程师',
+    company: '某科技公司',
+    description: '负责公司核心产品的前端架构设计和开发，优化用户体验和性能。',
+  },
+];
+---
+
+<Layout title="YMLL Blog - 关于">
+  <Header />
+
+  <main class="pt-16">
+    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="prose">
+        <h1>关于我</h1>
+
+        <div class="flex flex-col md:flex-row gap-8 mb-12">
+          <div class="md:w-1/3">
+            <div class="aspect-square bg-gradient-to-br from-primary to-primary-700 rounded-lg flex items-center justify-center">
+              <span class="text-6xl font-bold text-white">Y</span>
+            </div>
+          </div>
+
+          <div class="md:w-2/3">
+            <p class="text-lg">
+              你好！我是 YMLL，一个热爱技术与设计的开发者。
+            </p>
+            <p>
+              我专注于现代 Web 技术栈，喜欢探索新的技术和工具，用代码创造美好的用户体验。
+              这个博客是我记录学习、思考和创作的地方。
+            </p>
+            <p>
+              当我不在写代码的时候，你可能会发现我在阅读、摄影或者探索大自然。
+            </p>
+          </div>
+        </div>
+
+        <h2>技能</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
+          {skills.map(skill => (
+            <div class="flex items-center gap-4">
+              <span class="w-24 font-medium">{skill.name}</span>
+              <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  class="h-full bg-primary dark:bg-primary-400 rounded-full"
+                  style={`width: ${skill.level}%`}
+                />
+              </div>
+              <span class="text-sm text-text-muted">{skill.level}%</span>
+            </div>
+          ))}
+        </div>
+
+        <h2>经历</h2>
+        <div class="space-y-8 mb-12">
+          {experiences.map(exp => (
+            <div class="border-l-4 border-primary pl-4">
+              <div class="flex flex-wrap gap-2 mb-2">
+                <span class="text-sm font-medium text-primary">{exp.period}</span>
+                <span class="text-sm text-text-muted">•</span>
+                <span class="text-sm font-medium">{exp.title}</span>
+                <span class="text-sm text-text-muted">•</span>
+                <span class="text-sm text-text-muted">{exp.company}</span>
+              </div>
+              <p>{exp.description}</p>
+            </div>
+          ))}
+        </div>
+
+        <h2>联系方式</h2>
+        <p>
+          如果你有任何问题、建议或者合作意向，欢迎通过以下方式联系我：
+        </p>
+        <ul>
+          <li>GitHub: <a href="https://github.com/yanmengli123" target="_blank">@yanmengli123</a></li>
+          <li>Email: contact@example.com</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
