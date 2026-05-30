@@ -6,7 +6,7 @@ import TableOfContents from '../components/TableOfContents.astro';
 import { calculateReadingTime } from '../lib/reading-time';
 import { getRelatedPosts, getPageURL } from '../lib/posts';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 interface Props {
   frontmatter: {
@@ -67,7 +67,7 @@ const relatedPosts = await getRelatedPosts({ slug, data: { tags: frontmatter.tag
         <div class="flex flex-wrap gap-2 mb-6">
           {frontmatter.tags.map(tag => (
             <a
-              href={`${base}tags/${tag}`}
+              href={`${base}/tags/${tag}`}
               class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-sm font-medium hover:bg-emerald-100 transition-colors"
             >
               {tag}
@@ -145,7 +145,7 @@ const relatedPosts = await getRelatedPosts({ slug, data: { tags: frontmatter.tag
             <div class="flex flex-wrap gap-2 mb-8">
               {frontmatter.tags.map(tag => (
                 <a
-                  href={`${base}tags/${tag}`}
+                  href={`${base}/tags/${tag}`}
                   class="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
                 >
                   #{tag}
@@ -186,7 +186,7 @@ const relatedPosts = await getRelatedPosts({ slug, data: { tags: frontmatter.tag
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {relatedPosts.map(post => (
               <a
-                href={`${base}blog/${post.slug}`}
+                href={`${base}/blog/${post.slug}`}
                 class="group block p-6 bg-white rounded-xl border border-stone-200 hover:border-emerald-300 hover:shadow-lg transition-all"
               >
                 <h3 class="font-bold text-stone-900 group-hover:text-emerald-600 transition-colors mb-2">

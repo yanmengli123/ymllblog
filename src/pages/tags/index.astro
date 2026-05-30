@@ -4,7 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 // 获取所有文章
 const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -51,7 +51,7 @@ const tagColors = [
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {tags.map((tag, index) => (
           <a
-            href={`${base}tags/${tag.name}`}
+            href={`${base}/tags/${tag.name}`}
             class="group relative bg-white rounded-2xl p-6 border border-stone-200 hover:border-emerald-300 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden"
           >
             {/* 图标 */}

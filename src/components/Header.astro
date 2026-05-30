@@ -1,12 +1,12 @@
 ---
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const navItems = [
-  { label: '首页', href: base },
-  { label: '博客', href: `${base}blog` },
-  { label: '标签', href: `${base}tags` },
-  { label: '归档', href: `${base}archive` },
-  { label: '关于', href: `${base}about` },
+  { label: '首页', href: `${base}/` },
+  { label: '博客', href: `${base}/blog` },
+  { label: '标签', href: `${base}/tags` },
+  { label: '归档', href: `${base}/archive` },
+  { label: '关于', href: `${base}/about` },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -14,8 +14,8 @@ const currentPath = Astro.url.pathname;
 function isActive(href: string) {
   const cleanHref = href.replace(/\/$/, '') || '/';
   const cleanPath = currentPath.replace(/\/$/, '') || '/';
-  if (cleanHref === base.replace(/\/$/, '') || cleanHref === '/') {
-    return cleanPath === base.replace(/\/$/, '') || cleanPath === '/';
+  if (cleanHref === base || cleanHref === '/') {
+    return cleanPath === base || cleanPath === '/' || cleanPath === `${base}/`;
   }
   return cleanPath.startsWith(cleanHref);
 }
@@ -72,7 +72,7 @@ function isActive(href: string) {
 
         <!-- RSS -->
         <a
-          href={`${base}rss.xml`}
+          href={`${base}/rss.xml`}
           class="p-2.5 rounded-lg text-stone-500 hover:text-stone-700 hover:bg-stone-100 transition-all"
           aria-label="RSS"
           target="_blank"
