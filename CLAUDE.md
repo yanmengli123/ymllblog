@@ -11,6 +11,7 @@ YMLL Blog — a Chinese-language personal tech/design blog built as a fully stat
 - **Framework:** Astro 4.x (static output mode)
 - **Styling:** Tailwind CSS 3.4 via `@astrojs/tailwind`
 - **Interactivity:** React 18 + Framer Motion 11 (used only in `AnimatedPostCard.tsx`)
+- **Math Rendering:** KaTeX via `remark-math` + `rehype-katex`
 - **Language:** TypeScript (strict mode)
 - **Deployment:** GitHub Pages via GitHub Actions
 
@@ -47,6 +48,12 @@ Never hardcode `/blog` — it will 404 on GitHub Pages.
 - `src/pages/blog/[slug].astro` — individual blog posts (generated from content collection)
 - `src/pages/tags/[tag].astro` — tag filtering pages (generated from post tags)
 
+### Math Formula Support
+LaTeX math formulas are supported via KaTeX:
+- Display math: `$$ ... $$`
+- Inline math: `$ ... $`
+- CSS styling in `PostLayout.astro` with emerald green accent
+
 ### Helper Functions
 Located in `src/lib/`:
 - `posts.ts` — Content collection queries (getPublishedPosts, getPostsByTag, etc.)
@@ -57,11 +64,11 @@ Located in `src/lib/`:
 
 | File | Purpose |
 |------|---------|
-| `astro.config.mjs` | Site URL (`yanmengli123.github.io`), base path (`/ymllblog`), integrations |
+| `astro.config.mjs` | Site URL (`yanmengli123.github.io`), base path (`/ymllblog`), integrations, KaTeX config |
 | `src/content/config.ts` | Content collection schema (blog posts) |
 | `src/lib/posts.ts` | Post query functions |
-| `src/layouts/Layout.astro` | Base HTML, SEO meta, OG tags, JSON-LD, font loading |
-| `src/layouts/PostLayout.astro` | Blog post detail layout with TOC, related posts, sharing |
+| `src/layouts/Layout.astro` | Base HTML, SEO meta, OG tags, JSON-LD, KaTeX CSS, font loading |
+| `src/layouts/PostLayout.astro` | Blog post layout with TOC, author info, related posts, math styling |
 | `src/components/Header.astro` | Navigation with scroll effects, mobile menu |
 | `src/components/TableOfContents.astro` | Auto-generated TOC from headings |
 | `.github/workflows/deploy.yml` | GitHub Pages deployment pipeline |
@@ -71,6 +78,7 @@ Located in `src/lib/`:
 - **Primary color:** Emerald (#10b981) — defined in `tailwind.config.mjs`
 - **Fonts:** Inter (sans), Playfair Display (serif) — loaded via Google Fonts
 - **Utility classes:** `.glass` (frosted glass), `.gradient-text`, `.hover-lift`, `.animate-on-scroll`
+- **Math blocks:** Green left border with light green background
 
 ## Deployment
 
@@ -79,5 +87,4 @@ Automatic on every push to `main`. The GitHub Actions workflow runs `npm ci && n
 ## Known Issues
 
 1. **Dark mode incomplete** — Tailwind `darkMode: 'class'` is configured but most components lack `dark:` variants
-2. **No sitemap integration** — `robots.txt` references sitemap but `@astrojs/sitemap` is not configured
-3. **No tests, linting, or pre-commit hooks** — CI only handles build/deploy
+2. **No tests, linting, or pre-commit hooks** — CI only handles build/deploy
