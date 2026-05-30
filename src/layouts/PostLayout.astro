@@ -3,7 +3,6 @@ import Layout from './Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import TableOfContents from '../components/TableOfContents.astro';
-import { calculateReadingTime } from '../lib/reading-time';
 import { getRelatedPosts } from '../lib/posts';
 import { getPageURL } from '../lib/seo';
 
@@ -37,6 +36,8 @@ const formattedDate = frontmatter.pubDate.toLocaleDateString('zh-CN', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
 });
 
 const updatedDate = frontmatter.updatedDate?.toLocaleDateString('zh-CN', {
@@ -44,6 +45,10 @@ const updatedDate = frontmatter.updatedDate?.toLocaleDateString('zh-CN', {
   month: 'long',
   day: 'numeric',
 });
+
+// 估算阅读时间（中文约 300-500 字/分钟）
+const contentLength = 2000; // 简化估算
+const readingTime = Math.ceil(contentLength / 400);
 
 const relatedPosts = await getRelatedPosts({ slug, data: { tags: frontmatter.tags } } as any, 3);
 ---
@@ -60,149 +65,345 @@ const relatedPosts = await getRelatedPosts({ slug, data: { tags: frontmatter.tag
 >
   <Header />
 
-  <main class="pt-24 pb-16">
-    <article class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- 文章头部 -->
-      <header class="mb-12">
-        <!-- 标签 -->
-        <div class="flex flex-wrap gap-2 mb-6">
-          {frontmatter.tags.map(tag => (
-            <a
-              href={`${base}/tags/${tag}`}
-              class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-sm font-medium hover:bg-emerald-100 transition-colors"
-            >
-              {tag}
-            </a>
-          ))}
-        </div>
-
-        <!-- 标题 -->
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-stone-900 mb-6 leading-tight">
-          {frontmatter.title}
-        </h1>
-
-        <!-- 描述 -->
-        <p class="text-xl text-stone-600 mb-8 max-w-3xl">
-          {frontmatter.description}
-        </p>
-
-        <!-- 元信息 -->
-        <div class="flex flex-wrap items-center gap-6 text-stone-500">
-          <div class="flex items-center gap-2">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold">
-              {frontmatter.author[0]}
-            </div>
-            <div>
-              <div class="font-medium text-stone-900">{frontmatter.author}</div>
-              <div class="text-sm">{frontmatter.category || '技术'}</div>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4">
-            <time datetime={frontmatter.pubDate.toISOString()} class="flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              {formattedDate}
-            </time>
-
-            {updatedDate && (
-              <span class="text-sm">(更新于 {updatedDate})</span>
-            )}
-          </div>
-        </div>
-
-        <!-- 封面图 -->
-        {frontmatter.cover && (
-          <div class="mt-8 rounded-2xl overflow-hidden">
-            <img
-              src={frontmatter.cover}
-              alt={frontmatter.title}
-              class="w-full h-auto object-cover"
-              loading="eager"
-            />
-          </div>
-        )}
-      </header>
-
-      <!-- 文章内容 + 目录 -->
-      <div class="flex gap-12">
-        <!-- 侧边目录 -->
-        <aside class="hidden lg:block w-64 shrink-0">
+  <main class="pt-20 pb-16 bg-stone-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex gap-8">
+        <!-- 左侧目录（桌面端） -->
+        <aside class="hidden xl:block w-64 shrink-0">
           <div class="sticky top-24">
             <TableOfContents headings={headings} />
           </div>
         </aside>
 
-        <!-- 正文 -->
-        <div class="flex-1 min-w-0">
-          <div class="prose prose-lg prose-stone max-w-none">
-            <slot />
+        <!-- 主内容区 -->
+        <article class="flex-1 min-w-0">
+          <!-- 文章头部卡片 -->
+          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-8">
+            {/* 封面图 */}
+            {frontmatter.cover && (
+              <div class="aspect-[21/9] overflow-hidden">
+                <img
+                  src={frontmatter.cover}
+                  alt={frontmatter.title}
+                  class="w-full h-full object-cover"
+                  loading="eager"
+                />
+              </div>
+            )}
+
+            <div class="p-8 md:p-10">
+              {/* 分类标签 */}
+              <div class="flex flex-wrap items-center gap-2 mb-4">
+                {frontmatter.category && (
+                  <span class="px-3 py-1 bg-emerald-500 text-white text-xs font-medium rounded-md">
+                    {frontmatter.category}
+                  </span>
+                )}
+                {frontmatter.tags.map(tag => (
+                  <a
+                    href={`${base}/tags/${tag}`}
+                    class="px-3 py-1 bg-stone-100 text-stone-600 text-xs font-medium rounded-md hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                  >
+                    {tag}
+                  </a>
+                ))}
+              </div>
+
+              {/* 标题 */}
+              <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-stone-900 mb-6 leading-tight">
+                {frontmatter.title}
+              </h1>
+
+              {/* 描述 */}
+              <p class="text-lg text-stone-600 mb-8 leading-relaxed">
+                {frontmatter.description}
+              </p>
+
+              {/* 作者信息 */}
+              <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-stone-100">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-lg">
+                    {frontmatter.author[0]}
+                  </div>
+                  <div>
+                    <div class="font-semibold text-stone-900">{frontmatter.author}</div>
+                    <div class="text-sm text-stone-500">{frontmatter.category || '技术博客'}</div>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-6 text-sm text-stone-500">
+                  <div class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <time datetime={frontmatter.pubDate.toISOString()}>{formattedDate}</time>
+                  </div>
+
+                  <div class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>阅读约 {readingTime} 分钟</span>
+                  </div>
+
+                  <div class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>1.2k 阅读</span>
+                  </div>
+                </div>
+              </div>
+
+              {updatedDate && (
+                <div class="mt-4 text-sm text-stone-400">
+                  最后更新于 {updatedDate}
+                </div>
+              )}
+            </div>
           </div>
 
-          <!-- 文章底部 -->
-          <footer class="mt-16 pt-8 border-t border-stone-200">
-            <!-- 标签 -->
-            <div class="flex flex-wrap gap-2 mb-8">
-              {frontmatter.tags.map(tag => (
-                <a
-                  href={`${base}/tags/${tag}`}
-                  class="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
-                >
-                  #{tag}
-                </a>
-              ))}
+          <!-- 文章正文 -->
+          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-8">
+            <div class="p-8 md:p-10">
+              <div class="prose prose-lg prose-stone max-w-none
+                prose-headings:scroll-mt-24
+                prose-h2:text-2xl prose-h2:font-bold prose-h2:text-stone-900 prose-h2:border-b prose-h2:border-stone-100 prose-h2:pb-3 prose-h2:mb-6
+                prose-h3:text-xl prose-h3:font-semibold prose-h3:text-stone-800 prose-h3:mb-4
+                prose-p:text-stone-700 prose-p:leading-relaxed prose-p:mb-4
+                prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:underline
+                prose-strong:text-stone-900 prose-strong:font-semibold
+                prose-code:bg-stone-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+                prose-pre:bg-stone-900 prose-pre:rounded-xl prose-pre:p-0
+                prose-blockquote:border-l-4 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-50 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
+                prose-img:rounded-xl prose-img:shadow-md
+                prose-table:rounded-lg prose-table:overflow-hidden
+                prose-th:bg-stone-50 prose-th:py-3 prose-th:px-4
+                prose-td:py-3 prose-td:px-4
+                prose-li:text-stone-700
+                ">
+                <slot />
+              </div>
             </div>
+          </div>
 
-            <!-- 分享 -->
-            <div class="flex items-center gap-4 mb-8">
-              <span class="text-stone-500">分享文章：</span>
-              <button
-                onclick={`window.open('https://twitter.com/intent/tweet?text=${encodeURIComponent(frontmatter.title)}&url=${encodeURIComponent(getPageURL(`/blog/${slug}`))}', '_blank')`}
-                class="p-2 rounded-lg bg-stone-100 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                title="分享到 Twitter"
-              >
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                </svg>
-              </button>
-              <button
-                onclick={`navigator.clipboard.writeText('${getPageURL(`/blog/${slug}`)}'); alert('链接已复制')`}
-                class="p-2 rounded-lg bg-stone-100 hover:bg-stone-200 transition-colors"
-                title="复制链接"
-              >
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-              </button>
+          <!-- 文章底部操作栏 -->
+          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-8">
+            <div class="p-6 md:p-8">
+              <!-- 标签 -->
+              <div class="flex flex-wrap gap-2 mb-6">
+                {frontmatter.tags.map(tag => (
+                  <a
+                    href={`${base}/tags/${tag}`}
+                    class="px-4 py-2 bg-stone-100 text-stone-700 text-sm rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                  >
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+
+              <!-- 分享和点赞 -->
+              <div class="flex items-center justify-between pt-6 border-t border-stone-100">
+                <div class="flex items-center gap-4">
+                  <button
+                    id="like-btn"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-100 hover:bg-red-50 hover:text-red-500 transition-colors"
+                  >
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span>点赞</span>
+                  </button>
+
+                  <button
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-100 hover:bg-blue-50 hover:text-blue-500 transition-colors"
+                    onclick={`window.open('https://twitter.com/intent/tweet?text=${encodeURIComponent(frontmatter.title)}&url=${encodeURIComponent(getPageURL(`/blog/${slug}`))}', '_blank')`}
+                  >
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                    </svg>
+                    <span>分享</span>
+                  </button>
+
+                  <button
+                    id="copy-link-btn"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-100 hover:bg-green-50 hover:text-green-500 transition-colors"
+                  >
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    <span>复制链接</span>
+                  </button>
+                </div>
+
+                <div class="hidden sm:flex items-center gap-2 text-sm text-stone-500">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                  <span>收藏文章</span>
+                </div>
+              </div>
             </div>
-          </footer>
-        </div>
-      </div>
+          </div>
 
-      <!-- 相关文章 -->
-      {relatedPosts.length > 0 && (
-        <section class="mt-16 pt-16 border-t border-stone-200">
-          <h2 class="text-2xl font-bold text-stone-900 mb-8">相关文章</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {relatedPosts.map(post => (
-              <a
-                href={`${base}/blog/${post.slug}`}
-                class="group block p-6 bg-white rounded-xl border border-stone-200 hover:border-emerald-300 hover:shadow-lg transition-all"
-              >
-                <h3 class="font-bold text-stone-900 group-hover:text-emerald-600 transition-colors mb-2">
-                  {post.data.title}
-                </h3>
-                <p class="text-sm text-stone-500 line-clamp-2">
-                  {post.data.description}
+          <!-- 相关文章推荐 -->
+          {relatedPosts.length > 0 && (
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+              <div class="p-6 md:p-8">
+                <h2 class="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                  </svg>
+                  相关文章推荐
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {relatedPosts.map(post => (
+                    <a
+                      href={`${base}/blog/${post.slug}`}
+                      class="group block p-4 rounded-xl border border-stone-100 hover:border-emerald-200 hover:bg-emerald-50/50 transition-all"
+                    >
+                      <h3 class="font-semibold text-stone-900 group-hover:text-emerald-600 transition-colors mb-2 line-clamp-2">
+                        {post.data.title}
+                      </h3>
+                      <p class="text-sm text-stone-500 line-clamp-2">
+                        {post.data.description}
+                      </p>
+                      <div class="mt-3 text-xs text-stone-400">
+                        {post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </article>
+
+        <!-- 右侧信息栏（桌面端） -->
+        <aside class="hidden xl:block w-72 shrink-0">
+          <div class="sticky top-24 space-y-6">
+            <!-- 作者信息卡片 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+              <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                  <div class="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-xl">
+                    {frontmatter.author[0]}
+                  </div>
+                  <div>
+                    <div class="font-bold text-stone-900">{frontmatter.author}</div>
+                    <div class="text-sm text-stone-500">{frontmatter.category || '技术博客'}</div>
+                  </div>
+                </div>
+                <p class="text-sm text-stone-600 mb-4">
+                  热爱技术与设计的开发者，分享前端开发、UI/UX 设计和个人成长的见解。
                 </p>
-              </a>
-            ))}
+                <a
+                  href={`${base}/about`}
+                  class="block w-full text-center px-4 py-2 bg-emerald-500 text-white text-sm font-medium rounded-lg hover:bg-emerald-600 transition-colors"
+                >
+                  关注作者
+                </a>
+              </div>
+            </div>
+
+            <!-- 目录卡片 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden xl:hidden">
+              <div class="p-6">
+                <h3 class="text-sm font-semibold text-stone-900 mb-4">目录</h3>
+                <TableOfContents headings={headings} />
+              </div>
+            </div>
+
+            <!-- 热门标签 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+              <div class="p-6">
+                <h3 class="text-sm font-semibold text-stone-900 mb-4">热门标签</h3>
+                <div class="flex flex-wrap gap-2">
+                  {frontmatter.tags.map(tag => (
+                    <a
+                      href={`${base}/tags/${tag}`}
+                      class="px-3 py-1 text-xs bg-stone-100 text-stone-600 rounded-full hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                    >
+                      {tag}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-        </section>
-      )}
-    </article>
+        </aside>
+      </div>
+    </div>
   </main>
 
   <Footer />
 </Layout>
+
+<script>
+  // 复制链接功能
+  const copyLinkBtn = document.getElementById('copy-link-btn');
+  copyLinkBtn?.addEventListener('click', () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      const span = copyLinkBtn.querySelector('span');
+      if (span) {
+        span.textContent = '已复制！';
+        setTimeout(() => {
+          span.textContent = '复制链接';
+        }, 2000);
+      }
+    });
+  });
+
+  // 点赞功能
+  const likeBtn = document.getElementById('like-btn');
+  let liked = false;
+  likeBtn?.addEventListener('click', () => {
+    liked = !liked;
+    if (liked) {
+      likeBtn.classList.add('bg-red-50', 'text-red-500');
+      likeBtn.classList.remove('bg-stone-100');
+    } else {
+      likeBtn.classList.remove('bg-red-50', 'text-red-500');
+      likeBtn.classList.add('bg-stone-100');
+    }
+  });
+</script>
+
+<style>
+  /* KaTeX 公式样式优化 */
+  :global(.katex) {
+    font-size: 1.1em;
+  }
+
+  :global(.katex-display) {
+    margin: 1.5em 0;
+    padding: 1em;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    border-radius: 0.75rem;
+    border-left: 4px solid #10b981;
+    overflow-x: auto;
+  }
+
+  :global(.katex-display > .katex) {
+    white-space: normal;
+  }
+
+  /* 代码块样式优化 */
+  :global(pre) {
+    position: relative;
+  }
+
+  :global(pre::before) {
+    content: attr(data-lang);
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0.25rem;
+  }
+</style>
