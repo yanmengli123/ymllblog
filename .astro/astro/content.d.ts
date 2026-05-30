@@ -140,7 +140,65 @@ declare module 'astro:content' {
 	>;
 
 	type ContentEntryMap = {
-		
+		"blog": {
+"build-blog-with-astro.md": {
+	id: "build-blog-with-astro.md";
+  slug: "build-blog-with-astro";
+  body: string;
+  collection: "blog";
+  data: any
+} & { render(): Render[".md"] };
+"css-grid-guide.md": {
+	id: "css-grid-guide.md";
+  slug: "css-grid-guide";
+  body: string;
+  collection: "blog";
+  data: any
+} & { render(): Render[".md"] };
+"framer-motion-tutorial.md": {
+	id: "framer-motion-tutorial.md";
+  slug: "framer-motion-tutorial";
+  body: string;
+  collection: "blog";
+  data: any
+} & { render(): Render[".md"] };
+"git-workflow.md": {
+	id: "git-workflow.md";
+  slug: "git-workflow";
+  body: string;
+  collection: "blog";
+  data: any
+} & { render(): Render[".md"] };
+"react-19-features.md": {
+	id: "react-19-features.md";
+  slug: "react-19-features";
+  body: string;
+  collection: "blog";
+  data: any
+} & { render(): Render[".md"] };
+"tailwind-design-system.md": {
+	id: "tailwind-design-system.md";
+  slug: "tailwind-design-system";
+  body: string;
+  collection: "blog";
+  data: any
+} & { render(): Render[".md"] };
+"typescript-advanced-types.md": {
+	id: "typescript-advanced-types.md";
+  slug: "typescript-advanced-types";
+  body: string;
+  collection: "blog";
+  data: any
+} & { render(): Render[".md"] };
+"web-performance.md": {
+	id: "web-performance.md";
+  slug: "web-performance";
+  body: string;
+  collection: "blog";
+  data: any
+} & { render(): Render[".md"] };
+};
+
 	};
 
 	type DataEntryMap = {

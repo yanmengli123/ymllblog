@@ -1,64 +1,16 @@
 ---
+import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import AnimatedPostCard from '../../components/AnimatedPostCard';
+import PostCard from '../../components/PostCard.astro';
 
-const allPosts = [
-  {
-    title: '使用 Astro 构建高性能博客',
-    description: '深入了解如何利用 Astro 的岛屿架构打造极致性能的现代博客，实现毫秒级页面加载和完美的 SEO 表现。',
-    date: '2024-01-15',
-    tags: ['Astro', '性能优化', '前端'],
-    slug: 'build-blog-with-astro',
-    readingTime: '8 分钟',
-    image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80',
-  },
-  {
-    title: 'Tailwind CSS 设计系统最佳实践',
-    description: '掌握 Tailwind CSS 的设计系统配置，创建一致且可维护的用户界面，提升开发效率。',
-    date: '2024-01-10',
-    tags: ['Tailwind', 'CSS', '设计系统'],
-    slug: 'tailwind-design-system',
-    readingTime: '6 分钟',
-    image: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&q=80',
-  },
-  {
-    title: 'React 19 新特性抢先看',
-    description: '探索 React 19 带来的革命性特性，包括 Server Components、Actions 和新的 Hooks。',
-    date: '2024-01-05',
-    tags: ['React', '前端', 'JavaScript'],
-    slug: 'react-19-features',
-    readingTime: '10 分钟',
-    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',
-  },
-  {
-    title: 'TypeScript 高级类型体操',
-    description: '深入 TypeScript 类型系统，掌握泛型、条件类型、映射类型等高级特性。',
-    date: '2023-12-28',
-    tags: ['TypeScript', '类型系统'],
-    slug: 'typescript-advanced-types',
-    readingTime: '12 分钟',
-  },
-  {
-    title: 'Framer Motion 动效实战',
-    description: '使用 Framer Motion 创建流畅的用户界面动画，提升用户体验。',
-    date: '2023-12-20',
-    tags: ['Framer Motion', 'React', '动效'],
-    slug: 'framer-motion-tutorial',
-    readingTime: '7 分钟',
-  },
-  {
-    title: 'Git 工作流最佳实践',
-    description: '掌握 Git Flow、GitHub Flow 等工作流，提升团队协作效率。',
-    date: '2023-12-15',
-    tags: ['Git', '工具', '协作'],
-    slug: 'git-workflow',
-    readingTime: '5 分钟',
-  },
-];
+// 获取所有已发布的文章
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
-const tags = ['全部', '前端', 'React', 'Astro', 'TypeScript', 'Tailwind', '设计系统', '性能优化'];
+// 获取所有标签
+const tags = ['全部', ...new Set(posts.flatMap(post => post.data.tags))];
 ---
 
 <Layout title="博客文章 - YMLL Blog" description="探索技术与设计的最新见解">
@@ -66,16 +18,19 @@ const tags = ['全部', '前端', 'React', 'Astro', 'TypeScript', 'Tailwind', '�
 
   <main class="pt-24 pb-16">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Page header */}
+      <!-- 页面头部 -->
       <div class="mb-12">
         <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-4">博客文章</h1>
-        <p class="text-lg text-stone-600">探索技术与设计的最新见解，分享我的学习和成长</p>
+        <p class="text-lg text-stone-600">
+          共 <span class="text-emerald-600 font-bold">{posts.length}</span> 篇文章，探索技术与设计的最新见解
+        </p>
       </div>
 
-      {/* Filter tags */}
+      <!-- 筛选标签 -->
       <div class="flex flex-wrap gap-2 mb-10 pb-8 border-b border-stone-200">
         {tags.map((tag, index) => (
-          <button
+          <a
+            href={tag === '全部' ? '/blog' : `/tags/${tag}`}
             class:list={[
               'px-4 py-2 text-sm font-medium rounded-lg transition-all',
               index === 0
@@ -84,45 +39,29 @@ const tags = ['全部', '前端', 'React', 'Astro', 'TypeScript', 'Tailwind', '�
             ]}
           >
             {tag}
-          </button>
+          </a>
         ))}
       </div>
 
-      {/* Posts grid */}
+      <!-- 文章网格 -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {allPosts.map((post, index) => (
-          <AnimatedPostCard
-            client:load
-            title={post.title}
-            description={post.description}
-            date={post.date}
-            tags={post.tags}
+        {posts.map(post => (
+          <PostCard
+            title={post.data.title}
+            description={post.data.description}
+            date={post.data.pubDate.toISOString()}
+            tags={post.data.tags}
             slug={post.slug}
-            readingTime={post.readingTime}
-            image={post.image}
-            index={index}
+            image={post.data.cover}
           />
         ))}
       </div>
 
-      {/* Pagination */}
-      <div class="flex items-center justify-center gap-2 mt-16">
-        <button class="px-4 py-2 text-sm font-medium text-stone-500 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors" disabled>
-          上一页
-        </button>
-        <button class="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-lg">
-          1
-        </button>
-        <button class="px-4 py-2 text-sm font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
-          2
-        </button>
-        <button class="px-4 py-2 text-sm font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
-          3
-        </button>
-        <button class="px-4 py-2 text-sm font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
-          下一页
-        </button>
-      </div>
+      {posts.length === 0 && (
+        <div class="text-center py-20">
+          <p class="text-stone-500 text-lg">暂无文章</p>
+        </div>
+      )}
     </div>
   </main>
 

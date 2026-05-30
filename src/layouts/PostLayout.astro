@@ -1,0 +1,205 @@
+---
+import Layout from './Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import { calculateReadingTime } from '../lib/reading-time';
+import { getRelatedPosts, getPageURL } from '../lib/posts';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    description: string;
+    pubDate: Date;
+    updatedDate?: Date;
+    author: string;
+    tags: string[];
+    category?: string;
+    cover?: string;
+    draft: boolean;
+    featured: boolean;
+    lang: string;
+  };
+  headings: {
+    depth: number;
+    slug: string;
+    text: string;
+  }[];
+  slug: string;
+}
+
+const { frontmatter, headings, slug } = Astro.props;
+
+const formattedDate = frontmatter.pubDate.toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const updatedDate = frontmatter.updatedDate?.toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const relatedPosts = await getRelatedPosts({ slug, data: { tags: frontmatter.tags } } as any, 3);
+---
+
+<Layout
+  title={`${frontmatter.title} - YMLL Blog`}
+  description={frontmatter.description}
+  image={frontmatter.cover}
+  type="article"
+  publishedTime={frontmatter.pubDate}
+  updatedTime={frontmatter.updatedDate}
+  author={frontmatter.author}
+  tags={frontmatter.tags}
+>
+  <Header />
+
+  <main class="pt-24 pb-16">
+    <article class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 文章头部 -->
+      <header class="mb-12">
+        <!-- 标签 -->
+        <div class="flex flex-wrap gap-2 mb-6">
+          {frontmatter.tags.map(tag => (
+            <a
+              href={`/tags/${tag}`}
+              class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-sm font-medium hover:bg-emerald-100 transition-colors"
+            >
+              {tag}
+            </a>
+          ))}
+        </div>
+
+        <!-- 标题 -->
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-stone-900 mb-6 leading-tight">
+          {frontmatter.title}
+        </h1>
+
+        <!-- 描述 -->
+        <p class="text-xl text-stone-600 mb-8 max-w-3xl">
+          {frontmatter.description}
+        </p>
+
+        <!-- 元信息 -->
+        <div class="flex flex-wrap items-center gap-6 text-stone-500">
+          <div class="flex items-center gap-2">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold">
+              {frontmatter.author[0]}
+            </div>
+            <div>
+              <div class="font-medium text-stone-900">{frontmatter.author}</div>
+              <div class="text-sm">{frontmatter.category || '技术'}</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <time datetime={frontmatter.pubDate.toISOString()} class="flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {formattedDate}
+            </time>
+
+            {updatedDate && (
+              <span class="text-sm">(更新于 {updatedDate})</span>
+            )}
+          </div>
+        </div>
+
+        <!-- 封面图 -->
+        {frontmatter.cover && (
+          <div class="mt-8 rounded-2xl overflow-hidden">
+            <img
+              src={frontmatter.cover}
+              alt={frontmatter.title}
+              class="w-full h-auto object-cover"
+              loading="eager"
+            />
+          </div>
+        )}
+      </header>
+
+      <!-- 文章内容 + 目录 -->
+      <div class="flex gap-12">
+        <!-- 侧边目录 -->
+        <aside class="hidden lg:block w-64 shrink-0">
+          <div class="sticky top-24">
+            <TableOfContents headings={headings} />
+          </div>
+        </aside>
+
+        <!-- 正文 -->
+        <div class="flex-1 min-w-0">
+          <div class="prose prose-lg prose-stone max-w-none">
+            <slot />
+          </div>
+
+          <!-- 文章底部 -->
+          <footer class="mt-16 pt-8 border-t border-stone-200">
+            <!-- 标签 -->
+            <div class="flex flex-wrap gap-2 mb-8">
+              {frontmatter.tags.map(tag => (
+                <a
+                  href={`/tags/${tag}`}
+                  class="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                >
+                  #{tag}
+                </a>
+              ))}
+            </div>
+
+            <!-- 分享 -->
+            <div class="flex items-center gap-4 mb-8">
+              <span class="text-stone-500">分享文章：</span>
+              <button
+                onclick={`window.open('https://twitter.com/intent/tweet?text=${encodeURIComponent(frontmatter.title)}&url=${encodeURIComponent(getPageURL(`/blog/${slug}`))}', '_blank')`}
+                class="p-2 rounded-lg bg-stone-100 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                title="分享到 Twitter"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                </svg>
+              </button>
+              <button
+                onclick={`navigator.clipboard.writeText('${getPageURL(`/blog/${slug}`)}'); alert('链接已复制')`}
+                class="p-2 rounded-lg bg-stone-100 hover:bg-stone-200 transition-colors"
+                title="复制链接"
+              >
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              </button>
+            </div>
+          </footer>
+        </div>
+      </div>
+
+      <!-- 相关文章 -->
+      {relatedPosts.length > 0 && (
+        <section class="mt-16 pt-16 border-t border-stone-200">
+          <h2 class="text-2xl font-bold text-stone-900 mb-8">相关文章</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {relatedPosts.map(post => (
+              <a
+                href={`/blog/${post.slug}`}
+                class="group block p-6 bg-white rounded-xl border border-stone-200 hover:border-emerald-300 hover:shadow-lg transition-all"
+              >
+                <h3 class="font-bold text-stone-900 group-hover:text-emerald-600 transition-colors mb-2">
+                  {post.data.title}
+                </h3>
+                <p class="text-sm text-stone-500 line-clamp-2">
+                  {post.data.description}
+                </p>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </article>
+  </main>
+
+  <Footer />
+</Layout>

@@ -10,4 +10,10 @@ export default defineConfig({
     react(),
   ],
   output: 'static',
+  markdown: {
+    shikiConfig: {
+      theme: 'github-dark',
+      wrap: true,
+    },
+  },
 });

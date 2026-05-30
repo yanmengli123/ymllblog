@@ -1,19 +1,44 @@
 ---
+import { getPageURL, getImageURL, generateJSONLD } from '../lib/seo';
+
 interface Props {
   title?: string;
   description?: string;
   image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: Date;
+  updatedTime?: Date;
+  author?: string;
+  tags?: string[];
 }
 
 const {
   title = 'YMLL Blog',
   description = '探索技术与设计的交汇点，记录成长与思考',
-  image = '/og-image.png'
+  image = '/og-image.png',
+  type = 'website',
+  publishedTime,
+  updatedTime,
+  author,
+  tags,
 } = Astro.props;
 
-const siteUrl = Astro.site?.href || 'https://yanmengli123.github.io/ymllblog/';
-const canonicalURL = new URL(Astro.url.pathname, siteUrl);
-const ogImage = new URL(image, siteUrl);
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImage = getImageURL(image);
+const siteURL = getPageURL('');
+
+// 生成 JSON-LD
+const jsonLD = generateJSONLD({
+  title,
+  description,
+  image,
+  canonicalURL,
+  type,
+  publishedTime,
+  updatedTime,
+  author,
+  tags,
+});
 ---
 
 <!doctype html>
@@ -24,30 +49,57 @@ const ogImage = new URL(image, siteUrl);
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
+    {/* Open Graph */}
+    <meta property="og:type" content={type} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content="YMLL Blog" />
+    <meta property="og:locale" content="zh_CN" />
 
-    <!-- Twitter -->
+    {type === 'article' && publishedTime && (
+      <meta property="article:published_time" content={publishedTime.toISOString()} />
+    )}
+    {type === 'article' && updatedTime && (
+      <meta property="article:modified_time" content={updatedTime.toISOString()} />
+    )}
+    {type === 'article' && author && (
+      <meta property="article:author" content={author} />
+    )}
+    {type === 'article' && tags && tags.map(tag => (
+      <meta property="article:tag" content={tag} />
+    ))}
+
+    {/* Twitter */}
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalURL} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={ogImage} />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {/* Canonical URL */}
     <link rel="canonical" href={canonicalURL} />
+
+    {/* RSS Feed */}
+    <link rel="alternate" type="application/rss+xml" title="YMLL Blog RSS" href={`${siteURL}rss.xml`} />
+
+    {/* Favicon */}
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+
+    {/* Title */}
     <title>{title}</title>
 
-    <!-- Preload fonts -->
+    {/* Preload fonts */}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    {/* JSON-LD */}
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLD)} />
   </head>
   <body class="bg-stone-50 text-stone-900 font-sans antialiased selection:bg-emerald-500 selection:text-white">
-    <!-- Background gradient -->
+    {/* Background gradient */}
     <div class="fixed inset-0 -z-10">
       <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-white to-amber-50/30"></div>
       <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-b from-emerald-100/20 to-transparent rounded-full blur-3xl"></div>
@@ -56,7 +108,7 @@ const ogImage = new URL(image, siteUrl);
 
     <slot />
 
-    <!-- Smooth scroll script -->
+    {/* Smooth scroll script */}
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const observer = new IntersectionObserver((entries) => {

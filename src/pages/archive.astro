@@ -1,25 +1,25 @@
 ---
+import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
-const postsByYear = {
-  '2024': [
-    { title: '使用 Astro 构建高性能博客', date: '2024-01-15', slug: 'build-blog-with-astro', tags: ['Astro', '前端'] },
-    { title: 'Tailwind CSS 设计系统最佳实践', date: '2024-01-10', slug: 'tailwind-design-system', tags: ['Tailwind', 'CSS'] },
-    { title: 'React 19 新特性抢先看', date: '2024-01-05', slug: 'react-19-features', tags: ['React', 'JavaScript'] },
-  ],
-  '2023': [
-    { title: 'TypeScript 高级类型体操', date: '2023-12-28', slug: 'typescript-advanced-types', tags: ['TypeScript'] },
-    { title: 'Framer Motion 动效实战', date: '2023-12-20', slug: 'framer-motion-tutorial', tags: ['Framer Motion', 'React'] },
-    { title: 'Git 工作流最佳实践', date: '2023-12-15', slug: 'git-workflow', tags: ['Git', '工具'] },
-    { title: 'Web 性能优化指南', date: '2023-11-28', slug: 'web-performance', tags: ['性能优化', '前端'] },
-    { title: 'CSS Grid 布局完全指南', date: '2023-11-15', slug: 'css-grid-guide', tags: ['CSS', '布局'] },
-  ],
-};
+// 获取所有已发布文章
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
-const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
-const totalPosts = Object.values(postsByYear).flat().length;
+// 按年份分组
+const postsByYear = new Map<number, typeof posts>();
+posts.forEach(post => {
+  const year = post.data.pubDate.getFullYear();
+  if (!postsByYear.has(year)) {
+    postsByYear.set(year, []);
+  }
+  postsByYear.get(year)!.push(post);
+});
+
+const years = Array.from(postsByYear.keys()).sort((a, b) => b - a);
+const totalPosts = posts.length;
 ---
 
 <Layout title="归档 - YMLL Blog" description="按时间线浏览所有文章">
@@ -27,7 +27,7 @@ const totalPosts = Object.values(postsByYear).flat().length;
 
   <main class="pt-24 pb-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Page header */}
+      <!-- 页面头部 -->
       <div class="text-center mb-16">
         <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-4">文章归档</h1>
         <p class="text-lg text-stone-600">
@@ -35,59 +35,62 @@ const totalPosts = Object.values(postsByYear).flat().length;
         </p>
       </div>
 
-      {/* Timeline */}
+      {/* 时间线 */}
       <div class="relative">
-        {/* Vertical line */}
+        {/* 垂直线 */}
         <div class="absolute left-8 md:left-12 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500 via-emerald-200 to-transparent"></div>
 
-        {years.map(year => (
-          <div class="mb-16 last:mb-0">
-            {/* Year header */}
-            <div class="flex items-center gap-4 mb-8">
-              <div class="relative z-10 w-16 h-16 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                <span class="text-white text-2xl md:text-3xl font-bold">{year}</span>
-              </div>
-              <div>
-                <h2 class="text-2xl font-bold text-stone-900">{year} 年</h2>
-                <p class="text-stone-500">{postsByYear[year].length} 篇文章</p>
-              </div>
-            </div>
-
-            {/* Posts */}
-            <div class="space-y-4 pl-20 md:pl-32">
-              {postsByYear[year].map((post, index) => (
-                <div class="group relative">
-                  {/* Dot on timeline */}
-                  <div class="absolute -left-[44px] md:-left-[68px] top-4 w-3 h-3 bg-emerald-500 rounded-full ring-4 ring-white"></div>
-
-                  {/* Post card */}
-                  <a
-                    href={`/blog/${post.slug}`}
-                    class="block p-5 bg-white rounded-xl border border-stone-200 hover:border-emerald-300 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-                  >
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                      <time datetime={post.date} class="text-sm text-stone-400 shrink-0">
-                        {new Date(post.date).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
-                      </time>
-                      <h3 class="text-base font-medium text-stone-800 group-hover:text-emerald-600 transition-colors">
-                        {post.title}
-                      </h3>
-                    </div>
-                    {post.tags && (
-                      <div class="flex flex-wrap gap-2 mt-3">
-                        {post.tags.map(tag => (
-                          <span class="px-2 py-1 text-xs bg-stone-100 text-stone-500 rounded-md">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </a>
+        {years.map(year => {
+          const yearPosts = postsByYear.get(year) || [];
+          return (
+            <div class="mb-16 last:mb-0">
+              {/* 年份标题 */}
+              <div class="flex items-center gap-4 mb-8">
+                <div class="relative z-10 w-16 h-16 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                  <span class="text-white text-2xl md:text-3xl font-bold">{year}</span>
                 </div>
-              ))}
+                <div>
+                  <h2 class="text-2xl font-bold text-stone-900">{year} 年</h2>
+                  <p class="text-stone-500">{yearPosts.length} 篇文章</p>
+                </div>
+              </div>
+
+              {/* 文章列表 */}
+              <div class="space-y-4 pl-20 md:pl-32">
+                {yearPosts.map(post => (
+                  <div class="group relative">
+                    {/* 时间线上的点 */}
+                    <div class="absolute -left-[44px] md:-left-[68px] top-4 w-3 h-3 bg-emerald-500 rounded-full ring-4 ring-white"></div>
+
+                    {/* 文章卡片 */}
+                    <a
+                      href={`/blog/${post.slug}`}
+                      class="block p-5 bg-white rounded-xl border border-stone-200 hover:border-emerald-300 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                    >
+                      <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <time datetime={post.data.pubDate.toISOString()} class="text-sm text-stone-400 shrink-0">
+                          {post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
+                        </time>
+                        <h3 class="text-base font-medium text-stone-800 group-hover:text-emerald-600 transition-colors">
+                          {post.data.title}
+                        </h3>
+                      </div>
+                      {post.data.tags.length > 0 && (
+                        <div class="flex flex-wrap gap-2 mt-3">
+                          {post.data.tags.slice(0, 3).map(tag => (
+                            <span class="px-2 py-1 text-xs bg-stone-100 text-stone-500 rounded-md">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </a>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   </main>
