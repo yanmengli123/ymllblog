@@ -1,0 +1,106 @@
+---
+---
+
+<section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-20">
+  <!-- Background decoration -->
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute top-20 left-10 w-72 h-72 bg-emerald-200/30 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-20 right-10 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-emerald-100/10 to-teal-100/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Grid pattern background -->
+  <div class="absolute inset-0 -z-10 opacity-[0.03]" style="background-image: radial-gradient(circle at 1px 1px, #1a1a1a 1px, transparent 0); background-size: 40px 40px;"></div>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <!-- Greeting -->
+    <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-stone-200/60 shadow-sm mb-8 animate-on-scroll">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      </span>
+      <span class="text-sm text-stone-600">欢迎来到我的数字空间</span>
+    </div>
+
+    <!-- Main heading -->
+    <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-stone-900 mb-8 animate-on-scroll">
+      <span class="block">你好，我是</span>
+      <span class="block mt-2">
+        <span class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+          YMLL
+        </span>
+      </span>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="text-lg sm:text-xl md:text-2xl text-stone-600 max-w-3xl mx-auto mb-12 leading-relaxed animate-on-scroll">
+      热爱技术与设计的开发者，在这里记录<span class="text-stone-900 font-medium">前端工程</span>、
+      <span class="text-stone-900 font-medium">UI/UX 设计</span>和
+      <span class="text-stone-900 font-medium">个人成长</span>的思考
+    </p>
+
+    <!-- CTA buttons -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-on-scroll">
+      <a
+        href="/blog"
+        class="group relative inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium rounded-2xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all hover:-translate-y-0.5 overflow-hidden"
+      >
+        <span class="relative z-10">探索文章</span>
+        <svg class="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+        <div class="absolute inset-0 bg-gradient-to-r from-teal-600 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+      </a>
+      <a
+        href="/about"
+        class="inline-flex items-center gap-2 px-8 py-4 bg-white text-stone-700 font-medium rounded-2xl border border-stone-200 hover:border-stone-300 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+      >
+        了解更多
+      </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-3 gap-8 max-w-lg mx-auto mt-20 animate-on-scroll">
+      <div class="text-center">
+        <div class="text-3xl font-bold text-stone-900">12+</div>
+        <div class="text-sm text-stone-500 mt-1">篇文章</div>
+      </div>
+      <div class="text-center border-x border-stone-200">
+        <div class="text-3xl font-bold text-stone-900">5+</div>
+        <div class="text-sm text-stone-500 mt-1">个标签</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-stone-900">2+</div>
+        <div class="text-sm text-stone-500 mt-1">年经验</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+    <div class="w-6 h-10 rounded-full border-2 border-stone-300 flex items-start justify-center p-1.5">
+      <div class="w-1.5 h-3 bg-stone-400 rounded-full animate-scroll"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes scroll {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(12px); opacity: 0; }
+  }
+
+  .animate-gradient {
+    animation: gradient 3s ease infinite;
+  }
+
+  .animate-scroll {
+    animation: scroll 1.5s ease-in-out infinite;
+  }
+</style>

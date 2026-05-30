@@ -4,43 +4,67 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 
 const tags = [
-  { name: 'Astro', count: 5 },
-  { name: 'React', count: 8 },
-  { name: 'TypeScript', count: 6 },
-  { name: 'Tailwind', count: 4 },
-  { name: '前端', count: 12 },
-  { name: '技术', count: 10 },
-  { name: '设计', count: 3 },
-  { name: 'CSS', count: 7 },
-  { name: 'JavaScript', count: 9 },
-  { name: 'Node.js', count: 4 },
+  { name: '前端', count: 12, description: 'Web 前端开发技术', color: 'from-emerald-500 to-teal-600' },
+  { name: 'React', count: 8, description: 'React 框架与生态系统', color: 'from-blue-500 to-cyan-600' },
+  { name: 'Astro', count: 5, description: 'Astro 框架开发', color: 'from-orange-500 to-red-600' },
+  { name: 'TypeScript', count: 6, description: 'TypeScript 类型系统', color: 'from-blue-600 to-indigo-600' },
+  { name: 'Tailwind', count: 4, description: 'Tailwind CSS 框架', color: 'from-teal-500 to-emerald-600' },
+  { name: '设计系统', count: 3, description: 'UI/UX 设计与系统', color: 'from-purple-500 to-pink-600' },
+  { name: '性能优化', count: 4, description: 'Web 性能优化策略', color: 'from-yellow-500 to-orange-600' },
+  { name: 'JavaScript', count: 9, description: 'JavaScript 语言特性', color: 'from-amber-500 to-yellow-600' },
+  { name: 'CSS', count: 7, description: 'CSS 样式与布局', color: 'from-pink-500 to-rose-600' },
+  { name: 'Git', count: 3, description: '版本控制工具', color: 'from-red-500 to-orange-600' },
 ];
 ---
 
-<Layout title="YMLL Blog - 标签">
+<Layout title="标签 - YMLL Blog" description="通过标签探索感兴趣的内容">
   <Header />
 
-  <main class="pt-16">
-    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 class="text-3xl font-bold text-text dark:text-text-dark mb-2">标签</h1>
-      <p class="text-text-muted dark:text-gray-400 mb-10">共 {tags.length} 个标签</p>
+  <main class="pt-24 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Page header */}
+      <div class="text-center mb-16">
+        <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-4">探索标签</h1>
+        <p class="text-lg text-stone-600 max-w-2xl mx-auto">
+          通过标签快速定位你感兴趣的内容，发现更多技术见解
+        </p>
+      </div>
 
-      <div class="flex flex-wrap gap-4">
-        {tags.map(tag => (
+      {/* Tags grid */}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {tags.map((tag, index) => (
           <a
             href={`/tags/${tag.name}`}
-            class="group flex items-center gap-2 px-4 py-2 bg-surface dark:bg-surface-dark rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+            class="group relative bg-white rounded-2xl p-6 border border-stone-200 hover:border-emerald-300 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+            style={`animation-delay: ${index * 50}ms`}
           >
-            <span class="text-lg font-medium text-text dark:text-text-dark group-hover:text-primary transition-colors">
+            {/* Background gradient on hover */}
+            <div class="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-5 transition-opacity duration-500 ${tag.color}"></div>
+
+            {/* Icon */}
+            <div class={`w-12 h-12 rounded-xl bg-gradient-to-br ${tag.color} flex items-center justify-center mb-4 shadow-lg`}>
+              <span class="text-white text-xl font-bold">{tag.name[0]}</span>
+            </div>
+
+            {/* Content */}
+            <h3 class="text-xl font-bold text-stone-900 mb-2 group-hover:text-emerald-600 transition-colors">
               {tag.name}
-            </span>
-            <span class="text-sm text-text-muted bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
-              {tag.count}
-            </span>
+            </h3>
+            <p class="text-sm text-stone-500 mb-4">{tag.description}</p>
+
+            {/* Count */}
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-stone-400">
+                {tag.count} 篇文章
+              </span>
+              <span class="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
+                查看 →
+              </span>
+            </div>
           </a>
         ))}
       </div>
-    </section>
+    </div>
   </main>
 
   <Footer />

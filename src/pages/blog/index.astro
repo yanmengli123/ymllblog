@@ -6,57 +6,90 @@ import AnimatedPostCard from '../../components/AnimatedPostCard';
 
 const allPosts = [
   {
-    title: '欢迎来到 YMLL Blog',
-    description: '这是一个使用 Astro + Tailwind CSS + Framer Motion 构建的企业级个人博客。',
+    title: '使用 Astro 构建高性能博客',
+    description: '深入了解如何利用 Astro 的岛屿架构打造极致性能的现代博客，实现毫秒级页面加载和完美的 SEO 表现。',
     date: '2024-01-15',
-    tags: ['博客', '技术'],
-    slug: 'welcome',
-    readingTime: '2 分钟',
+    tags: ['Astro', '性能优化', '前端'],
+    slug: 'build-blog-with-astro',
+    readingTime: '8 分钟',
+    image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80',
   },
   {
-    title: 'Astro 岛屿架构详解',
-    description: '深入了解 Astro 的岛屿架构，以及如何用它构建高性能网站。',
+    title: 'Tailwind CSS 设计系统最佳实践',
+    description: '掌握 Tailwind CSS 的设计系统配置，创建一致且可维护的用户界面，提升开发效率。',
     date: '2024-01-10',
-    tags: ['Astro', '前端'],
-    slug: 'astro-islands',
-    readingTime: '5 分钟',
-  },
-  {
-    title: 'Tailwind CSS 最佳实践',
-    description: '掌握 Tailwind CSS 的设计系统和组件化开发技巧。',
-    date: '2024-01-05',
-    tags: ['CSS', 'Tailwind'],
-    slug: 'tailwind-best-practices',
-    readingTime: '4 分钟',
-  },
-  {
-    title: 'React Hooks 深入理解',
-    description: '从原理到实践，全面掌握 React Hooks 的使用技巧。',
-    date: '2023-12-28',
-    tags: ['React', '前端'],
-    slug: 'react-hooks',
+    tags: ['Tailwind', 'CSS', '设计系统'],
+    slug: 'tailwind-design-system',
     readingTime: '6 分钟',
+    image: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&q=80',
+  },
+  {
+    title: 'React 19 新特性抢先看',
+    description: '探索 React 19 带来的革命性特性，包括 Server Components、Actions 和新的 Hooks。',
+    date: '2024-01-05',
+    tags: ['React', '前端', 'JavaScript'],
+    slug: 'react-19-features',
+    readingTime: '10 分钟',
+    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',
   },
   {
     title: 'TypeScript 高级类型体操',
-    description: '探索 TypeScript 类型系统的强大能力，提升代码类型安全。',
-    date: '2023-12-20',
-    tags: ['TypeScript', '类型'],
+    description: '深入 TypeScript 类型系统，掌握泛型、条件类型、映射类型等高级特性。',
+    date: '2023-12-28',
+    tags: ['TypeScript', '类型系统'],
     slug: 'typescript-advanced-types',
+    readingTime: '12 分钟',
+  },
+  {
+    title: 'Framer Motion 动效实战',
+    description: '使用 Framer Motion 创建流畅的用户界面动画，提升用户体验。',
+    date: '2023-12-20',
+    tags: ['Framer Motion', 'React', '动效'],
+    slug: 'framer-motion-tutorial',
     readingTime: '7 分钟',
   },
+  {
+    title: 'Git 工作流最佳实践',
+    description: '掌握 Git Flow、GitHub Flow 等工作流，提升团队协作效率。',
+    date: '2023-12-15',
+    tags: ['Git', '工具', '协作'],
+    slug: 'git-workflow',
+    readingTime: '5 分钟',
+  },
 ];
+
+const tags = ['全部', '前端', 'React', 'Astro', 'TypeScript', 'Tailwind', '设计系统', '性能优化'];
 ---
 
-<Layout title="YMLL Blog - 博客">
+<Layout title="博客文章 - YMLL Blog" description="探索技术与设计的最新见解">
   <Header />
 
-  <main class="pt-16">
-    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 class="text-3xl font-bold text-text dark:text-text-dark mb-2">博客文章</h1>
-      <p class="text-text-muted dark:text-gray-400 mb-10">共 {allPosts.length} 篇文章</p>
+  <main class="pt-24 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Page header */}
+      <div class="mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-4">博客文章</h1>
+        <p class="text-lg text-stone-600">探索技术与设计的最新见解，分享我的学习和成长</p>
+      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Filter tags */}
+      <div class="flex flex-wrap gap-2 mb-10 pb-8 border-b border-stone-200">
+        {tags.map((tag, index) => (
+          <button
+            class:list={[
+              'px-4 py-2 text-sm font-medium rounded-lg transition-all',
+              index === 0
+                ? 'bg-emerald-500 text-white shadow-sm'
+                : 'bg-white text-stone-600 hover:bg-stone-50 border border-stone-200 hover:border-stone-300'
+            ]}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+
+      {/* Posts grid */}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {allPosts.map((post, index) => (
           <AnimatedPostCard
             client:load
@@ -66,11 +99,31 @@ const allPosts = [
             tags={post.tags}
             slug={post.slug}
             readingTime={post.readingTime}
+            image={post.image}
             index={index}
           />
         ))}
       </div>
-    </section>
+
+      {/* Pagination */}
+      <div class="flex items-center justify-center gap-2 mt-16">
+        <button class="px-4 py-2 text-sm font-medium text-stone-500 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors" disabled>
+          上一页
+        </button>
+        <button class="px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-lg">
+          1
+        </button>
+        <button class="px-4 py-2 text-sm font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
+          2
+        </button>
+        <button class="px-4 py-2 text-sm font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
+          3
+        </button>
+        <button class="px-4 py-2 text-sm font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
+          下一页
+        </button>
+      </div>
+    </div>
   </main>
 
   <Footer />

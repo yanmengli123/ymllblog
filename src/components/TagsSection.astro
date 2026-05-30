@@ -1,0 +1,33 @@
+---
+interface Props {
+  tags: { name: string; count: number }[];
+}
+
+const { tags } = Astro.props;
+---
+
+<section class="py-20 bg-gradient-to-b from-transparent to-stone-50/50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-stone-900 mb-2">探索标签</h2>
+      <p class="text-stone-500">通过标签发现感兴趣的内容</p>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-3">
+      {tags.map((tag, index) => (
+        <a
+          href={`/tags/${tag.name}`}
+          class="group relative inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-xl border border-stone-200 hover:border-emerald-300 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+          style={`animation-delay: ${index * 50}ms`}
+        >
+          <span class="text-sm font-medium text-stone-700 group-hover:text-emerald-600 transition-colors">
+            {tag.name}
+          </span>
+          <span class="px-2 py-0.5 text-xs bg-stone-100 group-hover:bg-emerald-50 text-stone-500 group-hover:text-emerald-600 rounded-full transition-colors">
+            {tag.count}
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

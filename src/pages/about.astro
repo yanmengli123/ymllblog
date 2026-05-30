@@ -4,12 +4,12 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
 const skills = [
-  { name: 'Astro', level: 90 },
-  { name: 'React', level: 85 },
-  { name: 'TypeScript', level: 80 },
-  { name: 'Tailwind CSS', level: 95 },
-  { name: 'Node.js', level: 75 },
-  { name: 'Git', level: 85 },
+  { name: 'React / Next.js', level: 95, color: 'from-blue-500 to-cyan-500' },
+  { name: 'TypeScript', level: 90, color: 'from-blue-600 to-indigo-600' },
+  { name: 'Tailwind CSS', level: 92, color: 'from-teal-500 to-emerald-500' },
+  { name: 'Node.js', level: 85, color: 'from-green-500 to-emerald-600' },
+  { name: 'Astro', level: 88, color: 'from-orange-500 to-red-500' },
+  { name: 'UI/UX Design', level: 80, color: 'from-purple-500 to-pink-500' },
 ];
 
 const experiences = [
@@ -17,88 +17,157 @@ const experiences = [
     period: '2023 - 至今',
     title: '全栈开发工程师',
     company: '自由职业',
-    description: '专注于现代 Web 技术栈，为企业和个人提供高质量的网站和应用开发服务。',
+    description: '专注于现代 Web 技术栈，为企业和个人提供高质量的网站和应用开发服务。擅长使用 React、Next.js、Astro 等框架构建高性能应用。',
+    current: true,
   },
   {
     period: '2021 - 2023',
     title: '前端开发工程师',
     company: '某科技公司',
-    description: '负责公司核心产品的前端架构设计和开发，优化用户体验和性能。',
+    description: '负责公司核心产品的前端架构设计和开发，优化用户体验和性能。带领团队完成多个重要项目的技术选型和落地。',
+    current: false,
   },
+  {
+    period: '2019 - 2021',
+    title: '初级前端开发',
+    company: '创业公司',
+    description: '参与公司 Web 应用的开发，学习并实践现代前端技术。从零开始搭建了公司的前端技术体系。',
+    current: false,
+  },
+];
+
+const stats = [
+  { value: '50+', label: '个项目' },
+  { value: '100+', label: '篇文章' },
+  { value: '5K+', label: '次提交' },
+  { value: '2+', label: '年经验' },
 ];
 ---
 
-<Layout title="YMLL Blog - 关于">
+<Layout title="关于 - YMLL Blog" description="了解我 - 热爱技术与设计的开发者">
   <Header />
 
-  <main class="pt-16">
-    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="prose">
-        <h1>关于我</h1>
-
-        <div class="flex flex-col md:flex-row gap-8 mb-12">
-          <div class="md:w-1/3">
-            <div class="aspect-square bg-gradient-to-br from-primary to-primary-700 rounded-lg flex items-center justify-center">
-              <span class="text-6xl font-bold text-white">Y</span>
-            </div>
+  <main class="pt-24 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero section */}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
+        {/* Avatar & Info */}
+        <div>
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full text-emerald-600 text-sm font-medium mb-6">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            开放合作中
           </div>
 
-          <div class="md:w-2/3">
-            <p class="text-lg">
-              你好！我是 YMLL，一个热爱技术与设计的开发者。
-            </p>
-            <p>
-              我专注于现代 Web 技术栈，喜欢探索新的技术和工具，用代码创造美好的用户体验。
-              这个博客是我记录学习、思考和创作的地方。
-            </p>
-            <p>
-              当我不在写代码的时候，你可能会发现我在阅读、摄影或者探索大自然。
-            </p>
+          <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-6">
+            你好，我是
+            <span class="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">YMLL</span>
+          </h1>
+
+          <p class="text-lg text-stone-600 leading-relaxed mb-8">
+            一个热爱技术与设计的全栈开发者。我相信优秀的代码应该像诗一样优雅，好的设计应该像水一样自然。
+            在这里，我记录我的学习、思考和创作。
+          </p>
+
+          <div class="flex flex-wrap gap-4">
+            <a
+              href="/blog"
+              class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-emerald-500/25 transition-all hover:-translate-y-0.5"
+            >
+              查看文章
+            </a>
+            <a
+              href="https://github.com/yanmengli123"
+              target="_blank"
+              class="px-6 py-3 bg-white text-stone-700 font-medium rounded-xl border border-stone-200 hover:border-stone-300 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 inline-flex items-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+              </svg>
+              GitHub
+            </a>
           </div>
         </div>
 
-        <h2>技能</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
+        {/* Avatar */}
+        <div class="flex justify-center lg:justify-end">
+          <div class="relative">
+            <div class="w-72 h-72 md:w-80 md:h-80 rounded-3xl bg-gradient-to-br from-emerald-400 to-teal-500 p-1 shadow-2xl shadow-emerald-500/25 rotate-3 hover:rotate-0 transition-transform duration-500">
+              <div class="w-full h-full rounded-3xl bg-stone-100 flex items-center justify-center overflow-hidden">
+                <div class="text-8xl">👨‍💻</div>
+              </div>
+            </div>
+            {/* Floating elements */}
+            <div class="absolute -top-4 -right-4 w-20 h-20 bg-amber-100 rounded-2xl flex items-center justify-center shadow-lg rotate-12 hover:rotate-0 transition-transform duration-300">
+              <span class="text-3xl">⚡</span>
+            </div>
+            <div class="absolute -bottom-4 -left-4 w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg -rotate-12 hover:rotate-0 transition-transform duration-300">
+              <span class="text-3xl">🎨</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-24">
+        {stats.map(stat => (
+          <div class="bg-white rounded-2xl p-6 text-center border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
+              {stat.value}
+            </div>
+            <div class="text-sm text-stone-500">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Skills */}
+      <div class="mb-24">
+        <h2 class="text-3xl font-bold text-stone-900 mb-8 text-center">技能专长</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           {skills.map(skill => (
-            <div class="flex items-center gap-4">
-              <span class="w-24 font-medium">{skill.name}</span>
-              <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+            <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-semibold text-stone-800">{skill.name}</span>
+                <span class="text-sm font-medium text-emerald-600">{skill.level}%</span>
+              </div>
+              <div class="h-3 bg-stone-100 rounded-full overflow-hidden">
                 <div
-                  class="h-full bg-primary dark:bg-primary-400 rounded-full"
+                  class={`h-full bg-gradient-to-r ${skill.color} rounded-full transition-all duration-1000 ease-out`}
                   style={`width: ${skill.level}%`}
                 />
               </div>
-              <span class="text-sm text-text-muted">{skill.level}%</span>
             </div>
           ))}
         </div>
-
-        <h2>经历</h2>
-        <div class="space-y-8 mb-12">
-          {experiences.map(exp => (
-            <div class="border-l-4 border-primary pl-4">
-              <div class="flex flex-wrap gap-2 mb-2">
-                <span class="text-sm font-medium text-primary">{exp.period}</span>
-                <span class="text-sm text-text-muted">•</span>
-                <span class="text-sm font-medium">{exp.title}</span>
-                <span class="text-sm text-text-muted">•</span>
-                <span class="text-sm text-text-muted">{exp.company}</span>
-              </div>
-              <p>{exp.description}</p>
-            </div>
-          ))}
-        </div>
-
-        <h2>联系方式</h2>
-        <p>
-          如果你有任何问题、建议或者合作意向，欢迎通过以下方式联系我：
-        </p>
-        <ul>
-          <li>GitHub: <a href="https://github.com/yanmengli123" target="_blank">@yanmengli123</a></li>
-          <li>Email: contact@example.com</li>
-        </ul>
       </div>
-    </section>
+
+      {/* Experience */}
+      <div>
+        <h2 class="text-3xl font-bold text-stone-900 mb-8 text-center">工作经历</h2>
+        <div class="space-y-8">
+          {experiences.map(exp => (
+            <div class="relative bg-white rounded-2xl p-8 border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+              {exp.current && (
+                <div class="absolute top-4 right-4 px-3 py-1 bg-emerald-50 text-emerald-600 text-xs font-medium rounded-full">
+                  当前
+                </div>
+              )}
+              <div class="flex flex-wrap items-center gap-3 mb-4">
+                <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-sm font-medium rounded-lg">
+                  {exp.period}
+                </span>
+                <span class="text-lg font-bold text-stone-900">{exp.title}</span>
+                <span class="text-stone-400">•</span>
+                <span class="text-stone-600">{exp.company}</span>
+              </div>
+              <p class="text-stone-600 leading-relaxed">{exp.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   </main>
 
   <Footer />

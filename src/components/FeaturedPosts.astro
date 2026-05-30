@@ -1,0 +1,68 @@
+---
+import PostCard from './PostCard.astro';
+
+interface Post {
+  title: string;
+  description: string;
+  date: string;
+  tags?: string[];
+  slug: string;
+  image?: string;
+  readingTime?: string;
+}
+
+interface Props {
+  posts: Post[];
+  title?: string;
+}
+
+const { posts, title = '最新文章' } = Astro.props;
+---
+
+<section class="py-20">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    {/* Section header */}
+    <div class="flex items-center justify-between mb-12">
+      <div>
+        <h2 class="text-3xl md:text-4xl font-bold text-stone-900 mb-2">{title}</h2>
+        <p class="text-stone-500">探索技术与设计的最新见解</p>
+      </div>
+      <a
+        href="/blog"
+        class="hidden sm:flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors group"
+      >
+        查看全部
+        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </a>
+    </div>
+
+    {/* Featured post */}
+    {posts.length > 0 && (
+      <div class="mb-8">
+        <PostCard {...posts[0]} featured={true} />
+      </div>
+    )}
+
+    {/* Post grid */}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {posts.slice(1).map(post => (
+        <PostCard {...post} />
+      ))}
+    </div>
+
+    {/* Mobile view all */}
+    <div class="sm:hidden mt-8 text-center">
+      <a
+        href="/blog"
+        class="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium"
+      >
+        查看全部文章
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>

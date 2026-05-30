@@ -2,82 +2,75 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import AnimatedPostCard from '../components/AnimatedPostCard';
+import HeroSection from '../components/HeroSection.astro';
+import FeaturedPosts from '../components/FeaturedPosts.astro';
+import TagsSection from '../components/TagsSection.astro';
 
 const posts = [
   {
-    title: '欢迎来到 YMLL Blog',
-    description: '这是一个使用 Astro + Tailwind CSS + Framer Motion 构建的企业级个人博客。',
+    title: '使用 Astro 构建高性能博客',
+    description: '深入了解如何利用 Astro 的岛屿架构打造极致性能的现代博客，实现毫秒级页面加载和完美的 SEO 表现。',
     date: '2024-01-15',
-    tags: ['博客', '技术'],
-    slug: 'welcome',
-    readingTime: '2 分钟',
+    tags: ['Astro', '性能优化', '前端'],
+    slug: 'build-blog-with-astro',
+    readingTime: '8 分钟',
+    image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80',
   },
   {
-    title: 'Astro 岛屿架构详解',
-    description: '深入了解 Astro 的岛屿架构，以及如何用它构建高性能网站。',
+    title: 'Tailwind CSS 设计系统最佳实践',
+    description: '掌握 Tailwind CSS 的设计系统配置，创建一致且可维护的用户界面，提升开发效率。',
     date: '2024-01-10',
-    tags: ['Astro', '前端'],
-    slug: 'astro-islands',
-    readingTime: '5 分钟',
+    tags: ['Tailwind', 'CSS', '设计系统'],
+    slug: 'tailwind-design-system',
+    readingTime: '6 分钟',
+    image: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&q=80',
   },
   {
-    title: 'Tailwind CSS 最佳实践',
-    description: '掌握 Tailwind CSS 的设计系统和组件化开发技巧。',
+    title: 'React 19 新特性抢先看',
+    description: '探索 React 19 带来的革命性特性，包括 Server Components、Actions 和新的 Hooks。',
     date: '2024-01-05',
-    tags: ['CSS', 'Tailwind'],
-    slug: 'tailwind-best-practices',
-    readingTime: '4 分钟',
+    tags: ['React', '前端', 'JavaScript'],
+    slug: 'react-19-features',
+    readingTime: '10 分钟',
+    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',
   },
+  {
+    title: 'TypeScript 高级类型体操',
+    description: '深入 TypeScript 类型系统，掌握泛型、条件类型、映射类型等高级特性。',
+    date: '2023-12-28',
+    tags: ['TypeScript', '类型系统'],
+    slug: 'typescript-advanced-types',
+    readingTime: '12 分钟',
+  },
+  {
+    title: 'Framer Motion 动效实战',
+    description: '使用 Framer Motion 创建流畅的用户界面动画，提升用户体验。',
+    date: '2023-12-20',
+    tags: ['Framer Motion', 'React', '动效'],
+    slug: 'framer-motion-tutorial',
+    readingTime: '7 分钟',
+  },
+];
+
+const tags = [
+  { name: '前端', count: 12 },
+  { name: 'React', count: 8 },
+  { name: 'Astro', count: 5 },
+  { name: 'TypeScript', count: 6 },
+  { name: 'Tailwind', count: 4 },
+  { name: '设计系统', count: 3 },
+  { name: '性能优化', count: 4 },
+  { name: 'JavaScript', count: 9 },
 ];
 ---
 
-<Layout title="YMLL Blog - 首页">
+<Layout title="YMLL Blog - 首页" description="探索技术与设计的交汇点，记录成长与思考">
   <Header />
 
-  <main class="pt-16">
-    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <div class="text-center">
-        <h1 class="text-4xl sm:text-5xl font-bold text-text dark:text-text-dark mb-6 animate-fade-in-up">
-          你好，我是 <span class="text-primary dark:text-primary-400">YMLL</span>
-        </h1>
-        <p class="text-lg text-text-muted dark:text-gray-400 mb-8 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.1s;">
-          一个热爱技术与设计的开发者，在这里记录我的思考、项目与成长
-        </p>
-        <div class="flex justify-center gap-4 animate-fade-in-up" style="animation-delay: 0.2s;">
-          <a
-            href="/blog"
-            class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            阅读博客
-          </a>
-          <a
-            href="/about"
-            class="px-6 py-3 border border-primary text-primary dark:text-primary-400 rounded-lg hover:bg-primary/10 transition-colors"
-          >
-            了解更多
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-      <h2 class="text-2xl font-bold text-text dark:text-text-dark mb-8">最新文章</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {posts.map((post, index) => (
-          <AnimatedPostCard
-            client:load
-            title={post.title}
-            description={post.description}
-            date={post.date}
-            tags={post.tags}
-            slug={post.slug}
-            readingTime={post.readingTime}
-            index={index}
-          />
-        ))}
-      </div>
-    </section>
+  <main>
+    <HeroSection />
+    <FeaturedPosts posts={posts} />
+    <TagsSection tags={tags} />
   </main>
 
   <Footer />
