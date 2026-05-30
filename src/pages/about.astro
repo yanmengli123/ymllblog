@@ -3,6 +3,8 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
+const base = import.meta.env.BASE_URL;
+
 const skills = [
   { name: 'React / Next.js', level: 95, color: 'from-blue-500 to-cyan-500' },
   { name: 'TypeScript', level: 90, color: 'from-blue-600 to-indigo-600' },
@@ -73,7 +75,7 @@ const stats = [
 
           <div class="flex flex-wrap gap-4">
             <a
-              href="/blog"
+              href={`${base}blog`}
               class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-emerald-500/25 transition-all hover:-translate-y-0.5"
             >
               查看文章
