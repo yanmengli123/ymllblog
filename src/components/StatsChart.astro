@@ -1,9 +1,8 @@
 ---
-// 统计数据组件
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// 统计数据组件 - 纯静态 HTML/CSS 实现
 ---
 
-<section class="py-20 relative overflow-hidden">
+<section class="py-20 relative overflow-hidden bg-gradient-to-b from-white to-stone-50">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- 标题 -->
     <div class="text-center mb-16">
@@ -27,8 +26,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
           <span class="text-xs text-emerald-500 font-medium bg-emerald-50 px-2 py-1 rounded-full">+2 本月</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="stat-articles">9</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target="9">0</div>
         <div class="text-sm text-stone-500">文章总数</div>
+        <!-- 进度条 -->
+        <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+          <div class="h-full bg-emerald-500 rounded-full progress-bar" data-width="75"></div>
+        </div>
       </div>
 
       <!-- 标签总数 -->
@@ -41,8 +44,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
           <span class="text-xs text-blue-500 font-medium bg-blue-50 px-2 py-1 rounded-full">热门</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="stat-tags">22</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target="22">0</div>
         <div class="text-sm text-stone-500">标签总数</div>
+        <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+          <div class="h-full bg-blue-500 rounded-full progress-bar" data-width="60"></div>
+        </div>
       </div>
 
       <!-- 访问人数 -->
@@ -56,8 +62,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
           <span class="text-xs text-purple-500 font-medium bg-purple-50 px-2 py-1 rounded-full">↑12%</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="stat-views">1,284</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target="1284">0</div>
         <div class="text-sm text-stone-500">总访问量</div>
+        <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+          <div class="h-full bg-purple-500 rounded-full progress-bar" data-width="85"></div>
+        </div>
       </div>
 
       <!-- 点赞数 -->
@@ -70,14 +79,17 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
           <span class="text-xs text-pink-500 font-medium bg-pink-50 px-2 py-1 rounded-full">❤️</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="stat-likes">386</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target="386">0</div>
         <div class="text-sm text-stone-500">获赞总数</div>
+        <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+          <div class="h-full bg-pink-500 rounded-full progress-bar" data-width="45"></div>
+        </div>
       </div>
     </div>
 
-    <!-- 图表区域 -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- 标签分布饼图 -->
+    <!-- 标签分布可视化 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <!-- 标签分布 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
         <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
           <svg class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -86,25 +98,60 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           </svg>
           标签分布
         </h3>
-        <div class="h-64">
-          <canvas id="tagsChart"></canvas>
+        <div class="space-y-4">
+          <!-- 标签条形图 -->
+          <div class="flex items-center gap-4">
+            <span class="text-sm text-stone-600 w-24">前端</span>
+            <div class="flex-1 h-6 bg-stone-100 rounded-full overflow-hidden">
+              <div class="h-full bg-emerald-500 rounded-full flex items-center justify-end pr-2" style="width: 85%">
+                <span class="text-xs text-white font-medium">12</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-sm text-stone-600 w-24">JavaScript</span>
+            <div class="flex-1 h-6 bg-stone-100 rounded-full overflow-hidden">
+              <div class="h-full bg-yellow-500 rounded-full flex items-center justify-end pr-2" style="width: 65%">
+                <span class="text-xs text-white font-medium">9</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-sm text-stone-600 w-24">React</span>
+            <div class="flex-1 h-6 bg-stone-100 rounded-full overflow-hidden">
+              <div class="h-full bg-blue-500 rounded-full flex items-center justify-end pr-2" style="width: 55%">
+                <span class="text-xs text-white font-medium">8</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-sm text-stone-600 w-24">CSS</span>
+            <div class="flex-1 h-6 bg-stone-100 rounded-full overflow-hidden">
+              <div class="h-full bg-pink-500 rounded-full flex items-center justify-end pr-2" style="width: 50%">
+                <span class="text-xs text-white font-medium">7</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-sm text-stone-600 w-24">TypeScript</span>
+            <div class="flex-1 h-6 bg-stone-100 rounded-full overflow-hidden">
+              <div class="h-full bg-blue-600 rounded-full flex items-center justify-end pr-2" style="width: 42%">
+                <span class="text-xs text-white font-medium">6</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-sm text-stone-600 w-24">Astro</span>
+            <div class="flex-1 h-6 bg-stone-100 rounded-full overflow-hidden">
+              <div class="h-full bg-orange-500 rounded-full flex items-center justify-end pr-2" style="width: 35%">
+                <span class="text-xs text-white font-medium">5</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- 文章趋势折线图 -->
-      <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
-        <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-          <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-          </svg>
-          发布趋势
-        </h3>
-        <div class="h-64">
-          <canvas id="trendChart"></canvas>
-        </div>
-      </div>
-
-      <!-- 分类柱状图 -->
+      <!-- 文章分类 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
         <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
           <svg class="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,242 +159,139 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           </svg>
           分类统计
         </h3>
-        <div class="h-64">
-          <canvas id="categoryChart"></canvas>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-emerald-50 rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-emerald-600 mb-1">6</div>
+            <div class="text-xs text-emerald-700">前端工程</div>
+          </div>
+          <div class="bg-blue-50 rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-blue-600 mb-1">1</div>
+            <div class="text-xs text-blue-700">计算生物学</div>
+          </div>
+          <div class="bg-purple-50 rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-purple-600 mb-1">1</div>
+            <div class="text-xs text-purple-700">设计系统</div>
+          </div>
+          <div class="bg-orange-50 rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-orange-600 mb-1">1</div>
+            <div class="text-xs text-orange-700">开发工具</div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- 访问趋势面积图 -->
-      <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
-        <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-          <svg class="w-5 h-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          访问趋势
-        </h3>
-        <div class="h-64">
-          <canvas id="visitorsChart"></canvas>
+    <!-- 发布趋势 -->
+    <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+      <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+        发布趋势
+      </h3>
+      <div class="flex items-end justify-between h-40 gap-2">
+        <div class="flex-1 flex flex-col items-center gap-2">
+          <div class="w-full bg-emerald-100 rounded-t-lg" style="height: 20%">
+            <div class="w-full h-full bg-emerald-500 rounded-t-lg"></div>
+          </div>
+          <span class="text-xs text-stone-500">11月</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-2">
+          <div class="w-full bg-emerald-100 rounded-t-lg" style="height: 30%">
+            <div class="w-full h-full bg-emerald-500 rounded-t-lg"></div>
+          </div>
+          <span class="text-xs text-stone-500">12月</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-2">
+          <div class="w-full bg-emerald-100 rounded-t-lg" style="height: 50%">
+            <div class="w-full h-full bg-emerald-500 rounded-t-lg"></div>
+          </div>
+          <span class="text-xs text-stone-500">1月</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-2">
+          <div class="w-full bg-emerald-100 rounded-t-lg" style="height: 60%">
+            <div class="w-full h-full bg-emerald-500 rounded-t-lg"></div>
+          </div>
+          <span class="text-xs text-stone-500">2月</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-2">
+          <div class="w-full bg-emerald-100 rounded-t-lg" style="height: 70%">
+            <div class="w-full h-full bg-emerald-500 rounded-t-lg"></div>
+          </div>
+          <span class="text-xs text-stone-500">3月</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-2">
+          <div class="w-full bg-emerald-100 rounded-t-lg" style="height: 80%">
+            <div class="w-full h-full bg-emerald-500 rounded-t-lg"></div>
+          </div>
+          <span class="text-xs text-stone-500">4月</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-2">
+          <div class="w-full bg-emerald-500 rounded-t-lg" style="height: 100%">
+            <div class="w-full h-full bg-emerald-500 rounded-t-lg animate-pulse"></div>
+          </div>
+          <span class="text-xs text-emerald-600 font-medium">5月</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<script>
-  import Chart from 'chart.js/auto';
-
-  // 标签分布饼图
-  const tagsCtx = document.getElementById('tagsChart') as HTMLCanvasElement;
-  if (tagsCtx) {
-    new Chart(tagsCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['前端', 'React', 'Astro', 'TypeScript', 'Tailwind', 'CSS', 'JavaScript', 'Git', '其他'],
-        datasets: [{
-          data: [12, 8, 5, 6, 4, 7, 9, 3, 5],
-          backgroundColor: [
-            '#10b981', '#3b82f6', '#f97316', '#3b82f6', '#06b6d4',
-            '#ec4899', '#f59e0b', '#ef4444', '#8b5cf6'
-          ],
-          borderWidth: 0,
-          hoverOffset: 10
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: {
-              padding: 15,
-              usePointStyle: true,
-              pointStyleWidth: 10,
-              font: { size: 12 }
-            }
-          }
-        },
-        cutout: '60%'
-      }
-    });
-  }
-
-  // 发布趋势折线图
-  const trendCtx = document.getElementById('trendChart') as HTMLCanvasElement;
-  if (trendCtx) {
-    new Chart(trendCtx, {
-      type: 'line',
-      data: {
-        labels: ['2023-11', '2023-12', '2024-01', '2024-02', '2024-03', '2024-04', '2024-05'],
-        datasets: [{
-          label: '文章数量',
-          data: [2, 3, 5, 6, 7, 8, 9],
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4,
-          pointBackgroundColor: '#10b981',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { stepSize: 2 },
-            grid: { color: 'rgba(0,0,0,0.05)' }
-          },
-          x: {
-            grid: { display: false }
-          }
-        }
-      }
-    });
-  }
-
-  // 分类柱状图
-  const categoryCtx = document.getElementById('categoryChart') as HTMLCanvasElement;
-  if (categoryCtx) {
-    new Chart(categoryCtx, {
-      type: 'bar',
-      data: {
-        labels: ['前端工程', '计算生物学', '设计系统', '开发工具', '其他'],
-        datasets: [{
-          label: '文章数量',
-          data: [6, 1, 1, 1, 0],
-          backgroundColor: [
-            'rgba(16, 185, 129, 0.8)',
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(249, 115, 22, 0.8)',
-            'rgba(139, 92, 246, 0.8)',
-            'rgba(236, 72, 153, 0.8)'
-          ],
-          borderColor: [
-            '#10b981',
-            '#3b82f6',
-            '#f97316',
-            '#8b5cf6',
-            '#ec4899'
-          ],
-          borderWidth: 1,
-          borderRadius: 8,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { stepSize: 2 },
-            grid: { color: 'rgba(0,0,0,0.05)' }
-          },
-          x: {
-            grid: { display: false }
-          }
-        }
-      }
-    });
-  }
-
-  // 访问趋势面积图
-  const visitorsCtx = document.getElementById('visitorsChart') as HTMLCanvasElement;
-  if (visitorsCtx) {
-    new Chart(visitorsCtx, {
-      type: 'line',
-      data: {
-        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
-        datasets: [
-          {
-            label: '独立访客',
-            data: [120, 180, 250, 320, 420, 580],
-            borderColor: '#8b5cf6',
-            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4
-          },
-          {
-            label: '页面浏览',
-            data: [350, 520, 680, 850, 1050, 1284],
-            borderColor: '#ec4899',
-            backgroundColor: 'rgba(236, 72, 153, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: {
-              usePointStyle: true,
-              padding: 20,
-              font: { size: 12 }
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.05)' }
-          },
-          x: {
-            grid: { display: false }
-          }
-        }
-      }
-    });
-  }
-
+<script is:inline>
   // 数字滚动动画
-  function animateValue(element: HTMLElement, start: number, end: number, duration: number) {
-    const range = end - start;
-    const increment = end > start ? 1 : -1;
-    const stepTime = Math.abs(Math.floor(duration / range));
-    let current = start;
+  document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('.counter');
+    const progressBars = document.querySelectorAll('.progress-bar');
 
-    const timer = setInterval(() => {
-      current += increment;
-      element.textContent = current.toLocaleString();
-      if (current === end) {
-        clearInterval(timer);
-      }
-    }, stepTime);
-  }
+    const observerOptions = {
+      threshold: 0.5
+    };
 
-  // 观察器：当元素进入视口时触发动画
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const element = entry.target as HTMLElement;
-        const finalValue = parseInt(element.textContent?.replace(/,/g, '') || '0');
-        animateValue(element, 0, finalValue, 1500);
-        observer.unobserve(element);
-      }
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          // 数字动画
+          if (entry.target.classList.contains('counter')) {
+            const target = parseInt(entry.target.getAttribute('data-target') || '0');
+            animateCounter(entry.target, target);
+          }
+
+          // 进度条动画
+          if (entry.target.classList.contains('progress-bar')) {
+            const width = entry.target.getAttribute('data-width');
+            setTimeout(function() {
+              entry.target.style.width = width + '%';
+            }, 200);
+          }
+
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    counters.forEach(function(counter) {
+      observer.observe(counter);
     });
-  }, { threshold: 0.5 });
 
-  // 观察所有统计数字
-  ['stat-articles', 'stat-tags', 'stat-views', 'stat-likes'].forEach(id => {
-    const element = document.getElementById(id);
-    if (element) observer.observe(element);
+    progressBars.forEach(function(bar) {
+      bar.style.width = '0%';
+      bar.style.transition = 'width 1.5s ease-out';
+      observer.observe(bar);
+    });
+
+    function animateCounter(element, target) {
+      var current = 0;
+      var increment = target / 60;
+      var duration = 1500;
+      var stepTime = duration / 60;
+
+      var timer = setInterval(function() {
+        current += increment;
+        if (current >= target) {
+          current = target;
+          clearInterval(timer);
+        }
+        element.textContent = Math.floor(current).toLocaleString();
+      }, stepTime);
+    }
   });
 </script>

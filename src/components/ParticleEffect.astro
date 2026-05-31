@@ -1,173 +1,149 @@
 ---
-// 鼠标粒子效果组件
+// 鼠标粒子效果组件 - 使用 is:inline 脚本
 ---
 
-<canvas id="particleCanvas" class="fixed inset-0 -z-10 pointer-events-none"></canvas>
+<canvas id="particleCanvas" class="fixed inset-0 pointer-events-none" style="z-index: -1;"></canvas>
 
-<script>
-  class Particle {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    life: number;
-    maxLife: number;
-    size: number;
-    color: string;
+<script is:inline>
+  (function() {
+    var canvas = document.getElementById('particleCanvas');
+    if (!canvas) return;
 
-    constructor(x: number, y: number) {
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var mouse = { x: 0, y: 0 };
+    var lastMouse = { x: 0, y: 0 };
+    var animationId = null;
+
+    // 颜色数组
+    var colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'];
+
+    // 调整画布大小
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // 粒子类
+    function Particle(x, y) {
       this.x = x;
       this.y = y;
-      this.vx = (Math.random() - 0.5) * 2;
-      this.vy = (Math.random() - 0.5) * 2;
+      this.vx = (Math.random() - 0.5) * 3;
+      this.vy = (Math.random() - 0.5) * 3;
       this.life = 0;
-      this.maxLife = 50 + Math.random() * 50;
+      this.maxLife = 40 + Math.random() * 40;
       this.size = Math.random() * 3 + 1;
-
-      const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'];
       this.color = colors[Math.floor(Math.random() * colors.length)];
     }
 
-    update() {
+    Particle.prototype.update = function() {
       this.x += this.vx;
       this.y += this.vy;
       this.life++;
-      this.vx *= 0.99;
-      this.vy *= 0.99;
-    }
+      this.vx *= 0.98;
+      this.vy *= 0.98;
+    };
 
-    draw(ctx: CanvasRenderingContext2D) {
-      const alpha = 1 - (this.life / this.maxLife);
+    Particle.prototype.draw = function() {
+      var alpha = 1 - (this.life / this.maxLife);
       ctx.globalAlpha = alpha;
       ctx.fillStyle = this.color;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
-    }
+    };
 
-    isDead() {
+    Particle.prototype.isDead = function() {
       return this.life >= this.maxLife;
-    }
-  }
+    };
 
-  class ParticleSystem {
-    canvas: HTMLCanvasElement;
-    ctx: CanvasRenderingContext2D;
-    particles: Particle[];
-    mouse: { x: number; y: number };
-    lastMouse: { x: number; y: number };
-    animationId: number | null;
+    // 鼠标移动事件
+    document.addEventListener('mousemove', function(e) {
+      lastMouse.x = mouse.x;
+      lastMouse.y = mouse.y;
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
 
-    constructor() {
-      this.canvas = document.getElementById('particleCanvas') as HTMLCanvasElement;
-      if (!this.canvas) return;
+      var dx = mouse.x - lastMouse.x;
+      var dy = mouse.y - lastMouse.y;
+      var speed = Math.sqrt(dx * dx + dy * dy);
 
-      this.ctx = this.canvas.getContext('2d')!;
-      this.particles = [];
-      this.mouse = { x: 0, y: 0 };
-      this.lastMouse = { x: 0, y: 0 };
-      this.animationId = null;
+      var particleCount = Math.min(Math.floor(speed / 8), 3);
+      for (var i = 0; i < particleCount; i++) {
+        particles.push(new Particle(mouse.x, mouse.y));
+      }
+    });
 
-      this.resize();
-      this.bindEvents();
-      this.animate();
-    }
+    // 点击事件
+    document.addEventListener('click', function(e) {
+      for (var i = 0; i < 15; i++) {
+        particles.push(new Particle(e.clientX, e.clientY));
+      }
+    });
 
-    resize() {
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
-    }
-
-    bindEvents() {
-      window.addEventListener('resize', () => this.resize());
-
-      document.addEventListener('mousemove', (e) => {
-        this.lastMouse.x = this.mouse.x;
-        this.lastMouse.y = this.mouse.y;
-        this.mouse.x = e.clientX;
-        this.mouse.y = e.clientY;
-
-        // 根据鼠标速度生成粒子
-        const dx = this.mouse.x - this.lastMouse.x;
-        const dy = this.mouse.y - this.lastMouse.y;
-        const speed = Math.sqrt(dx * dx + dy * dy);
-
-        const particleCount = Math.min(Math.floor(speed / 5), 5);
-        for (let i = 0; i < particleCount; i++) {
-          this.particles.push(new Particle(this.mouse.x, this.mouse.y));
-        }
-      });
-
-      document.addEventListener('click', (e) => {
-        // 点击时生成更多粒子
-        for (let i = 0; i < 20; i++) {
-          this.particles.push(new Particle(e.clientX, e.clientY));
-        }
-      });
-    }
-
-    animate() {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // 动画循环
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // 更新和绘制粒子
-      this.particles = this.particles.filter(particle => {
-        particle.update();
-        particle.draw(this.ctx);
-        return !particle.isDead();
-      });
+      var aliveParticles = [];
+      for (var i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        if (!particles[i].isDead()) {
+          aliveParticles.push(particles[i]);
+        }
+      }
+      particles = aliveParticles;
 
       // 绘制连线
-      for (let i = 0; i < this.particles.length; i++) {
-        for (let j = i + 1; j < this.particles.length; j++) {
-          const dx = this.particles[i].x - this.particles[j].x;
-          const dy = this.particles[i].y - this.particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+      ctx.globalAlpha = 1;
+      for (var i = 0; i < particles.length; i++) {
+        for (var j = i + 1; j < particles.length; j++) {
+          var dx = particles[i].x - particles[j].x;
+          var dy = particles[i].y - particles[j].y;
+          var distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < 100) {
-            const alpha = 1 - (distance / 100);
-            this.ctx.globalAlpha = alpha * 0.2;
-            this.ctx.strokeStyle = '#10b981';
-            this.ctx.lineWidth = 1;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
-            this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
-            this.ctx.stroke();
+          if (distance < 80) {
+            var alpha = (1 - (distance / 80)) * 0.15;
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
           }
         }
       }
 
-      this.ctx.globalAlpha = 1;
+      ctx.globalAlpha = 1;
 
       // 限制粒子数量
-      if (this.particles.length > 200) {
-        this.particles = this.particles.slice(-200);
+      if (particles.length > 150) {
+        particles = particles.slice(-150);
       }
 
-      this.animationId = requestAnimationFrame(() => this.animate());
+      animationId = requestAnimationFrame(animate);
     }
 
-    destroy() {
-      if (this.animationId) {
-        cancelAnimationFrame(this.animationId);
+    // 开始动画
+    animate();
+
+    // 页面可见性变化时暂停/恢复
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+          animationId = null;
+        }
+      } else {
+        if (!animationId) {
+          animate();
+        }
       }
-    }
-  }
-
-  // 初始化
-  let particleSystem: ParticleSystem | null = null;
-
-  function initParticles() {
-    if (particleSystem) particleSystem.destroy();
-    particleSystem = new ParticleSystem();
-  }
-
-  // 页面加载时初始化
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initParticles);
-  } else {
-    initParticles();
-  }
-
-  // 页面切换时重新初始化（Astro SPA 模式）
-  document.addEventListener('astro:page-load', initParticles);
+    });
+  })();
 </script>
