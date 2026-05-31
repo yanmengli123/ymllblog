@@ -6,6 +6,8 @@ import Footer from '../components/Footer.astro';
 import HeroSection from '../components/HeroSection.astro';
 import FeaturedPosts from '../components/FeaturedPosts.astro';
 import TagsSection from '../components/TagsSection.astro';
+import StatsChart from '../components/StatsChart.astro';
+import ParticleEffect from '../components/ParticleEffect.astro';
 
 // 获取精选文章
 const allPosts = await getCollection('blog', ({ data }) => !data.draft);
@@ -43,6 +45,9 @@ const totalTags = tagMap.size;
 ---
 
 <Layout title="YMLL Blog - 首页" description="探索技术与设计的交汇点，记录成长与思考">
+  <!-- 鼠标粒子效果 -->
+  <ParticleEffect />
+
   <Header />
 
   <main>
@@ -50,29 +55,8 @@ const totalTags = tagMap.size;
     <FeaturedPosts posts={formattedPosts} title="精选文章" />
     <TagsSection tags={tags} />
 
-    <!-- 统计数据 -->
-    <section class="py-20">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div class="text-center p-6 bg-white rounded-2xl border border-stone-200">
-            <div class="text-3xl font-bold text-emerald-600 mb-2">{totalPosts}</div>
-            <div class="text-sm text-stone-500">篇文章</div>
-          </div>
-          <div class="text-center p-6 bg-white rounded-2xl border border-stone-200">
-            <div class="text-3xl font-bold text-emerald-600 mb-2">{totalTags}</div>
-            <div class="text-sm text-stone-500">个标签</div>
-          </div>
-          <div class="text-center p-6 bg-white rounded-2xl border border-stone-200">
-            <div class="text-3xl font-bold text-emerald-600 mb-2">100+</div>
-            <div class="text-sm text-stone-500">小时写作</div>
-          </div>
-          <div class="text-center p-6 bg-white rounded-2xl border border-stone-200">
-            <div class="text-3xl font-bold text-emerald-600 mb-2">5000+</div>
-            <div class="text-sm text-stone-500">字内容</div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- 数据统计图表 -->
+    <StatsChart />
   </main>
 
   <Footer />
