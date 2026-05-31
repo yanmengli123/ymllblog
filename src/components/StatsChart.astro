@@ -39,15 +39,6 @@ const categories = Array.from(categoryMap.entries())
   .map(([name, count]) => ({ name, count }))
   .sort((a, b) => b.count - a.count);
 
-// 按年份统计文章
-const yearMap = new Map<number, number>();
-allPosts.forEach(post => {
-  const year = post.data.pubDate.getFullYear();
-  yearMap.set(year, (yearMap.get(year) || 0) + 1);
-});
-const postsByYear = Array.from(yearMap.entries())
-  .sort((a, b) => a[0] - b[0]);
-
 // 按月统计文章（最近12个月）
 const monthMap = new Map<string, number>();
 const now = new Date();
@@ -70,10 +61,8 @@ const latestPosts = allPosts
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
   .slice(0, 5);
 
-// 模拟访问数据（实际项目中应从分析服务获取）
-const totalViews = totalPosts * 156; // 基于文章数估算
-const totalLikes = totalPosts * 28;
-const totalComments = totalPosts * 12;
+// 标签颜色
+const tagColors = ['bg-emerald-500', 'bg-blue-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-cyan-500', 'bg-yellow-500', 'bg-red-500'];
 ---
 
 <!-- 粒子背景画布 -->
@@ -92,7 +81,14 @@ const totalComments = totalPosts * 12;
     </div>
 
     <!-- 核心指标卡片 -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12"
+         id="stats-container"
+         data-posts={totalPosts}
+         data-words={Math.floor(totalCharacters / 1000)}
+         data-tags={totalTags}
+         data-time={totalReadingMinutes}
+         data-monthly={JSON.stringify(monthlyData)}>
+
       <!-- 文章总数 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
         <div class="flex items-center justify-between mb-4">
@@ -101,7 +97,7 @@ const totalComments = totalPosts * 12;
           </div>
           <span class="text-xs text-emerald-500 font-medium bg-emerald-50 px-2 py-1 rounded-full">已发布</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target={totalPosts} id="counter-posts">0</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-posts">{totalPosts}</div>
         <div class="text-sm text-stone-500">文章总数</div>
         <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
           <div class="h-full bg-emerald-500 rounded-full transition-all duration-1500" id="bar-posts" style="width: 0%"></div>
@@ -116,7 +112,7 @@ const totalComments = totalPosts * 12;
           </div>
           <span class="text-xs text-blue-500 font-medium bg-blue-50 px-2 py-1 rounded-full">原创</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target={Math.floor(totalCharacters / 1000)} id="counter-words">0</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-words">{Math.floor(totalCharacters / 1000)}</div>
         <div class="text-sm text-stone-500">总字数 (千)</div>
         <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
           <div class="h-full bg-blue-500 rounded-full transition-all duration-1500" id="bar-words" style="width: 0%"></div>
@@ -131,7 +127,7 @@ const totalComments = totalPosts * 12;
           </div>
           <span class="text-xs text-purple-500 font-medium bg-purple-50 px-2 py-1 rounded-full">热门</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target={totalTags} id="counter-tags">0</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-tags">{totalTags}</div>
         <div class="text-sm text-stone-500">标签总数</div>
         <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
           <div class="h-full bg-purple-500 rounded-full transition-all duration-1500" id="bar-tags" style="width: 0%"></div>
@@ -146,7 +142,7 @@ const totalComments = totalPosts * 12;
           </div>
           <span class="text-xs text-orange-500 font-medium bg-orange-50 px-2 py-1 rounded-full">预计</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target={totalReadingMinutes} id="counter-time">0</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-time">{totalReadingMinutes}</div>
         <div class="text-sm text-stone-500">阅读时间 (分钟)</div>
         <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
           <div class="h-full bg-orange-500 rounded-full transition-all duration-1500" id="bar-time" style="width: 0%"></div>
@@ -169,18 +165,17 @@ const totalComments = totalPosts * 12;
       <!-- 标签分布 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
         <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-          <span class="text-xl">🏷️</span> 标签分布
+          <span class="text-xl">🏷️</span> 标签分布 (Top 8)
         </h3>
-        <div class="space-y-3" id="tagsBarChart">
+        <div class="space-y-3">
           {tags.slice(0, 8).map((tag, index) => {
             const maxCount = tags[0].count;
             const width = (tag.count / maxCount) * 100;
-            const colors = ['bg-emerald-500', 'bg-blue-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-cyan-500', 'bg-yellow-500', 'bg-red-500'];
             return (
               <div class="flex items-center gap-3">
                 <span class="text-sm text-stone-600 w-24 text-right">{tag.name}</span>
                 <div class="flex-1 h-8 bg-stone-100 rounded-full overflow-hidden">
-                  <div class={`h-full ${colors[index % colors.length]} rounded-full flex items-center justify-end pr-3 transition-all duration-1000`} style={`width: ${width}%`}>
+                  <div class={`h-full ${tagColors[index % tagColors.length]} rounded-full flex items-center justify-end pr-3 transition-all duration-1000`} style={`width: ${width}%`}>
                     <span class="text-xs text-white font-bold">{tag.count}</span>
                   </div>
                 </div>
@@ -245,12 +240,15 @@ const totalComments = totalPosts * 12;
         <span class="text-xl">📅</span> 文章发布时间分布
       </h3>
       <div class="grid grid-cols-4 md:grid-cols-6 gap-4">
-        {postsByYear.map(([year, count]) => (
-          <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 text-center border border-emerald-200">
-            <div class="text-2xl font-bold text-emerald-600 mb-1">{year}</div>
-            <div class="text-sm text-emerald-700">{count} 篇</div>
-          </div>
-        ))}
+        {Array.from(new Set(allPosts.map(p => p.data.pubDate.getFullYear()))).sort().map(year => {
+          const count = allPosts.filter(p => p.data.pubDate.getFullYear() === year).length;
+          return (
+            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 text-center border border-emerald-200">
+              <div class="text-2xl font-bold text-emerald-600 mb-1">{year}</div>
+              <div class="text-sm text-emerald-700">{count} 篇</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   </div>
@@ -258,20 +256,21 @@ const totalComments = totalPosts * 12;
 
 <script is:inline>
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Dashboard loaded with real data');
+  // 从 data 属性获取数据
+  var container = document.getElementById('stats-container');
+  if (!container) return;
 
-  // 数据
-  var totalPosts = {totalPosts};
-  var totalCharacters = {totalCharacters};
-  var totalTags = {totalTags};
-  var totalReadingMinutes = {totalReadingMinutes};
-  var monthlyData = {JSON.stringify(monthlyData)};
+  var totalPosts = parseInt(container.getAttribute('data-posts')) || 0;
+  var totalWords = parseInt(container.getAttribute('data-words')) || 0;
+  var totalTags = parseInt(container.getAttribute('data-tags')) || 0;
+  var totalTime = parseInt(container.getAttribute('data-time')) || 0;
+  var monthlyData = JSON.parse(container.getAttribute('data-monthly') || '[]');
+
+  console.log('Stats loaded:', { posts: totalPosts, words: totalWords, tags: totalTags, time: totalTime });
 
   // 数字动画
-  function animateCounter(id, target, duration) {
-    var el = document.getElementById(id);
-    if (!el) return;
-
+  function animateCounter(element, target, duration) {
+    if (!element) return;
     var start = 0;
     var startTime = null;
 
@@ -282,9 +281,9 @@ document.addEventListener('DOMContentLoaded', function() {
       var current = Math.floor(easeOut * target);
 
       if (target >= 1000) {
-        el.textContent = (current / 1000).toFixed(1) + 'K';
+        element.textContent = (current / 1000).toFixed(1) + 'K';
       } else {
-        el.textContent = current.toLocaleString();
+        element.textContent = current.toLocaleString();
       }
 
       if (progress < 1) {
@@ -296,12 +295,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // 进度条动画
-  function animateBar(id, width) {
-    var el = document.getElementById(id);
-    if (!el) return;
-
+  function animateBar(element, width) {
+    if (!element) return;
     setTimeout(function() {
-      el.style.width = width + '%';
+      element.style.width = width + '%';
     }, 300);
   }
 
@@ -318,7 +315,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var mouse = { x: null, y: null };
     var colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'];
 
-    // 创建粒子
     for (var i = 0; i < 40; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -364,7 +360,6 @@ document.addEventListener('DOMContentLoaded', function() {
       for (var i = 0; i < particles.length; i++) {
         var p = particles[i];
 
-        // 鼠标交互
         if (mouse.x !== null && !p.life) {
           var dx = mouse.x - p.x;
           var dy = mouse.y - p.y;
@@ -379,18 +374,15 @@ document.addEventListener('DOMContentLoaded', function() {
         p.x += p.speedX;
         p.y += p.speedY;
 
-        // 生命周期
         if (p.life !== undefined) {
           p.life++;
           if (p.life >= p.maxLife) continue;
           p.opacity = 1 - (p.life / p.maxLife);
         }
 
-        // 边界反弹
         if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
         if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
 
-        // 绘制粒子
         ctx.globalAlpha = p.opacity;
         ctx.fillStyle = p.color;
         ctx.beginPath();
@@ -399,7 +391,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         alive.push(p);
 
-        // 连线
         if (!p.life) {
           for (var j = i + 1; j < particles.length; j++) {
             var other = particles[j];
@@ -435,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // 折线图
   function drawLineChart() {
     var canvas = document.getElementById('trendChart');
-    if (!canvas) return;
+    if (!canvas || !monthlyData.length) return;
 
     var ctx = canvas.getContext('2d');
     var rect = canvas.parentElement.getBoundingClientRect();
@@ -503,7 +494,6 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // 数值
       if (item[1] > 0) {
         ctx.fillStyle = '#374151';
         ctx.font = 'bold 12px sans-serif';
@@ -513,16 +503,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // 启动
-  animateCounter('counter-posts', totalPosts, 1500);
-  animateCounter('counter-words', Math.floor(totalCharacters / 1000), 2000);
-  animateCounter('counter-tags', totalTags, 1200);
-  animateCounter('counter-time', totalReadingMinutes, 1800);
+  // 启动动画
+  animateCounter(document.getElementById('counter-posts'), totalPosts, 1500);
+  animateCounter(document.getElementById('counter-words'), totalWords, 2000);
+  animateCounter(document.getElementById('counter-tags'), totalTags, 1200);
+  animateCounter(document.getElementById('counter-time'), totalTime, 1800);
 
-  animateBar('bar-posts', Math.min(totalPosts * 10, 100));
-  animateBar('bar-words', Math.min(Math.floor(totalCharacters / 10000) * 10, 100));
-  animateBar('bar-tags', Math.min(totalTags * 5, 100));
-  animateBar('bar-time', Math.min(totalReadingMinutes / 10, 100));
+  animateBar(document.getElementById('bar-posts'), Math.min(totalPosts * 10, 100));
+  animateBar(document.getElementById('bar-words'), Math.min(totalWords / 20, 100));
+  animateBar(document.getElementById('bar-tags'), Math.min(totalTags * 5, 100));
+  animateBar(document.getElementById('bar-time'), Math.min(totalTime / 2, 100));
 
   initParticles();
 
@@ -530,6 +520,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   window.addEventListener('resize', drawLineChart);
 
-  console.log('Dashboard initialized with', totalPosts, 'posts,', totalCharacters, 'characters');
+  console.log('Dashboard initialized');
 });
 </script>
