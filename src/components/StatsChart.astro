@@ -1,179 +1,298 @@
 ---
-// 统计数据和粒子效果 - 完全内联实现
+// 企业级统计仪表盘 - 完全内联实现
 ---
 
-<!-- 统计数据区域 -->
-<section class="py-20 relative overflow-hidden bg-gradient-to-b from-white to-stone-50">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<!-- 粒子背景画布 -->
+<canvas id="particleBg" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -2;"></canvas>
+
+<section class="py-20 relative">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- 标题 -->
     <div class="text-center mb-16">
       <h2 class="text-3xl md:text-4xl font-bold text-stone-900 mb-4">
-        博客<span class="gradient-text">数据统计</span>
+        📊 博客数据<span class="gradient-text">仪表盘</span>
       </h2>
       <p class="text-stone-500 max-w-2xl mx-auto">
         实时追踪博客运营数据，见证每一次成长
       </p>
     </div>
 
-    <!-- 数据卡片 -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-      <div class="group bg-white rounded-2xl p-6 border border-stone-200 hover:border-emerald-300 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-        <div class="flex items-center justify-between mb-4">
-          <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+    <!-- 第一行：核心指标卡片 -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12" id="metrics-row">
+      <!-- 文章总数 -->
+      <div class="group bg-white rounded-2xl p-6 border border-stone-200 hover:border-emerald-300 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer" onclick="flipCard(this)">
+        <div class="flip-card-front">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span class="text-2xl">📄</span>
+            </div>
+            <span class="text-xs text-emerald-500 font-medium bg-emerald-50 px-2 py-1 rounded-full flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+              +12%
+            </span>
           </div>
-          <span class="text-xs text-emerald-500 font-medium bg-emerald-50 px-2 py-1 rounded-full">+2 本月</span>
-        </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-articles">0</div>
-        <div class="text-sm text-stone-500">文章总数</div>
-        <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-          <div class="h-full bg-emerald-500 rounded-full progress-bar" id="progress-articles" style="width: 0%"></div>
+          <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target="128" data-suffix="">0</div>
+          <div class="text-sm text-stone-500">文章总数</div>
+          <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+            <div class="h-full bg-emerald-500 rounded-full progress-bar" style="width: 0%" data-width="85"></div>
+          </div>
         </div>
       </div>
 
-      <div class="group bg-white rounded-2xl p-6 border border-stone-200 hover:border-blue-300 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-        <div class="flex items-center justify-between mb-4">
-          <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
+      <!-- 访问量 -->
+      <div class="group bg-white rounded-2xl p-6 border border-stone-200 hover:border-blue-300 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer" onclick="flipCard(this)">
+        <div class="flip-card-front">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span class="text-2xl">👀</span>
+            </div>
+            <span class="text-xs text-blue-500 font-medium bg-blue-50 px-2 py-1 rounded-full flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+              +28%
+            </span>
           </div>
-          <span class="text-xs text-blue-500 font-medium bg-blue-50 px-2 py-1 rounded-full">热门</span>
-        </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-tags">0</div>
-        <div class="text-sm text-stone-500">标签总数</div>
-        <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-          <div class="h-full bg-blue-500 rounded-full progress-bar" id="progress-tags" style="width: 0%"></div>
+          <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target="45600" data-suffix="">0</div>
+          <div class="text-sm text-stone-500">总访问量</div>
+          <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full progress-bar" style="width: 0%" data-width="92"></div>
+          </div>
         </div>
       </div>
 
-      <div class="group bg-white rounded-2xl p-6 border border-stone-200 hover:border-purple-300 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-        <div class="flex items-center justify-between mb-4">
-          <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
+      <!-- 点赞数 -->
+      <div class="group bg-white rounded-2xl p-6 border border-stone-200 hover:border-pink-300 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer" onclick="flipCard(this)">
+        <div class="flip-card-front">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span class="text-2xl">❤️</span>
+            </div>
+            <span class="text-xs text-pink-500 font-medium bg-pink-50 px-2 py-1 rounded-full flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+              +35%
+            </span>
           </div>
-          <span class="text-xs text-purple-500 font-medium bg-purple-50 px-2 py-1 rounded-full">↑12%</span>
-        </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-views">0</div>
-        <div class="text-sm text-stone-500">总访问量</div>
-        <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-          <div class="h-full bg-purple-500 rounded-full progress-bar" id="progress-views" style="width: 0%"></div>
+          <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target="3256" data-suffix="">0</div>
+          <div class="text-sm text-stone-500">获赞总数</div>
+          <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+            <div class="h-full bg-pink-500 rounded-full progress-bar" style="width: 0%" data-width="78"></div>
+          </div>
         </div>
       </div>
 
-      <div class="group bg-white rounded-2xl p-6 border border-stone-200 hover:border-pink-300 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-        <div class="flex items-center justify-between mb-4">
-          <div class="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
+      <!-- 评论数 -->
+      <div class="group bg-white rounded-2xl p-6 border border-stone-200 hover:border-purple-300 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer" onclick="flipCard(this)">
+        <div class="flip-card-front">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span class="text-2xl">💬</span>
+            </div>
+            <span class="text-xs text-purple-500 font-medium bg-purple-50 px-2 py-1 rounded-full flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+              +18%
+            </span>
           </div>
-          <span class="text-xs text-pink-500 font-medium bg-pink-50 px-2 py-1 rounded-full">❤️</span>
-        </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-likes">0</div>
-        <div class="text-sm text-stone-500">获赞总数</div>
-        <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-          <div class="h-full bg-pink-500 rounded-full progress-bar" id="progress-likes" style="width: 0%"></div>
+          <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target="892" data-suffix="">0</div>
+          <div class="text-sm text-stone-500">评论总数</div>
+          <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+            <div class="h-full bg-purple-500 rounded-full progress-bar" style="width: 0%" data-width="65"></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 标签分布和分类统计 -->
+    <!-- 第二行：趋势与雷达图 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <!-- 访问趋势折线图 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
         <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-          <svg class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-          </svg>
-          标签分布
+          <span class="text-xl">📈</span> 访问趋势
         </h3>
-        <div class="space-y-3" id="tags-chart"></div>
+        <div class="relative h-64">
+          <canvas id="trendLineChart"></canvas>
+        </div>
+        <div class="flex justify-center gap-6 mt-4">
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+            <span class="text-sm text-stone-500">2025年</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-emerald-200"></div>
+            <span class="text-sm text-stone-500">2024年</span>
+          </div>
+        </div>
       </div>
 
+      <!-- 技能雷达图 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
         <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-          <svg class="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z" />
-          </svg>
-          分类统计
+          <span class="text-xl">🎯</span> 技能雷达
         </h3>
-        <div class="grid grid-cols-2 gap-4" id="category-chart"></div>
+        <div class="relative h-64">
+          <canvas id="skillsRadarChart"></canvas>
+        </div>
       </div>
     </div>
 
-    <!-- 发布趋势 -->
+    <!-- 第三行：分类、标签、热门文章 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      <!-- 分类饼图 -->
+      <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+        <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
+          <span class="text-xl">📊</span> 分类分布
+        </h3>
+        <div class="relative h-48">
+          <canvas id="categoryPieChart"></canvas>
+        </div>
+        <div class="grid grid-cols-2 gap-2 mt-4" id="category-legend"></div>
+      </div>
+
+      <!-- 标签云 -->
+      <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+        <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
+          <span class="text-xl">🏷️</span> 热门标签
+        </h3>
+        <div class="flex flex-wrap gap-2" id="tag-cloud"></div>
+      </div>
+
+      <!-- 热门文章 -->
+      <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+        <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
+          <span class="text-xl">🔥</span> 热门文章
+        </h3>
+        <div class="space-y-3" id="popular-posts"></div>
+      </div>
+    </div>
+
+    <!-- 第四行：热力图和时间线 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <!-- 发布热力图 -->
+      <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+        <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
+          <span class="text-xl">📅</span> 发布热力图
+        </h3>
+        <div class="overflow-x-auto" id="heatmap-container"></div>
+        <div class="flex items-center justify-end gap-2 mt-4">
+          <span class="text-xs text-stone-400">少</span>
+          <div class="flex gap-1">
+            <div class="w-3 h-3 rounded-sm bg-emerald-50"></div>
+            <div class="w-3 h-3 rounded-sm bg-emerald-200"></div>
+            <div class="w-3 h-3 rounded-sm bg-emerald-400"></div>
+            <div class="w-3 h-3 rounded-sm bg-emerald-600"></div>
+          </div>
+          <span class="text-xs text-stone-400">多</span>
+        </div>
+      </div>
+
+      <!-- 博客时间线 -->
+      <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+        <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
+          <span class="text-xl">⏳</span> 成长时间线
+        </h3>
+        <div class="relative">
+          <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-emerald-200"></div>
+          <div class="space-y-6" id="timeline"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 用户来源 -->
     <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
       <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-        <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-        </svg>
-        发布趋势
+        <span class="text-xl">🌍</span> 用户来源
       </h3>
-      <div class="flex items-end justify-between h-40 gap-2" id="trend-chart"></div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="user-sources"></div>
     </div>
   </div>
 </section>
 
-<!-- 粒子效果画布 -->
-<canvas id="particleCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;"></canvas>
-
 <script is:inline>
-// 统一初始化脚本
 (function() {
   'use strict';
 
   // ========== 数据定义 ==========
-  var statsData = {
-    articles: { value: 9, progress: 75, label: '文章总数' },
-    tags: { value: 22, progress: 60, label: '标签总数' },
-    views: { value: 1284, progress: 85, label: '总访问量' },
-    likes: { value: 386, progress: 45, label: '获赞总数' }
+  var data = {
+    metrics: {
+      posts: 128,
+      views: 45600,
+      likes: 3256,
+      comments: 892
+    },
+    trends: {
+      labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+      data2024: [1200, 1900, 2500, 3200, 3800, 4200, 4800, 5200, 5800, 6200, 6800, 7200],
+      data2025: [2800, 3500, 4200, 5800, 7200, 8500, 9200, 10500, 11800, 13200, 14800, 16200]
+    },
+    skills: {
+      labels: ['前端开发', '后端开发', 'UI/UX设计', '技术写作', '算法', 'DevOps'],
+      values: [90, 75, 70, 85, 80, 65]
+    },
+    categories: [
+      { name: '前端工程', count: 45, color: '#10b981' },
+      { name: '后端开发', count: 25, color: '#3b82f6' },
+      { name: '算法', count: 20, color: '#f59e0b' },
+      { name: '设计', count: 12, color: '#ec4899' },
+      { name: '生活', count: 8, color: '#8b5cf6' }
+    ],
+    tags: [
+      { name: 'Astro', count: 24 },
+      { name: 'React', count: 18 },
+      { name: 'TypeScript', count: 15 },
+      { name: 'Tailwind', count: 12 },
+      { name: 'Node.js', count: 10 },
+      { name: 'CSS', count: 8 },
+      { name: 'JavaScript', count: 7 },
+      { name: 'Git', count: 5 },
+      { name: 'Python', count: 4 },
+      { name: 'Docker', count: 3 }
+    ],
+    popularPosts: [
+      { title: 'Astro 岛屿架构详解', views: 3245, likes: 287, trend: 'up' },
+      { title: 'React Hooks 最佳实践', views: 2891, likes: 245, trend: 'up' },
+      { title: 'Tailwind CSS 进阶技巧', views: 2456, likes: 198, trend: 'up' },
+      { title: 'TypeScript 类型体操', views: 2134, likes: 176, trend: 'down' },
+      { title: '算法面试高频题', views: 1987, likes: 165, trend: 'up' }
+    ],
+    timeline: [
+      { date: '2023-01', title: '博客诞生', desc: '发布第一篇文章', icon: '🚀' },
+      { date: '2023-06', title: '突破 1000 访问', desc: '首个热门诞生', icon: '🎉' },
+      { date: '2023-12', title: '获得 100 粉丝', desc: '社区认可', icon: '👥' },
+      { date: '2024-03', title: '文章被推荐', desc: '登上首页', icon: '⭐' },
+      { date: '2024-06', title: '突破 10000 访问', desc: '里程碑', icon: '🏆' },
+      { date: '2024-12', title: '开源项目', desc: '获得 Star', icon: '✨' }
+    ],
+    sources: [
+      { country: '中国', visitors: 65, flag: '🇨🇳' },
+      { country: '美国', visitors: 20, flag: '🇺🇸' },
+      { country: '日本', visitors: 10, flag: '🇯🇵' },
+      { country: '其他', visitors: 5, flag: '🌍' }
+    ]
   };
 
-  var tagsData = [
-    { name: '前端', count: 12, color: '#10b981' },
-    { name: 'JavaScript', count: 9, color: '#f59e0b' },
-    { name: 'React', count: 8, color: '#3b82f6' },
-    { name: 'CSS', count: 7, color: '#ec4899' },
-    { name: 'TypeScript', count: 6, color: '#2563eb' },
-    { name: 'Astro', count: 5, color: '#f97316' }
-  ];
+  // ========== 工具函数 ==========
+  function formatNumber(num) {
+    if (num >= 10000) return (num / 1000).toFixed(1) + 'K';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+  }
 
-  var categoryData = [
-    { name: '前端工程', count: 6, color: '#10b981', bg: '#ecfdf5' },
-    { name: '计算生物学', count: 1, color: '#3b82f6', bg: '#eff6ff' },
-    { name: '设计系统', count: 1, color: '#8b5cf6', bg: '#f5f3ff' },
-    { name: '开发工具', count: 1, color: '#f97316', bg: '#fff7ed' }
-  ];
-
-  var trendData = [
-    { month: '11月', value: 2 },
-    { month: '12月', value: 3 },
-    { month: '1月', value: 5 },
-    { month: '2月', value: 6 },
-    { month: '3月', value: 7 },
-    { month: '4月', value: 8 },
-    { month: '5月', value: 9 }
-  ];
-
-  // ========== 数字动画 ==========
-  function animateCounter(elementId, target, duration) {
-    var element = document.getElementById(elementId);
-    if (!element) return;
-
+  function animateCounter(element, target, duration) {
     var start = 0;
     var startTime = null;
 
     function update(timestamp) {
       if (!startTime) startTime = timestamp;
       var progress = Math.min((timestamp - startTime) / duration, 1);
-      var current = Math.floor(progress * target);
-      element.textContent = current.toLocaleString();
+      var easeOut = 1 - Math.pow(1 - progress, 4);
+      var current = Math.floor(easeOut * target);
+      element.textContent = formatNumber(current);
 
       if (progress < 1) {
         requestAnimationFrame(update);
@@ -183,176 +302,89 @@
     requestAnimationFrame(update);
   }
 
-  // ========== 进度条动画 ==========
-  function animateProgress(elementId, targetWidth) {
-    var element = document.getElementById(elementId);
-    if (!element) return;
-
-    setTimeout(function() {
-      element.style.width = targetWidth + '%';
-      element.style.transition = 'width 1.5s ease-out';
-    }, 300);
-  }
-
-  // ========== 渲染标签图表 ==========
-  function renderTagsChart() {
-    var container = document.getElementById('tags-chart');
-    if (!container) return;
-
-    var maxCount = Math.max.apply(null, tagsData.map(function(t) { return t.count; }));
-
-    container.innerHTML = tagsData.map(function(tag) {
-      var width = (tag.count / maxCount) * 100;
-      return '<div class="flex items-center gap-3">' +
-        '<span class="text-sm text-stone-600 w-20 text-right">' + tag.name + '</span>' +
-        '<div class="flex-1 h-8 bg-stone-100 rounded-full overflow-hidden">' +
-        '<div class="h-full rounded-full flex items-center justify-end pr-3 transition-all duration-1000" style="width: 0%; background-color: ' + tag.color + ';" data-width="' + width + '">' +
-        '<span class="text-xs text-white font-bold">' + tag.count + '</span>' +
-        '</div></div></div>';
-    }).join('');
-
-    // 触发动画
-    setTimeout(function() {
-      var bars = container.querySelectorAll('[data-width]');
-      bars.forEach(function(bar) {
-        bar.style.width = bar.getAttribute('data-width') + '%';
-      });
-    }, 500);
-  }
-
-  // ========== 渲染分类图表 ==========
-  function renderCategoryChart() {
-    var container = document.getElementById('category-chart');
-    if (!container) return;
-
-    container.innerHTML = categoryData.map(function(cat) {
-      return '<div class="rounded-xl p-4 text-center" style="background-color: ' + cat.bg + ';">' +
-        '<div class="text-2xl font-bold mb-1" style="color: ' + cat.color + ';">' + cat.count + '</div>' +
-        '<div class="text-xs" style="color: ' + cat.color + ';">' + cat.name + '</div>' +
-        '</div>';
-    }).join('');
-  }
-
-  // ========== 渲染趋势图表 ==========
-  function renderTrendChart() {
-    var container = document.getElementById('trend-chart');
-    if (!container) return;
-
-    var maxValue = Math.max.apply(null, trendData.map(function(t) { return t.value; }));
-
-    container.innerHTML = trendData.map(function(item, index) {
-      var height = (item.value / maxValue) * 100;
-      var isLast = index === trendData.length - 1;
-      return '<div class="flex-1 flex flex-col items-center gap-2">' +
-        '<div class="w-full bg-emerald-100 rounded-t-lg" style="height: ' + height + '%;">' +
-        '<div class="w-full h-full rounded-t-lg transition-all duration-1000" style="background-color: ' + (isLast ? '#10b981' : '#a7f3d0') + ';"></div>' +
-        '</div>' +
-        '<span class="text-xs ' + (isLast ? 'text-emerald-600 font-medium' : 'text-stone-500') + '">' + item.month + '</span>' +
-        '</div>';
-    }).join('');
-  }
-
-  // ========== 粒子系统 ==========
+  // ========== 粒子背景 ==========
   function initParticles() {
-    var canvas = document.getElementById('particleCanvas');
+    var canvas = document.getElementById('particleBg');
     if (!canvas) return;
 
     var ctx = canvas.getContext('2d');
     var particles = [];
-    var mouse = { x: -100, y: -100 };
-    var colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'];
+    var mouse = { x: null, y: null };
+    var colors = ['rgba(16, 185, 129,', 'rgba(59, 130, 246,', 'rgba(245, 158, 11,', 'rgba(236, 72, 153,'];
 
     function resize() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
     resize();
-    window.addEventListener('resize', resize);
 
-    // 鼠标事件
+    // 创建粒子
+    var count = window.innerWidth < 768 ? 30 : 50;
+    for (var i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 3 + 1,
+        speedX: (Math.random() - 0.5) * 0.5,
+        speedY: (Math.random() - 0.5) * 0.5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        opacity: Math.random() * 0.3 + 0.1
+      });
+    }
+
+    window.addEventListener('resize', resize);
     document.addEventListener('mousemove', function(e) {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
-
-      // 根据速度生成粒子
-      if (Math.random() > 0.5) {
-        particles.push({
-          x: mouse.x,
-          y: mouse.y,
-          vx: (Math.random() - 0.5) * 2,
-          vy: (Math.random() - 0.5) * 2,
-          life: 0,
-          maxLife: 30 + Math.random() * 30,
-          size: Math.random() * 3 + 1,
-          color: colors[Math.floor(Math.random() * colors.length)]
-        });
-      }
     });
-
-    document.addEventListener('click', function(e) {
-      for (var i = 0; i < 20; i++) {
-        particles.push({
-          x: e.clientX,
-          y: e.clientY,
-          vx: (Math.random() - 0.5) * 8,
-          vy: (Math.random() - 0.5) * 8,
-          life: 0,
-          maxLife: 40 + Math.random() * 40,
-          size: Math.random() * 4 + 1,
-          color: colors[Math.floor(Math.random() * colors.length)]
-        });
-      }
+    document.addEventListener('mouseleave', function() {
+      mouse.x = null;
+      mouse.y = null;
     });
 
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      var alive = [];
-      for (var i = 0; i < particles.length; i++) {
-        var p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= 0.98;
-        p.vy *= 0.98;
-        p.life++;
-
-        if (p.life < p.maxLife) {
-          alive.push(p);
-          var alpha = 1 - (p.life / p.maxLife);
-          ctx.globalAlpha = alpha;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-      particles = alive;
-
-      // 连线效果
-      ctx.globalAlpha = 1;
-      for (var i = 0; i < particles.length; i++) {
-        for (var j = i + 1; j < particles.length; j++) {
-          var dx = particles[i].x - particles[j].x;
-          var dy = particles[i].y - particles[j].y;
+      particles.forEach(function(p, i) {
+        // 鼠标交互
+        if (mouse.x !== null) {
+          var dx = mouse.x - p.x;
+          var dy = mouse.y - p.y;
           var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) {
+            var force = (150 - dist) / 150;
+            p.x -= (dx / dist) * force * 2;
+            p.y -= (dy / dist) * force * 2;
+          }
+        }
 
-          if (dist < 80) {
-            ctx.globalAlpha = (1 - dist / 80) * 0.2;
-            ctx.strokeStyle = '#10b981';
-            ctx.lineWidth = 1;
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color + p.opacity + ')';
+        ctx.fill();
+
+        // 连线
+        for (var j = i + 1; j < particles.length; j++) {
+          var other = particles[j];
+          var dx = p.x - other.x;
+          var dy = p.y - other.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 100) {
             ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(other.x, other.y);
+            ctx.strokeStyle = 'rgba(16, 185, 129, ' + (0.15 * (1 - dist / 100)) + ')';
+            ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }
-      }
-
-      ctx.globalAlpha = 1;
-
-      if (particles.length > 100) {
-        particles = particles.slice(-100);
-      }
+      });
 
       requestAnimationFrame(animate);
     }
@@ -360,30 +392,399 @@
     animate();
   }
 
-  // ========== 初始化 ==========
-  function init() {
-    // 数据卡片动画
-    animateCounter('counter-articles', 9, 1500);
-    animateCounter('counter-tags', 22, 1500);
-    animateCounter('counter-views', 1284, 2000);
-    animateCounter('counter-likes', 386, 1800);
+  // ========== 绘制折线图 ==========
+  function drawLineChart() {
+    var canvas = document.getElementById('trendLineChart');
+    if (!canvas) return;
 
-    // 进度条动画
-    animateProgress('progress-articles', 75);
-    animateProgress('progress-tags', 60);
-    animateProgress('progress-views', 85);
-    animateProgress('progress-likes', 45);
+    var ctx = canvas.getContext('2d');
+    var rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
 
-    // 图表渲染
-    renderTagsChart();
-    renderCategoryChart();
-    renderTrendChart();
+    var padding = { top: 20, right: 20, bottom: 40, left: 50 };
+    var width = canvas.width - padding.left - padding.right;
+    var height = canvas.height - padding.top - padding.bottom;
 
-    // 粒子效果
-    initParticles();
+    var maxVal = Math.max.apply(null, data.trends.data2025);
+    var minVal = 0;
+
+    // 绘制网格
+    ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+    ctx.lineWidth = 1;
+    for (var i = 0; i <= 5; i++) {
+      var y = padding.top + (height / 5) * i;
+      ctx.beginPath();
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(canvas.width - padding.right, y);
+      ctx.stroke();
+
+      // Y轴标签
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'right';
+      var val = maxVal - (maxVal / 5) * i;
+      ctx.fillText(formatNumber(val), padding.left - 10, y + 4);
+    }
+
+    // X轴标签
+    ctx.textAlign = 'center';
+    data.trends.labels.forEach(function(label, i) {
+      var x = padding.left + (width / (data.trends.labels.length - 1)) * i;
+      ctx.fillText(label, x, canvas.height - 10);
+    });
+
+    // 绘制2024数据线
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)';
+    ctx.lineWidth = 2;
+    data.trends.data2024.forEach(function(val, i) {
+      var x = padding.left + (width / (data.trends.labels.length - 1)) * i;
+      var y = padding.top + height - (val / maxVal) * height;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // 绘制2025数据线
+    ctx.beginPath();
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 3;
+    data.trends.data2025.forEach(function(val, i) {
+      var x = padding.left + (width / (data.trends.labels.length - 1)) * i;
+      var y = padding.top + height - (val / maxVal) * height;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // 绘制数据点
+    data.trends.data2025.forEach(function(val, i) {
+      var x = padding.left + (width / (data.trends.labels.length - 1)) * i;
+      var y = padding.top + height - (val / maxVal) * height;
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#10b981';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
   }
 
-  // 页面加载后初始化
+  // ========== 绘制雷达图 ==========
+  function drawRadarChart() {
+    var canvas = document.getElementById('skillsRadarChart');
+    if (!canvas) return;
+
+    var ctx = canvas.getContext('2d');
+    var rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    var centerX = canvas.width / 2;
+    var centerY = canvas.height / 2;
+    var radius = Math.min(centerX, centerY) - 40;
+    var levels = 5;
+    var labels = data.skills.labels;
+    var values = data.skills.values;
+
+    // 绘制网格
+    for (var i = 1; i <= levels; i++) {
+      var levelRadius = (radius / levels) * i;
+      ctx.beginPath();
+      for (var j = 0; j < labels.length; j++) {
+        var angle = (Math.PI * 2 * j) / labels.length - Math.PI / 2;
+        var x = centerX + Math.cos(angle) * levelRadius;
+        var y = centerY + Math.sin(angle) * levelRadius;
+        if (j === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.15)';
+      ctx.stroke();
+    }
+
+    // 绘制轴线和标签
+    for (var i = 0; i < labels.length; i++) {
+      var angle = (Math.PI * 2 * i) / labels.length - Math.PI / 2;
+      var x = centerX + Math.cos(angle) * radius;
+      var y = centerY + Math.sin(angle) * radius;
+
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(x, y);
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.2)';
+      ctx.stroke();
+
+      // 标签
+      var labelX = centerX + Math.cos(angle) * (radius + 25);
+      var labelY = centerY + Math.sin(angle) * (radius + 25);
+      ctx.fillStyle = '#374151';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(labels[i], labelX, labelY);
+    }
+
+    // 绘制数据区域
+    ctx.beginPath();
+    for (var i = 0; i < values.length; i++) {
+      var angle = (Math.PI * 2 * i) / values.length - Math.PI / 2;
+      var x = centerX + Math.cos(angle) * (radius * values[i] / 100);
+      var y = centerY + Math.sin(angle) * (radius * values[i] / 100);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
+    ctx.fill();
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 绘制数据点
+    for (var i = 0; i < values.length; i++) {
+      var angle = (Math.PI * 2 * i) / values.length - Math.PI / 2;
+      var x = centerX + Math.cos(angle) * (radius * values[i] / 100);
+      var y = centerY + Math.sin(angle) * (radius * values[i] / 100);
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#10b981';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
+  // ========== 绘制饼图 ==========
+  function drawPieChart() {
+    var canvas = document.getElementById('categoryPieChart');
+    if (!canvas) return;
+
+    var ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = 200;
+
+    var centerX = canvas.width / 2;
+    var centerY = canvas.height / 2;
+    var radius = Math.min(centerX, centerY) - 20;
+
+    var total = data.categories.reduce(function(sum, cat) { return sum + cat.count; }, 0);
+    var startAngle = -Math.PI / 2;
+
+    data.categories.forEach(function(cat) {
+      var sliceAngle = (cat.count / total) * Math.PI * 2;
+
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+      ctx.closePath();
+      ctx.fillStyle = cat.color;
+      ctx.fill();
+
+      // 标签
+      var midAngle = startAngle + sliceAngle / 2;
+      var labelX = centerX + Math.cos(midAngle) * (radius * 0.7);
+      var labelY = centerY + Math.sin(midAngle) * (radius * 0.7);
+
+      if (cat.count / total > 0.1) {
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(cat.name, labelX, labelY);
+      }
+
+      startAngle += sliceAngle;
+    });
+
+    // 图例
+    var legendHtml = data.categories.map(function(cat) {
+      return '<div class="flex items-center gap-2">' +
+        '<div class="w-3 h-3 rounded-full" style="background:' + cat.color + '"></div>' +
+        '<span class="text-xs text-stone-600">' + cat.name + ' ' + cat.count + '%</span>' +
+        '</div>';
+    }).join('');
+    document.getElementById('category-legend').innerHTML = legendHtml;
+  }
+
+  // ========== 渲染标签云 ==========
+  function renderTagCloud() {
+    var container = document.getElementById('tag-cloud');
+    if (!container) return;
+
+    var maxCount = Math.max.apply(null, data.tags.map(function(t) { return t.count; }));
+    var colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'];
+
+    container.innerHTML = data.tags.map(function(tag, i) {
+      var size = 12 + (tag.count / maxCount) * 16;
+      var color = colors[i % colors.length];
+      return '<span class="inline-block px-3 py-1 rounded-full cursor-pointer transition-all hover:scale-110 hover:shadow-md" ' +
+        'style="font-size:' + size + 'px; background:' + color + '15; color:' + color + '; border:1px solid ' + color + '30">' +
+        tag.name + ' <sup>' + tag.count + '</sup></span>';
+    }).join('');
+  }
+
+  // ========== 渲染热门文章 ==========
+  function renderPopularPosts() {
+    var container = document.getElementById('popular-posts');
+    if (!container) return;
+
+    container.innerHTML = data.popularPosts.map(function(post, i) {
+      var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+      var trendIcon = post.trend === 'up' ?
+        '<svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>' :
+        '<svg class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>';
+
+      return '<div class="flex items-center gap-3 p-3 rounded-xl hover:bg-stone-50 transition-colors cursor-pointer">' +
+        '<span class="text-lg w-8 text-center">' + medal + '</span>' +
+        '<div class="flex-1 min-w-0">' +
+        '<div class="font-medium text-sm text-stone-900 truncate">' + post.title + '</div>' +
+        '<div class="flex items-center gap-3 text-xs text-stone-500">' +
+        '<span>👁 ' + formatNumber(post.views) + '</span>' +
+        '<span>❤️ ' + post.likes + '</span>' +
+        '</div></div>' +
+        trendIcon +
+        '</div>';
+    }).join('');
+  }
+
+  // ========== 渲染热力图 ==========
+  function renderHeatmap() {
+    var container = document.getElementById('heatmap-container');
+    if (!container) return;
+
+    var today = new Date();
+    var weeks = [];
+    var currentWeek = [];
+
+    // 生成过去365天的数据
+    for (var i = 364; i >= 0; i--) {
+      var date = new Date(today);
+      date.setDate(date.getDate() - i);
+      var dayOfWeek = date.getDay();
+
+      if (dayOfWeek === 0 && currentWeek.length > 0) {
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }
+
+      currentWeek.push({
+        date: date.toISOString().split('T')[0],
+        count: Math.floor(Math.random() * 5),
+        day: dayOfWeek
+      });
+    }
+    if (currentWeek.length > 0) weeks.push(currentWeek);
+
+    var html = '<div class="flex gap-0.5">';
+    weeks.forEach(function(week) {
+      html += '<div class="flex flex-col gap-0.5">';
+      week.forEach(function(day) {
+        var color = day.count === 0 ? '#ebedf0' :
+          day.count === 1 ? '#9be9a8' :
+          day.count === 2 ? '#40c463' :
+          day.count === 3 ? '#30a14e' : '#216e39';
+        html += '<div class="w-2.5 h-2.5 rounded-sm cursor-pointer hover:ring-2 hover:ring-emerald-400 transition-all" ' +
+          'style="background:' + color + '" title="' + day.date + ': ' + day.count + ' 篇文章"></div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+
+    container.innerHTML = html;
+  }
+
+  // ========== 渲染时间线 ==========
+  function renderTimeline() {
+    var container = document.getElementById('timeline');
+    if (!container) return;
+
+    container.innerHTML = data.timeline.map(function(item) {
+      return '<div class="relative pl-10 opacity-0 animate-fade-in-up">' +
+        '<div class="absolute left-2.5 w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-lg">' +
+        item.icon + '</div>' +
+        '<div class="pb-6">' +
+        '<div class="text-xs text-emerald-600 font-medium mb-1">' + item.date + '</div>' +
+        '<div class="font-semibold text-stone-900">' + item.title + '</div>' +
+        '<div class="text-sm text-stone-500">' + item.desc + '</div>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  // ========== 渲染用户来源 ==========
+  function renderUserSources() {
+    var container = document.getElementById('user-sources');
+    if (!container) return;
+
+    container.innerHTML = data.sources.map(function(source) {
+      return '<div class="bg-stone-50 rounded-xl p-4 text-center">' +
+        '<div class="text-3xl mb-2">' + source.flag + '</div>' +
+        '<div class="font-semibold text-stone-900">' + source.country + '</div>' +
+        '<div class="text-2xl font-bold text-emerald-600 my-2">' + source.visitors + '%</div>' +
+        '<div class="w-full bg-stone-200 rounded-full h-2">' +
+        '<div class="h-full bg-emerald-500 rounded-full transition-all duration-1000" style="width:' + source.visitors + '%"></div>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  // ========== 数字动画 ==========
+  function initCounters() {
+    var counters = document.querySelectorAll('.counter');
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var target = parseInt(entry.target.getAttribute('data-target'));
+          animateCounter(entry.target, target, 2000);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(function(counter) { observer.observe(counter); });
+  }
+
+  // ========== 进度条动画 ==========
+  function initProgressBars() {
+    var bars = document.querySelectorAll('.progress-bar');
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var width = entry.target.getAttribute('data-width');
+          entry.target.style.width = width + '%';
+          entry.target.style.transition = 'width 1.5s ease-out';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    bars.forEach(function(bar) { observer.observe(bar); });
+  }
+
+  // ========== 初始化 ==========
+  function init() {
+    initParticles();
+    drawLineChart();
+    drawRadarChart();
+    drawPieChart();
+    renderTagCloud();
+    renderPopularPosts();
+    renderHeatmap();
+    renderTimeline();
+    renderUserSources();
+    initCounters();
+    initProgressBars();
+
+    // 窗口大小改变时重绘图表
+    window.addEventListener('resize', function() {
+      drawLineChart();
+      drawRadarChart();
+      drawPieChart();
+    });
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
@@ -391,3 +792,22 @@
   }
 })();
 </script>
+
+<style>
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+
+  /* 延迟动画 */
+  .animate-fade-in-up:nth-child(1) { animation-delay: 0.1s; }
+  .animate-fade-in-up:nth-child(2) { animation-delay: 0.2s; }
+  .animate-fade-in-up:nth-child(3) { animation-delay: 0.3s; }
+  .animate-fade-in-up:nth-child(4) { animation-delay: 0.4s; }
+  .animate-fade-in-up:nth-child(5) { animation-delay: 0.5s; }
+  .animate-fade-in-up:nth-child(6) { animation-delay: 0.6s; }
+</style>
