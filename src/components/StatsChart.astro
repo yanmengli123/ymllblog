@@ -1,5 +1,79 @@
 ---
-// 企业级统计仪表盘
+// 统计仪表盘 - 基于真实数据
+import { getCollection } from 'astro:content';
+
+// 获取所有已发布文章
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// 计算真实统计数据
+const totalPosts = allPosts.length;
+
+// 计算总字数
+let totalCharacters = 0;
+allPosts.forEach(post => {
+  totalCharacters += post.body?.length || 0;
+});
+
+// 估算阅读时间（中文约 400 字/分钟）
+const totalReadingMinutes = Math.ceil(totalCharacters / 400);
+
+// 获取所有标签并统计
+const tagMap = new Map<string, number>();
+allPosts.forEach(post => {
+  post.data.tags.forEach(tag => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  });
+});
+const totalTags = tagMap.size;
+const tags = Array.from(tagMap.entries())
+  .map(([name, count]) => ({ name, count }))
+  .sort((a, b) => b.count - a.count);
+
+// 获取所有分类并统计
+const categoryMap = new Map<string, number>();
+allPosts.forEach(post => {
+  const cat = post.data.category || '未分类';
+  categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
+});
+const categories = Array.from(categoryMap.entries())
+  .map(([name, count]) => ({ name, count }))
+  .sort((a, b) => b.count - a.count);
+
+// 按年份统计文章
+const yearMap = new Map<number, number>();
+allPosts.forEach(post => {
+  const year = post.data.pubDate.getFullYear();
+  yearMap.set(year, (yearMap.get(year) || 0) + 1);
+});
+const postsByYear = Array.from(yearMap.entries())
+  .sort((a, b) => a[0] - b[0]);
+
+// 按月统计文章（最近12个月）
+const monthMap = new Map<string, number>();
+const now = new Date();
+for (let i = 11; i >= 0; i--) {
+  const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+  const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  monthMap.set(key, 0);
+}
+allPosts.forEach(post => {
+  const date = post.data.pubDate;
+  const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  if (monthMap.has(key)) {
+    monthMap.set(key, (monthMap.get(key) || 0) + 1);
+  }
+});
+const monthlyData = Array.from(monthMap.entries());
+
+// 获取最新文章
+const latestPosts = allPosts
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+  .slice(0, 5);
+
+// 模拟访问数据（实际项目中应从分析服务获取）
+const totalViews = totalPosts * 156; // 基于文章数估算
+const totalLikes = totalPosts * 28;
+const totalComments = totalPosts * 12;
 ---
 
 <!-- 粒子背景画布 -->
@@ -13,172 +87,190 @@
         📊 博客数据<span class="gradient-text">仪表盘</span>
       </h2>
       <p class="text-stone-500 max-w-2xl mx-auto">
-        实时追踪博客运营数据，见证每一次成长
+        基于 {totalPosts} 篇文章、{totalCharacters.toLocaleString()} 字内容的真实数据统计
       </p>
     </div>
 
     <!-- 核心指标卡片 -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+      <!-- 文章总数 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
         <div class="flex items-center justify-between mb-4">
           <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
             <span class="text-2xl">📄</span>
           </div>
-          <span class="text-xs text-emerald-500 font-medium bg-emerald-50 px-2 py-1 rounded-full">+12%</span>
+          <span class="text-xs text-emerald-500 font-medium bg-emerald-50 px-2 py-1 rounded-full">已发布</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-posts">0</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target={totalPosts} id="counter-posts">0</div>
         <div class="text-sm text-stone-500">文章总数</div>
         <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
           <div class="h-full bg-emerald-500 rounded-full transition-all duration-1500" id="bar-posts" style="width: 0%"></div>
         </div>
       </div>
 
+      <!-- 总字数 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
         <div class="flex items-center justify-between mb-4">
           <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-            <span class="text-2xl">👀</span>
+            <span class="text-2xl">📝</span>
           </div>
-          <span class="text-xs text-blue-500 font-medium bg-blue-50 px-2 py-1 rounded-full">+28%</span>
+          <span class="text-xs text-blue-500 font-medium bg-blue-50 px-2 py-1 rounded-full">原创</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-views">0</div>
-        <div class="text-sm text-stone-500">总访问量</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target={Math.floor(totalCharacters / 1000)} id="counter-words">0</div>
+        <div class="text-sm text-stone-500">总字数 (千)</div>
         <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-          <div class="h-full bg-blue-500 rounded-full transition-all duration-1500" id="bar-views" style="width: 0%"></div>
+          <div class="h-full bg-blue-500 rounded-full transition-all duration-1500" id="bar-words" style="width: 0%"></div>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-        <div class="flex items-center justify-between mb-4">
-          <div class="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center">
-            <span class="text-2xl">❤️</span>
-          </div>
-          <span class="text-xs text-pink-500 font-medium bg-pink-50 px-2 py-1 rounded-full">+35%</span>
-        </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-likes">0</div>
-        <div class="text-sm text-stone-500">获赞总数</div>
-        <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-          <div class="h-full bg-pink-500 rounded-full transition-all duration-1500" id="bar-likes" style="width: 0%"></div>
-        </div>
-      </div>
-
+      <!-- 标签总数 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
         <div class="flex items-center justify-between mb-4">
           <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-            <span class="text-2xl">💬</span>
+            <span class="text-2xl">🏷️</span>
           </div>
-          <span class="text-xs text-purple-500 font-medium bg-purple-50 px-2 py-1 rounded-full">+18%</span>
+          <span class="text-xs text-purple-500 font-medium bg-purple-50 px-2 py-1 rounded-full">热门</span>
         </div>
-        <div class="text-3xl font-bold text-stone-900 mb-1" id="counter-comments">0</div>
-        <div class="text-sm text-stone-500">评论总数</div>
+        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target={totalTags} id="counter-tags">0</div>
+        <div class="text-sm text-stone-500">标签总数</div>
         <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-          <div class="h-full bg-purple-500 rounded-full transition-all duration-1500" id="bar-comments" style="width: 0%"></div>
+          <div class="h-full bg-purple-500 rounded-full transition-all duration-1500" id="bar-tags" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- 阅读时间 -->
+      <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
+            <span class="text-2xl">⏱️</span>
+          </div>
+          <span class="text-xs text-orange-500 font-medium bg-orange-50 px-2 py-1 rounded-full">预计</span>
+        </div>
+        <div class="text-3xl font-bold text-stone-900 mb-1 counter" data-target={totalReadingMinutes} id="counter-time">0</div>
+        <div class="text-sm text-stone-500">阅读时间 (分钟)</div>
+        <div class="mt-3 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+          <div class="h-full bg-orange-500 rounded-full transition-all duration-1500" id="bar-time" style="width: 0%"></div>
         </div>
       </div>
     </div>
 
     <!-- 图表区域 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-      <!-- 趋势图 -->
+      <!-- 发布趋势 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
         <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-          <span class="text-xl">📈</span> 访问趋势
+          <span class="text-xl">📈</span> 发布趋势 (最近12个月)
         </h3>
         <div class="h-64">
           <canvas id="trendChart"></canvas>
         </div>
       </div>
 
-      <!-- 雷达图 -->
+      <!-- 标签分布 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
         <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-          <span class="text-xl">🎯</span> 技能雷达
+          <span class="text-xl">🏷️</span> 标签分布
         </h3>
-        <div class="h-64">
-          <canvas id="radarChart"></canvas>
+        <div class="space-y-3" id="tagsBarChart">
+          {tags.slice(0, 8).map((tag, index) => {
+            const maxCount = tags[0].count;
+            const width = (tag.count / maxCount) * 100;
+            const colors = ['bg-emerald-500', 'bg-blue-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-cyan-500', 'bg-yellow-500', 'bg-red-500'];
+            return (
+              <div class="flex items-center gap-3">
+                <span class="text-sm text-stone-600 w-24 text-right">{tag.name}</span>
+                <div class="flex-1 h-8 bg-stone-100 rounded-full overflow-hidden">
+                  <div class={`h-full ${colors[index % colors.length]} rounded-full flex items-center justify-end pr-3 transition-all duration-1000`} style={`width: ${width}%`}>
+                    <span class="text-xs text-white font-bold">{tag.count}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
 
-    <!-- 标签、分类、热门文章 -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-      <!-- 标签云 -->
-      <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
-        <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-          <span class="text-xl">🏷️</span> 热门标签
-        </h3>
-        <div class="flex flex-wrap gap-2" id="tagCloud"></div>
-      </div>
-
-      <!-- 分类 -->
+    <!-- 分类和最新文章 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+      <!-- 分类统计 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
         <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
           <span class="text-xl">📊</span> 分类统计
         </h3>
-        <div class="h-48">
-          <canvas id="pieChart"></canvas>
+        <div class="grid grid-cols-2 gap-4">
+          {categories.map((cat, index) => {
+            const colors = [
+              { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-200' },
+              { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-200' },
+              { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-200' },
+              { bg: 'bg-orange-50', text: 'text-orange-600', border: 'border-orange-200' },
+            ];
+            const color = colors[index % colors.length];
+            return (
+              <div class={`${color.bg} rounded-xl p-4 text-center border ${color.border}`}>
+                <div class={`text-3xl font-bold ${color.text} mb-1`}>{cat.count}</div>
+                <div class={`text-sm ${color.text}`}>{cat.name}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <!-- 热门文章 -->
+      <!-- 最新文章 -->
       <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
         <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-          <span class="text-xl">🔥</span> 热门文章
+          <span class="text-xl">📰</span> 最新文章
         </h3>
-        <div class="space-y-3" id="popularPosts"></div>
+        <div class="space-y-3">
+          {latestPosts.map((post, index) => (
+            <a href={`/blog/${post.slug}`} class="flex items-center gap-3 p-3 rounded-xl hover:bg-stone-50 transition-colors">
+              <span class="text-lg font-bold text-emerald-500 w-8">{index + 1}</span>
+              <div class="flex-1 min-w-0">
+                <div class="font-medium text-sm text-stone-900 truncate">{post.data.title}</div>
+                <div class="text-xs text-stone-500">
+                  {post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
+                  · {post.data.tags.slice(0, 2).join(', ')}
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
     </div>
 
-    <!-- 热力图 -->
+    <!-- 发布热力图 -->
     <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
       <h3 class="text-lg font-bold text-stone-900 mb-6 flex items-center gap-2">
-        <span class="text-xl">📅</span> 发布热力图
+        <span class="text-xl">📅</span> 文章发布时间分布
       </h3>
-      <div class="overflow-x-auto" id="heatmap"></div>
+      <div class="grid grid-cols-4 md:grid-cols-6 gap-4">
+        {postsByYear.map(([year, count]) => (
+          <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 text-center border border-emerald-200">
+            <div class="text-2xl font-bold text-emerald-600 mb-1">{year}</div>
+            <div class="text-sm text-emerald-700">{count} 篇</div>
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 </section>
 
 <script is:inline>
-// 等待 DOM 加载完成
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Dashboard script loaded');
+  console.log('Dashboard loaded with real data');
 
-  // ========== 数据 ==========
-  var data = {
-    posts: 128,
-    views: 45600,
-    likes: 3256,
-    comments: 892,
-    tags: [
-      { name: 'Astro', count: 24 },
-      { name: 'React', count: 18 },
-      { name: 'TypeScript', count: 15 },
-      { name: 'Tailwind', count: 12 },
-      { name: 'Node.js', count: 10 },
-      { name: 'CSS', count: 8 }
-    ],
-    categories: [
-      { name: '前端工程', count: 45, color: '#10b981' },
-      { name: '后端开发', count: 25, color: '#3b82f6' },
-      { name: '算法', count: 20, color: '#f59e0b' },
-      { name: '设计', count: 10, color: '#ec4899' }
-    ],
-    popularPosts: [
-      { title: 'Astro 岛屿架构详解', views: 3245, likes: 287 },
-      { title: 'React Hooks 最佳实践', views: 2891, likes: 245 },
-      { title: 'Tailwind CSS 进阶技巧', views: 2456, likes: 198 },
-      { title: 'TypeScript 类型体操', views: 2134, likes: 176 },
-      { title: '算法面试高频题', views: 1987, likes: 165 }
-    ]
-  };
+  // 数据
+  var totalPosts = {totalPosts};
+  var totalCharacters = {totalCharacters};
+  var totalTags = {totalTags};
+  var totalReadingMinutes = {totalReadingMinutes};
+  var monthlyData = {JSON.stringify(monthlyData)};
 
-  // ========== 数字动画 ==========
+  // 数字动画
   function animateCounter(id, target, duration) {
     var el = document.getElementById(id);
-    if (!el) {
-      console.log('Element not found:', id);
-      return;
-    }
+    if (!el) return;
 
     var start = 0;
     var startTime = null;
@@ -189,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var easeOut = 1 - Math.pow(1 - progress, 4);
       var current = Math.floor(easeOut * target);
 
-      if (target >= 10000) {
+      if (target >= 1000) {
         el.textContent = (current / 1000).toFixed(1) + 'K';
       } else {
         el.textContent = current.toLocaleString();
@@ -203,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
     requestAnimationFrame(update);
   }
 
-  // ========== 进度条动画 ==========
+  // 进度条动画
   function animateBar(id, width) {
     var el = document.getElementById(id);
     if (!el) return;
@@ -213,22 +305,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 300);
   }
 
-  // ========== 粒子背景 ==========
+  // 粒子背景
   function initParticles() {
     var canvas = document.getElementById('particleBg');
-    if (!canvas) {
-      console.log('Particle canvas not found');
-      return;
-    }
+    if (!canvas) return;
 
     var ctx = canvas.getContext('2d');
-    if (!ctx) {
-      console.log('Cannot get canvas context');
-      return;
-    }
-
-    console.log('Initializing particles');
-
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -339,7 +421,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       particles = alive;
 
-      // 限制粒子数量
       if (particles.length > 80) {
         particles = particles.slice(-80);
       }
@@ -349,32 +430,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     animate();
-    console.log('Particles initialized');
   }
 
-  // ========== 折线图 ==========
+  // 折线图
   function drawLineChart() {
     var canvas = document.getElementById('trendChart');
-    if (!canvas) {
-      console.log('Trend chart canvas not found');
-      return;
-    }
+    if (!canvas) return;
 
     var ctx = canvas.getContext('2d');
     var rect = canvas.parentElement.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = rect.height;
 
-    console.log('Drawing line chart:', canvas.width, canvas.height);
-
     var padding = { top: 20, right: 20, bottom: 30, left: 40 };
     var width = canvas.width - padding.left - padding.right;
     var height = canvas.height - padding.top - padding.bottom;
 
-    var data2024 = [1200, 1900, 2500, 3200, 3800, 4200, 4800, 5200, 5800, 6200, 6800, 7200];
-    var data2025 = [2800, 3500, 4200, 5800, 7200, 8500, 9200, 10500, 11800, 13200, 14800, 16200];
-    var labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-    var maxVal = 18000;
+    var maxVal = Math.max.apply(null, monthlyData.map(function(d) { return d[1]; })) || 1;
 
     // 网格
     ctx.strokeStyle = 'rgba(0,0,0,0.05)';
@@ -389,287 +461,75 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.fillStyle = '#9ca3af';
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(((maxVal / 4) * (4 - i) / 1000).toFixed(0) + 'K', padding.left - 5, y + 4);
+      ctx.fillText(Math.round(maxVal * (4 - i) / 4), padding.left - 5, y + 4);
     }
 
     // X轴标签
     ctx.textAlign = 'center';
-    labels.forEach(function(label, i) {
-      var x = padding.left + (width / 11) * i;
+    monthlyData.forEach(function(item, i) {
+      var x = padding.left + (width / (monthlyData.length - 1)) * i;
+      var label = item[0].split('-')[1] + '月';
       ctx.fillText(label, x, canvas.height - 10);
     });
 
-    // 2024线
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)';
-    ctx.lineWidth = 2;
-    data2024.forEach(function(val, i) {
-      var x = padding.left + (width / 11) * i;
-      var y = padding.top + height - (val / maxVal) * height;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    // 2025线
+    // 绘制数据
     ctx.beginPath();
     ctx.strokeStyle = '#10b981';
     ctx.lineWidth = 3;
-    data2025.forEach(function(val, i) {
-      var x = padding.left + (width / 11) * i;
-      var y = padding.top + height - (val / maxVal) * height;
+    monthlyData.forEach(function(item, i) {
+      var x = padding.left + (width / (monthlyData.length - 1)) * i;
+      var y = padding.top + height - (item[1] / maxVal) * height;
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     });
     ctx.stroke();
 
+    // 填充区域
+    ctx.lineTo(padding.left + width, padding.top + height);
+    ctx.lineTo(padding.left, padding.top + height);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.1)';
+    ctx.fill();
+
     // 数据点
-    data2025.forEach(function(val, i) {
-      var x = padding.left + (width / 11) * i;
-      var y = padding.top + height - (val / maxVal) * height;
+    monthlyData.forEach(function(item, i) {
+      var x = padding.left + (width / (monthlyData.length - 1)) * i;
+      var y = padding.top + height - (item[1] / maxVal) * height;
       ctx.beginPath();
-      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
       ctx.fillStyle = '#10b981';
       ctx.fill();
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 2;
       ctx.stroke();
-    });
-  }
 
-  // ========== 雷达图 ==========
-  function drawRadarChart() {
-    var canvas = document.getElementById('radarChart');
-    if (!canvas) return;
-
-    var ctx = canvas.getContext('2d');
-    var rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-
-    var centerX = canvas.width / 2;
-    var centerY = canvas.height / 2;
-    var radius = Math.min(centerX, centerY) - 40;
-    var labels = ['前端开发', '后端开发', 'UI/UX', '技术写作', '算法', 'DevOps'];
-    var values = [90, 75, 70, 85, 80, 65];
-
-    // 网格
-    for (var i = 1; i <= 5; i++) {
-      var r = (radius / 5) * i;
-      ctx.beginPath();
-      for (var j = 0; j < 6; j++) {
-        var angle = (Math.PI * 2 * j) / 6 - Math.PI / 2;
-        var x = centerX + Math.cos(angle) * r;
-        var y = centerY + Math.sin(angle) * r;
-        if (j === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.strokeStyle = 'rgba(16, 185, 129, 0.15)';
-      ctx.stroke();
-    }
-
-    // 轴线
-    for (var i = 0; i < 6; i++) {
-      var angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
-      ctx.strokeStyle = 'rgba(16, 185, 129, 0.2)';
-      ctx.stroke();
-
-      // 标签
-      var lx = centerX + Math.cos(angle) * (radius + 20);
-      var ly = centerY + Math.sin(angle) * (radius + 20);
-      ctx.fillStyle = '#374151';
-      ctx.font = '11px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(labels[i], lx, ly);
-    }
-
-    // 数据区域
-    ctx.beginPath();
-    values.forEach(function(val, i) {
-      var angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-      var x = centerX + Math.cos(angle) * (radius * val / 100);
-      var y = centerY + Math.sin(angle) * (radius * val / 100);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
-    ctx.fill();
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // 数据点
-    values.forEach(function(val, i) {
-      var angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-      var x = centerX + Math.cos(angle) * (radius * val / 100);
-      var y = centerY + Math.sin(angle) * (radius * val / 100);
-      ctx.beginPath();
-      ctx.arc(x, y, 4, 0, Math.PI * 2);
-      ctx.fillStyle = '#10b981';
-      ctx.fill();
-    });
-  }
-
-  // ========== 饼图 ==========
-  function drawPieChart() {
-    var canvas = document.getElementById('pieChart');
-    if (!canvas) return;
-
-    var ctx = canvas.getContext('2d');
-    canvas.width = canvas.parentElement.offsetWidth;
-    canvas.height = 192;
-
-    var centerX = canvas.width / 2;
-    var centerY = canvas.height / 2;
-    var radius = Math.min(centerX, centerY) - 10;
-    var total = data.categories.reduce(function(sum, c) { return sum + c.count; }, 0);
-    var startAngle = -Math.PI / 2;
-
-    data.categories.forEach(function(cat) {
-      var sliceAngle = (cat.count / total) * Math.PI * 2;
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
-      ctx.closePath();
-      ctx.fillStyle = cat.color;
-      ctx.fill();
-
-      // 标签
-      var midAngle = startAngle + sliceAngle / 2;
-      var lx = centerX + Math.cos(midAngle) * (radius * 0.6);
-      var ly = centerY + Math.sin(midAngle) * (radius * 0.6);
-      if (cat.count / total > 0.08) {
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 11px sans-serif';
+      // 数值
+      if (item[1] > 0) {
+        ctx.fillStyle = '#374151';
+        ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(cat.name, lx, ly);
+        ctx.fillText(item[1], x, y - 12);
       }
-
-      startAngle += sliceAngle;
     });
   }
 
-  // ========== 标签云 ==========
-  function renderTagCloud() {
-    var container = document.getElementById('tagCloud');
-    if (!container) return;
+  // 启动
+  animateCounter('counter-posts', totalPosts, 1500);
+  animateCounter('counter-words', Math.floor(totalCharacters / 1000), 2000);
+  animateCounter('counter-tags', totalTags, 1200);
+  animateCounter('counter-time', totalReadingMinutes, 1800);
 
-    var maxCount = Math.max.apply(null, data.tags.map(function(t) { return t.count; }));
-    var colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'];
+  animateBar('bar-posts', Math.min(totalPosts * 10, 100));
+  animateBar('bar-words', Math.min(Math.floor(totalCharacters / 10000) * 10, 100));
+  animateBar('bar-tags', Math.min(totalTags * 5, 100));
+  animateBar('bar-time', Math.min(totalReadingMinutes / 10, 100));
 
-    container.innerHTML = data.tags.map(function(tag, i) {
-      var size = 12 + (tag.count / maxCount) * 14;
-      var color = colors[i % colors.length];
-      return '<span class="inline-block px-3 py-1 rounded-full cursor-pointer transition-all hover:scale-110" ' +
-        'style="font-size:' + size + 'px; background:' + color + '15; color:' + color + '; border:1px solid ' + color + '30">' +
-        tag.name + '</span>';
-    }).join('');
-  }
-
-  // ========== 热门文章 ==========
-  function renderPopularPosts() {
-    var container = document.getElementById('popularPosts');
-    if (!container) return;
-
-    container.innerHTML = data.popularPosts.map(function(post, i) {
-      var medal = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'][i];
-      return '<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-stone-50 transition-colors">' +
-        '<span class="text-lg">' + medal + '</span>' +
-        '<div class="flex-1 min-w-0">' +
-        '<div class="font-medium text-sm text-stone-900 truncate">' + post.title + '</div>' +
-        '<div class="text-xs text-stone-500">👁 ' + (post.views / 1000).toFixed(1) + 'K · ❤️ ' + post.likes + '</div>' +
-        '</div></div>';
-    }).join('');
-  }
-
-  // ========== 热力图 ==========
-  function renderHeatmap() {
-    var container = document.getElementById('heatmap');
-    if (!container) return;
-
-    var today = new Date();
-    var weeks = [];
-    var currentWeek = [];
-
-    for (var i = 364; i >= 0; i--) {
-      var date = new Date(today);
-      date.setDate(date.getDate() - i);
-      var dayOfWeek = date.getDay();
-
-      if (dayOfWeek === 0 && currentWeek.length > 0) {
-        weeks.push(currentWeek);
-        currentWeek = [];
-      }
-
-      currentWeek.push({
-        date: date.toISOString().split('T')[0],
-        count: Math.floor(Math.random() * 5)
-      });
-    }
-    if (currentWeek.length > 0) weeks.push(currentWeek);
-
-    var html = '<div class="flex gap-0.5">';
-    weeks.forEach(function(week) {
-      html += '<div class="flex flex-col gap-0.5">';
-      week.forEach(function(day) {
-        var color = day.count === 0 ? '#ebedf0' :
-          day.count === 1 ? '#9be9a8' :
-          day.count === 2 ? '#40c463' :
-          day.count === 3 ? '#30a14e' : '#216e39';
-        html += '<div class="w-2.5 h-2.5 rounded-sm cursor-pointer hover:ring-2 hover:ring-emerald-400" ' +
-          'style="background:' + color + '" title="' + day.date + ': ' + day.count + '"></div>';
-      });
-      html += '</div>';
-    });
-    html += '</div>';
-
-    container.innerHTML = html;
-  }
-
-  // ========== 启动 ==========
-  console.log('Starting dashboard initialization');
-
-  // 数字动画
-  animateCounter('counter-posts', data.posts, 1500);
-  animateCounter('counter-views', data.views, 2000);
-  animateCounter('counter-likes', data.likes, 1800);
-  animateCounter('counter-comments', data.comments, 1600);
-
-  // 进度条
-  animateBar('bar-posts', 85);
-  animateBar('bar-views', 92);
-  animateBar('bar-likes', 78);
-  animateBar('bar-comments', 65);
-
-  // 粒子
   initParticles();
 
-  // 图表 - 延迟绘制确保 canvas 尺寸正确
-  setTimeout(function() {
-    drawLineChart();
-    drawRadarChart();
-    drawPieChart();
-  }, 100);
+  setTimeout(drawLineChart, 100);
 
-  // 其他
-  renderTagCloud();
-  renderPopularPosts();
-  renderHeatmap();
+  window.addEventListener('resize', drawLineChart);
 
-  // 窗口大小改变时重绘
-  window.addEventListener('resize', function() {
-    drawLineChart();
-    drawRadarChart();
-    drawPieChart();
-  });
-
-  console.log('Dashboard initialization complete');
+  console.log('Dashboard initialized with', totalPosts, 'posts,', totalCharacters, 'characters');
 });
 </script>
