@@ -5,172 +5,301 @@ import Footer from '../components/Footer.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
+// 技能数据 - Matery 风格
 const skills = [
-  { name: 'React / Next.js', level: 95, color: 'from-blue-500 to-cyan-500' },
-  { name: 'TypeScript', level: 90, color: 'from-blue-600 to-indigo-600' },
-  { name: 'Tailwind CSS', level: 92, color: 'from-teal-500 to-emerald-500' },
-  { name: 'Node.js', level: 85, color: 'from-green-500 to-emerald-600' },
-  { name: 'Astro', level: 88, color: 'from-orange-500 to-red-500' },
-  { name: 'UI/UX Design', level: 80, color: 'from-purple-500 to-pink-500' },
+  { name: 'React / Next.js', level: 95, icon: '⚛️', color: '#61DAFB' },
+  { name: 'TypeScript', level: 90, icon: '📘', color: '#3178C6' },
+  { name: 'Tailwind CSS', level: 92, icon: '🎨', color: '#06B6D4' },
+  { name: 'Node.js', level: 85, icon: '🟢', color: '#339933' },
+  { name: 'Astro', level: 88, icon: '🚀', color: '#FF5D01' },
+  { name: 'Python', level: 80, icon: '🐍', color: '#3776AB' },
+  { name: 'Git', level: 88, icon: '📦', color: '#F05032' },
+  { name: 'Docker', level: 75, icon: '🐳', color: '#2496ED' },
 ];
 
+// 项目经历
+const projects = [
+  {
+    icon: '🌐',
+    title: '企业官网重构',
+    description: '使用 Astro + Tailwind 重构企业官网，性能提升 300%',
+    tags: ['Astro', 'Tailwind', 'SEO'],
+    gradient: 'from-purple-500 to-green-500',
+  },
+  {
+    icon: '📊',
+    title: '数据可视化平台',
+    description: '基于 React + ECharts 的实时数据监控大屏',
+    tags: ['React', 'ECharts', 'WebSocket'],
+    gradient: 'from-blue-500 to-cyan-500',
+  },
+  {
+    icon: '🛒',
+    title: '电商小程序',
+    description: '微信小程序商城，支持支付、物流、会员系统',
+    tags: ['WeChat', 'Node.js', 'MongoDB'],
+    gradient: 'from-orange-500 to-red-500',
+  },
+  {
+    icon: '🤖',
+    title: 'AI 聊天助手',
+    description: '基于 GPT API 的智能客服系统',
+    tags: ['Python', 'FastAPI', 'OpenAI'],
+    gradient: 'from-pink-500 to-purple-500',
+  },
+];
+
+// 工作经历
 const experiences = [
   {
     period: '2023 - 至今',
     title: '全栈开发工程师',
     company: '自由职业',
-    description: '专注于现代 Web 技术栈，为企业和个人提供高质量的网站和应用开发服务。擅长使用 React、Next.js、Astro 等框架构建高性能应用。',
+    description: '专注于现代 Web 技术栈，为企业和个人提供高质量的网站和应用开发服务。',
     current: true,
   },
   {
     period: '2021 - 2023',
     title: '前端开发工程师',
     company: '某科技公司',
-    description: '负责公司核心产品的前端架构设计和开发，优化用户体验和性能。带领团队完成多个重要项目的技术选型和落地。',
+    description: '负责公司核心产品的前端架构设计和开发，优化用户体验和性能。',
     current: false,
   },
   {
     period: '2019 - 2021',
     title: '初级前端开发',
     company: '创业公司',
-    description: '参与公司 Web 应用的开发，学习并实践现代前端技术。从零开始搭建了公司的前端技术体系。',
+    description: '参与公司 Web 应用的开发，学习并实践现代前端技术。',
     current: false,
   },
 ];
 
-const stats = [
-  { value: '50+', label: '个项目' },
-  { value: '100+', label: '篇文章' },
-  { value: '5K+', label: '次提交' },
-  { value: '2+', label: '年经验' },
+// 社交链接
+const socialLinks = [
+  { name: 'GitHub', url: 'https://github.com/yanmengli123', icon: 'github' },
+  { name: 'Blog', url: `${base}/`, icon: 'blog' },
+  { name: 'Email', url: 'mailto:contact@example.com', icon: 'email' },
 ];
 ---
 
 <Layout title="关于 - YMLL Blog" description="了解我 - 热爱技术与设计的开发者">
   <Header />
 
-  <main class="pt-24 pb-16">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Hero section */}
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
-        {/* Avatar & Info */}
-        <div>
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full text-emerald-600 text-sm font-medium mb-6">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            开放合作中
-          </div>
+  <main class="pt-20 pb-16">
+    {/* 个人介绍卡片 */}
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <div class="bg-white rounded-2xl shadow-card overflow-hidden" data-aos="fade-up">
+        {/* 顶部渐变条 */}
+        <div class="h-2 bg-gradient-to-r from-purple-500 to-green-500"></div>
 
-          <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-6">
-            你好，我是
-            <span class="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">YMLL</span>
-          </h1>
-
-          <p class="text-lg text-stone-600 leading-relaxed mb-8">
-            一个热爱技术与设计的全栈开发者。我相信优秀的代码应该像诗一样优雅，好的设计应该像水一样自然。
-            在这里，我记录我的学习、思考和创作。
-          </p>
-
-          <div class="flex flex-wrap gap-4">
-            <a
-              href={`${base}/blog`}
-              class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-emerald-500/25 transition-all hover:-translate-y-0.5"
-            >
-              查看文章
-            </a>
-            <a
-              href="https://github.com/yanmengli123"
-              target="_blank"
-              class="px-6 py-3 bg-white text-stone-700 font-medium rounded-xl border border-stone-200 hover:border-stone-300 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 inline-flex items-center gap-2"
-            >
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
-              </svg>
-              GitHub
-            </a>
-          </div>
-        </div>
-
-        {/* Avatar */}
-        <div class="flex justify-center lg:justify-end">
-          <div class="relative">
-            <div class="w-72 h-72 md:w-80 md:h-80 rounded-3xl bg-gradient-to-br from-emerald-400 to-teal-500 p-1 shadow-2xl shadow-emerald-500/25 rotate-3 hover:rotate-0 transition-transform duration-500">
-              <div class="w-full h-full rounded-3xl bg-stone-100 flex items-center justify-center overflow-hidden">
-                <div class="text-8xl">👨‍💻</div>
+        <div class="p-8 md:p-12">
+          <div class="flex flex-col md:flex-row items-center gap-8">
+            {/* 头像 - Matery 风格圆形头像 */}
+            <div class="relative">
+              <div class="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500 to-green-500 p-1 shadow-lg">
+                <div class="w-full h-full rounded-full bg-white flex items-center justify-center">
+                  <span class="text-5xl">👨‍💻</span>
+                </div>
               </div>
+              {/* 状态指示器 */}
+              <div class="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white"></div>
             </div>
-            {/* Floating elements */}
-            <div class="absolute -top-4 -right-4 w-20 h-20 bg-amber-100 rounded-2xl flex items-center justify-center shadow-lg rotate-12 hover:rotate-0 transition-transform duration-300">
-              <span class="text-3xl">⚡</span>
-            </div>
-            <div class="absolute -bottom-4 -left-4 w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg -rotate-12 hover:rotate-0 transition-transform duration-300">
-              <span class="text-3xl">🎨</span>
+
+            {/* 信息 */}
+            <div class="flex-1 text-center md:text-left">
+              <h1 class="text-3xl md:text-4xl font-bold mb-2">
+                <span class="bg-gradient-to-r from-purple-500 to-green-500 bg-clip-text text-transparent">
+                  YMLL
+                </span>
+              </h1>
+              <p class="text-xl text-stone-600 mb-4">全栈开发工程师 · 技术博主</p>
+              <p class="text-stone-500 leading-relaxed mb-6">
+                热爱技术与设计的全栈开发者。我相信优秀的代码应该像诗一样优雅，好的设计应该像水一样自然。
+                在这里，我记录我的学习、思考和创作。
+              </p>
+
+              {/* 社交链接 - Matery 风格 */}
+              <div class="flex justify-center md:justify-start gap-3">
+                {socialLinks.map(link => (
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-green-500 flex items-center justify-center text-white hover:shadow-lg hover:shadow-purple-500/30 transition-all hover:-translate-y-1"
+                    title={link.name}
+                  >
+                    {link.icon === 'github' && (
+                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+                      </svg>
+                    )}
+                    {link.icon === 'blog' && (
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                      </svg>
+                    )}
+                    {link.icon === 'email' && (
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    )}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </section>
 
-      {/* Stats */}
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-24">
-        {stats.map(stat => (
-          <div class="bg-white rounded-2xl p-6 text-center border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
-            <div class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
-              {stat.value}
+    {/* 技能展示 - Matery 风格 */}
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <h2 class="text-2xl font-bold text-stone-900 mb-8 flex items-center gap-2" data-aos="fade-up">
+        <span class="w-2 h-8 bg-gradient-to-b from-purple-500 to-green-500 rounded-full"></span>
+        技能专长
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {skills.map((skill, index) => (
+          <div
+            class="bg-white rounded-xl p-5 shadow-card hover:shadow-card-hover transition-all"
+            data-aos="fade-up"
+            data-aos-delay={index * 50}
+          >
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">{skill.icon}</span>
+                <span class="font-medium text-stone-900">{skill.name}</span>
+              </div>
+              <span class="text-sm font-bold" style={`color: ${skill.color}`}>{skill.level}%</span>
             </div>
-            <div class="text-sm text-stone-500">{stat.label}</div>
+            <div class="h-3 bg-stone-100 rounded-full overflow-hidden">
+              <div
+                class="h-full rounded-full transition-all duration-1000"
+                style={`width: ${skill.level}%; background: linear-gradient(to right, ${skill.color}, ${skill.color}dd);`}
+                data-width={skill.level}
+              ></div>
+            </div>
           </div>
         ))}
       </div>
+    </section>
 
-      {/* Skills */}
-      <div class="mb-24">
-        <h2 class="text-3xl font-bold text-stone-900 mb-8 text-center">技能专长</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {skills.map(skill => (
-            <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
-              <div class="flex items-center justify-between mb-4">
-                <span class="font-semibold text-stone-800">{skill.name}</span>
-                <span class="text-sm font-medium text-emerald-600">{skill.level}%</span>
-              </div>
-              <div class="h-3 bg-stone-100 rounded-full overflow-hidden">
-                <div
-                  class={`h-full bg-gradient-to-r ${skill.color} rounded-full transition-all duration-1000 ease-out`}
-                  style={`width: ${skill.level}%`}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+    {/* 项目经历 - Matery 风格 */}
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <h2 class="text-2xl font-bold text-stone-900 mb-8 flex items-center gap-2" data-aos="fade-up">
+        <span class="w-2 h-8 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-full"></span>
+        项目经历
+      </h2>
 
-      {/* Experience */}
-      <div>
-        <h2 class="text-3xl font-bold text-stone-900 mb-8 text-center">工作经历</h2>
-        <div class="space-y-8">
-          {experiences.map(exp => (
-            <div class="relative bg-white rounded-2xl p-8 border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
-              {exp.current && (
-                <div class="absolute top-4 right-4 px-3 py-1 bg-emerald-50 text-emerald-600 text-xs font-medium rounded-full">
-                  当前
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {projects.map((project, index) => (
+          <div
+            class="bg-white rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all hover:-translate-y-1"
+            data-aos="zoom-in"
+            data-aos-delay={index * 100}
+          >
+            <div class={`h-2 bg-gradient-to-r ${project.gradient}`}></div>
+            <div class="p-6">
+              <div class="flex items-start gap-4">
+                <div class={`w-12 h-12 rounded-xl bg-gradient-to-br ${project.gradient} flex items-center justify-center text-2xl shadow-md`}>
+                  {project.icon}
                 </div>
-              )}
-              <div class="flex flex-wrap items-center gap-3 mb-4">
-                <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-sm font-medium rounded-lg">
-                  {exp.period}
-                </span>
-                <span class="text-lg font-bold text-stone-900">{exp.title}</span>
-                <span class="text-stone-400">•</span>
-                <span class="text-stone-600">{exp.company}</span>
+                <div class="flex-1">
+                  <h3 class="font-bold text-stone-900 mb-2">{project.title}</h3>
+                  <p class="text-sm text-stone-600 mb-3">{project.description}</p>
+                  <div class="flex flex-wrap gap-2">
+                    {project.tags.map(tag => (
+                      <span class="px-2 py-1 text-xs bg-stone-100 text-stone-600 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <p class="text-stone-600 leading-relaxed">{exp.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* 工作经历 - Matery 风格时间线 */}
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <h2 class="text-2xl font-bold text-stone-900 mb-8 flex items-center gap-2" data-aos="fade-up">
+        <span class="w-2 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></span>
+        工作经历
+      </h2>
+
+      <div class="relative">
+        {/* 时间线 */}
+        <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-green-500"></div>
+
+        <div class="space-y-8">
+          {experiences.map((exp, index) => (
+            <div
+              class="relative pl-16"
+              data-aos="fade-up"
+              data-aos-delay={index * 100}
+            >
+              {/* 时间点 */}
+              <div class="absolute left-6 w-4 h-4 rounded-full bg-gradient-to-br from-purple-500 to-green-500 border-4 border-white shadow-md"></div>
+
+              {/* 内容卡片 */}
+              <div class={`bg-white rounded-xl p-6 shadow-card ${exp.current ? 'ring-2 ring-emerald-500' : ''}`}>
+                <div class="flex flex-wrap items-center gap-3 mb-3">
+                  <span class="px-3 py-1 text-sm font-medium bg-gradient-to-r from-purple-500 to-green-500 text-white rounded-full">
+                    {exp.period}
+                  </span>
+                  {exp.current && (
+                    <span class="px-3 py-1 text-sm font-medium bg-emerald-100 text-emerald-700 rounded-full">
+                      当前
+                    </span>
+                  )}
+                </div>
+                <h3 class="text-lg font-bold text-stone-900 mb-1">{exp.title}</h3>
+                <p class="text-stone-600 mb-2">{exp.company}</p>
+                <p class="text-sm text-stone-500">{exp.description}</p>
+              </div>
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </section>
+
+    {/* 联系方式 */}
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-r from-purple-600 to-green-600 rounded-2xl p-8 md:p-12 text-center text-white" data-aos="fade-up">
+        <h2 class="text-2xl md:text-3xl font-bold mb-4">想和我聊聊？</h2>
+        <p class="text-white/80 mb-8 max-w-md mx-auto">
+          无论是技术问题、合作机会还是只是想打个招呼，都欢迎联系我
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a
+            href="https://github.com/yanmengli123"
+            target="_blank"
+            class="px-6 py-3 bg-white text-purple-600 font-bold rounded-btn hover:bg-yellow-300 hover:text-purple-700 transition-all"
+          >
+            GitHub
+          </a>
+          <a
+            href="mailto:contact@example.com"
+            class="px-6 py-3 bg-white/20 text-white font-bold rounded-btn border-2 border-white/50 hover:bg-white/30 transition-all"
+          >
+            发送邮件
+          </a>
+        </div>
+      </div>
+    </section>
   </main>
 
   <Footer />
 </Layout>
+
+<style>
+  .shadow-card {
+    box-shadow: 0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07);
+  }
+  .shadow-card-hover:hover {
+    box-shadow: 0 18px 40px rgba(50, 50, 93, .15), 0 8px 20px rgba(0, 0, 0, .1);
+  }
+</style>

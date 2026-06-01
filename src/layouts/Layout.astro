@@ -187,6 +187,54 @@ const jsonLD = generateJSONLD({
           pre.style.position = 'relative';
           pre.appendChild(copyBtn);
         });
+
+        // 为代码块添加行号
+        document.querySelectorAll('pre code').forEach(function(codeBlock) {
+          var lines = codeBlock.textContent.split('\n');
+          var lineNumbers = document.createElement('div');
+          lineNumbers.className = 'line-numbers';
+          lineNumbers.style.cssText = 'position:absolute;left:0;top:0;padding:1.5rem 0;width:2.5rem;text-align:right;color:#4b5263;font-size:0.75rem;line-height:1.7;user-select:none;border-right:1px solid #313244;';
+
+          for (var i = 1; i <= lines.length; i++) {
+            var lineNum = document.createElement('div');
+            lineNum.textContent = i;
+            lineNumbers.appendChild(lineNum);
+          }
+
+          codeBlock.parentElement.style.position = 'relative';
+          codeBlock.parentElement.insertBefore(lineNumbers, codeBlock);
+          codeBlock.style.paddingLeft = '3.5rem';
+        });
+
+        // 图片点击放大功能 - Matery 风格
+        var overlay = document.createElement('div');
+        overlay.id = 'image-overlay';
+        overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;cursor:zoom-out;justify-content:center;align-items:center;';
+        overlay.innerHTML = '<img id="overlay-img" style="max-width:90%;max-height:90%;object-fit:contain;border-radius:8px;" />';
+        document.body.appendChild(overlay);
+
+        var overlayImg = document.getElementById('overlay-img');
+
+        document.querySelectorAll('.prose img, article img').forEach(function(img) {
+          img.style.cursor = 'zoom-in';
+          img.addEventListener('click', function() {
+            overlayImg.src = this.src;
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+          });
+        });
+
+        overlay.addEventListener('click', function() {
+          overlay.style.display = 'none';
+          document.body.style.overflow = '';
+        });
+
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && overlay.style.display === 'flex') {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+          }
+        });
       });
     </script>
 
