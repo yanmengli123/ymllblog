@@ -2,11 +2,10 @@
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const navItems = [
-  { label: '首页', href: `${base}/` },
-  { label: '博客', href: `${base}/blog` },
-  { label: '标签', href: `${base}/tags` },
-  { label: '归档', href: `${base}/archive` },
-  { label: '关于', href: `${base}/about` },
+  { label: '首页', href: `${base}/`, icon: 'fa-home' },
+  { label: '标签', href: `${base}/tags`, icon: 'fa-tags' },
+  { label: '归档', href: `${base}/archive`, icon: 'fa-archive' },
+  { label: '关于', href: `${base}/about`, icon: 'fa-user' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -14,23 +13,21 @@ const currentPath = Astro.url.pathname;
 function isActive(href: string) {
   const cleanHref = href.replace(/\/$/, '') || '/';
   const cleanPath = currentPath.replace(/\/$/, '') || '/';
-  if (cleanHref === base || cleanHref === '/') {
-    return cleanPath === base || cleanPath === '/' || cleanPath === `${base}/`;
-  }
+  if (cleanHref === base || cleanHref === '/') return cleanPath === base || cleanPath === '/' || cleanPath === `${base}/`;
   return cleanPath.startsWith(cleanHref);
 }
 ---
 
 <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
   <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-20">
+    <div class="flex items-center justify-between h-16">
       <!-- Logo -->
-      <a href={base} class="flex items-center gap-3 group">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-all duration-300 group-hover:scale-105">
+      <a href={`${base}/`} class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-green-500 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all group-hover:scale-105">
           <span class="text-white font-bold text-lg">Y</span>
         </div>
-        <span class="text-xl font-semibold text-stone-800 group-hover:text-emerald-600 transition-colors">
-          YMLL<span class="text-emerald-500">.</span>blog
+        <span class="text-xl font-bold bg-gradient-to-r from-purple-500 to-green-500 bg-clip-text text-transparent">
+          YMLL Blog
         </span>
       </a>
 
@@ -42,34 +39,17 @@ function isActive(href: string) {
             class:list={[
               'relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
               isActive(item.href)
-                ? 'text-emerald-600 bg-emerald-50'
+                ? 'text-white bg-gradient-to-r from-purple-500 to-green-500 shadow-md'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/80'
             ]}
           >
             {item.label}
-            {isActive(item.href) && (
-              <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-emerald-500 rounded-full" />
-            )}
           </a>
         ))}
       </div>
 
       <!-- Right actions -->
       <div class="flex items-center gap-2">
-        <!-- Theme toggle -->
-        <button
-          id="theme-toggle"
-          class="p-2.5 rounded-lg text-stone-500 hover:text-stone-700 hover:bg-stone-100 transition-all"
-          aria-label="切换主题"
-        >
-          <svg class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-          <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-          </svg>
-        </button>
-
         <!-- RSS -->
         <a
           href={`${base}/rss.xml`}
@@ -97,14 +77,14 @@ function isActive(href: string) {
 
     <!-- Mobile menu -->
     <div id="mobile-menu" class="hidden md:hidden pb-4">
-      <div class="glass rounded-2xl p-4 space-y-1">
+      <div class="bg-white rounded-xl shadow-card p-4 space-y-1">
         {navItems.map(item => (
           <a
             href={item.href}
             class:list={[
-              'block px-4 py-3 rounded-xl text-sm font-medium transition-all',
+              'block px-4 py-3 rounded-lg text-sm font-medium transition-all',
               isActive(item.href)
-                ? 'text-emerald-600 bg-emerald-50'
+                ? 'text-white bg-gradient-to-r from-purple-500 to-green-500'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-stone-50'
             ]}
           >
@@ -117,36 +97,30 @@ function isActive(href: string) {
 </header>
 
 <script>
-  // Header scroll effect
+  // Header scroll effect - Matery 风格
   const header = document.getElementById('header');
-  let lastScroll = 0;
 
   window.addEventListener('scroll', () => {
     const currentScroll = window.scrollY;
 
     if (currentScroll > 50) {
-      header?.classList.add('glass', 'shadow-sm');
+      header?.classList.add('bg-white/95', 'backdrop-blur-md', 'shadow-nav');
     } else {
-      header?.classList.remove('glass', 'shadow-sm');
+      header?.classList.remove('bg-white/95', 'backdrop-blur-md', 'shadow-nav');
     }
-
-    lastScroll = currentScroll;
-  });
-
-  // Theme toggle
-  const themeToggle = document.getElementById('theme-toggle');
-  themeToggle?.addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
   });
 
   // Mobile menu
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
-  let menuOpen = false;
 
   mobileMenuToggle?.addEventListener('click', () => {
-    menuOpen = !menuOpen;
     mobileMenu?.classList.toggle('hidden');
   });
 </script>
+
+<style>
+  .shadow-nav {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+  }
+</style>

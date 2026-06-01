@@ -98,6 +98,9 @@ const jsonLD = generateJSONLD({
     {/* KaTeX Math Rendering */}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
 
+    {/* AOS - Animate On Scroll */}
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+
     {/* JSON-LD */}
     <script type="application/ld+json" set:html={JSON.stringify(jsonLD)} />
   </head>
@@ -110,6 +113,19 @@ const jsonLD = generateJSONLD({
     </div>
 
     <slot />
+
+    {/* AOS Script */}
+    <script is:inline src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+          easing: 'ease-in-out-sine',
+          duration: 700,
+          delay: 100,
+          once: true
+        });
+      });
+    </script>
 
     {/* Smooth scroll script */}
     <script>

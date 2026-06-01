@@ -28,50 +28,52 @@ const formattedDate = new Date(date).toLocaleDateString('zh-CN', {
   month: 'short',
   day: 'numeric',
 });
+
+// Matery 风格标签颜色
+const tagColors = [
+  '#F9EBEA', '#F5EEF8', '#D5F5E3', '#E8F8F5', '#FEF9E7',
+  '#82E0AA', '#D7BDE2', '#A3E4D7', '#85C1E9', '#F8C471'
+];
 ---
 
 <article class:list={[
-  'group relative overflow-hidden rounded-2xl transition-all duration-500',
-  featured
-    ? 'md:col-span-2 md:grid md:grid-cols-2'
-    : '',
-  'hover-lift'
+  'group relative bg-white rounded-card overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-500 hover:-translate-y-2',
+  featured ? 'md:col-span-2 md:grid md:grid-cols-2' : '',
 ]}>
-  {/* Image */}
-  {image ? (
-    <div class:list={[
-      'overflow-hidden',
-      featured ? 'aspect-[4/3] md:aspect-auto' : 'aspect-[16/10]'
-    ]}>
+  {/* Image - Matery 风格 */}
+  <div class:list={[
+    'relative overflow-hidden',
+    featured ? 'aspect-[4/3] md:aspect-auto' : 'aspect-[16/10]'
+  ]}>
+    {image ? (
       <img
         src={image}
         alt={title}
-        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         loading="lazy"
       />
-      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-    </div>
-  ) : (
-    <div class:list={[
-      'bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center',
-      featured ? 'aspect-[4/3] md:aspect-auto' : 'aspect-[16/10]'
-    ]}>
-      <div class="text-6xl opacity-20">📝</div>
-    </div>
-  )}
+    ) : (
+      <div class="w-full h-full bg-gradient-to-br from-purple-500 to-green-500 flex items-center justify-center">
+        <span class="text-6xl opacity-30">📝</span>
+      </div>
+    )}
+    {/* 渐变覆盖层 */}
+    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+  </div>
 
   {/* Content */}
   <div class:list={[
-    'p-6 md:p-8',
+    'p-6',
     featured ? 'flex flex-col justify-center' : '',
-    'bg-white/80 backdrop-blur-sm',
-    image ? 'absolute bottom-0 left-0 right-0 md:relative md:bg-transparent' : ''
   ]}>
-    {/* Tags */}
+    {/* Tags - Matery 风格彩色标签 */}
     {tags.length > 0 && (
       <div class="flex flex-wrap gap-2 mb-4">
-        {tags.slice(0, 3).map(tag => (
-          <span class="px-3 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
+        {tags.slice(0, 3).map((tag, index) => (
+          <span
+            class="px-3 py-1 text-xs font-medium rounded-chip transition-all hover:scale-105"
+            style={`background: ${tagColors[index % tagColors.length]}; color: #34495e;`}
+          >
             {tag}
           </span>
         ))}
@@ -115,6 +117,15 @@ const formattedDate = new Date(date).toLocaleDateString('zh-CN', {
     </div>
   </div>
 
-  {/* Hover effect border */}
-  <div class="absolute inset-0 rounded-2xl border-2 border-emerald-500/0 group-hover:border-emerald-500/50 transition-all duration-500 pointer-events-none" />
+  {/* Matery 风格边框动画 */}
+  <div class="absolute inset-0 rounded-card border-2 border-transparent group-hover:border-purple-500/30 transition-all duration-500 pointer-events-none"></div>
 </article>
+
+<style>
+  .shadow-card {
+    box-shadow: 0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07);
+  }
+  .shadow-card-hover:hover {
+    box-shadow: 0 18px 40px rgba(50, 50, 93, .15), 0 8px 20px rgba(0, 0, 0, .1);
+  }
+</style>
