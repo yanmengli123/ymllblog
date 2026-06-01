@@ -440,6 +440,136 @@ const jsonLD = generateJSONLD({
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
+      // ============ 9. 自动夜间模式 ============
+      function initAutoDarkMode() {
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+        var hour = new Date().getHours();
+        var savedTheme = localStorage.getItem('theme');
+
+        // 优先使用用户手动选择
+        if (savedTheme) {
+          if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+          }
+          return;
+        }
+
+        // 系统偏好或时间规则（19:00-7:00 自动深色）
+        var shouldDark = prefersDark.matches || hour >= 19 || hour < 7;
+
+        if (shouldDark) {
+          document.documentElement.classList.add('dark');
+        }
+
+        // 监听系统主题变化
+        prefersDark.addEventListener('change', function(e) {
+          if (!localStorage.getItem('theme')) {
+            document.documentElement.classList.toggle('dark', e.matches);
+          }
+        });
+      }
+      initAutoDarkMode();
+
+      // ============ 10. 鼠标跟随光晕 ============
+      var mouseFollower = document.createElement('div');
+      mouseFollower.id = 'mouse-follower';
+      mouseFollower.style.cssText = 'position:fixed;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle,rgba(191,48,172,0.3),rgba(15,157,88,0.1));pointer-events:none;z-index:9997;transition:transform 0.15s ease-out;mix-blend-mode:screen;';
+      document.body.appendChild(mouseFollower);
+
+      var mouseX = 0, mouseY = 0;
+      var followerX = 0, followerY = 0;
+
+      document.addEventListener('mousemove', function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      function animateFollower() {
+        followerX += (mouseX - followerX) * 0.15;
+        followerY += (mouseY - followerY) * 0.15;
+        mouseFollower.style.transform = 'translate(' + (followerX - 12) + 'px, ' + (followerY - 12) + 'px)';
+        requestAnimationFrame(animateFollower);
+      }
+      animateFollower();
+
+      // ============ 11. 阅读剩余时间 (文章页) ============
+      var articleContent = document.querySelector('.prose, .post-content, article');
+      if (articleContent) {
+        var readingTimeEl = document.createElement('div');
+        readingTimeEl.id = 'reading-time-remain';
+        readingTimeEl.style.cssText = 'position:fixed;bottom:80px;left:20px;background:white;padding:8px 16px;border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-size:0.875rem;color:#666;z-index:100;opacity:0;transition:opacity 0.3s;display:flex;align-items:center;gap:6px;';
+        readingTimeEl.innerHTML = '⏱️ 计算中...';
+        document.body.appendChild(readingTimeEl);
+
+        var totalWords = articleContent.textContent.trim().length;
+        var readSpeed = 400; // 中文阅读速度 字/分钟
+
+        window.addEventListener('scroll', function() {
+          var scrollTop = window.scrollY;
+          var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          var percent = Math.min(100, Math.max(0, (scrollTop / docHeight) * 100));
+
+          if (percent > 10 && percent < 90) {
+            var remainWords = totalWords * (1 - percent / 100);
+            var remainMinutes = Math.ceil(remainWords / readSpeed);
+            readingTimeEl.innerHTML = '⏱️ 剩余约 ' + remainMinutes + ' 分钟';
+            readingTimeEl.style.opacity = '1';
+          } else {
+            readingTimeEl.style.opacity = '0';
+          }
+        });
+      }
+
+      // ============ 12. 文章更新提醒 ============
+      var updatedBadges = document.querySelectorAll('[data-updated]');
+      updatedBadges.forEach(function(badge) {
+        var updatedDate = new Date(badge.getAttribute('data-updated'));
+        var now = new Date();
+        var diffDays = Math.floor((now - updatedDate) / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 7) {
+          badge.style.display = 'inline-flex';
+          badge.innerHTML = '🔄 最近更新';
+        }
+      });
+
+      // ============ 13. 邮件订阅弹窗 ============
+      var hasShownSubscribe = localStorage.getItem('ymll_subscribe_shown');
+      if (!hasShownSubscribe) {
+        setTimeout(function() {
+          var modal = document.createElement('div');
+          modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;';
+          modal.innerHTML = '<div style="background:white;border-radius:16px;padding:2rem;max-width:400px;width:90%;text-align:center;position:relative;"><button onclick="this.closest(\'div[style]\').remove()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;">✕</button><div style="font-size:3rem;margin-bottom:1rem;">📬</div><h3 style="font-size:1.25rem;font-weight:bold;margin-bottom:0.5rem;color:#1a1a1a;">订阅我的周报</h3><p style="color:#666;margin-bottom:1.5rem;font-size:0.875rem;">每周分享技术洞察、设计灵感和个人思考</p><form onsubmit="event.preventDefault();localStorage.setItem(\'ymll_subscribe_shown\',\'true\');this.closest(\'div[style]\').remove();alert(\'感谢订阅！\');" style="display:flex;gap:0.5rem;"><input type="email" placeholder="your@email.com" required style="flex:1;padding:0.75rem;border:2px solid #e5e7eb;border-radius:8px;outline:none;"><button type="submit" style="padding:0.75rem 1.5rem;background:linear-gradient(to right,#bf30ac,#0f9d58);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">订阅</button></form><p style="color:#999;font-size:0.75rem;margin-top:1rem;">🔒 我们尊重您的隐私，随时可取消订阅</p></div>';
+
+          // 30秒后或滚动50%后显示
+          var shown = false;
+          function showSubscribe() {
+            if (shown) return;
+            shown = true;
+            document.body.appendChild(modal);
+            localStorage.setItem('ymll_subscribe_shown', 'true');
+          }
+
+          setTimeout(showSubscribe, 30000);
+
+          window.addEventListener('scroll', function() {
+            var percent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+            if (percent > 0.5) showSubscribe();
+          });
+        }, 10000);
+      }
+
+      // ============ 14. 页面滚动进度 (文章页) ============
+      var progressBar = document.getElementById('reading-progress');
+      if (progressBar) {
+        window.addEventListener('scroll', function() {
+          var scrollTop = window.scrollY;
+          var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          var percent = Math.min(100, Math.max(0, (scrollTop / docHeight) * 100));
+          progressBar.style.width = percent + '%';
+        });
+      }
+
     })();
     </script>
   </body>
