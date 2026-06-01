@@ -4,13 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-YMLL Blog — a Chinese-language personal tech/design blog built as a fully static site. Deployed to GitHub Pages at `https://yanmengli123.github.io/ymllblog`.
+YMLL Blog — a Chinese-language personal tech/design blog built as a fully static site. Deployed to GitHub Pages at `https://yanmengli123.github.io/ymllblog`. Design inspired by Hexo Matery theme with Material Design aesthetics.
 
 ## Tech Stack
 
 - **Framework:** Astro 4.x (static output mode)
 - **Styling:** Tailwind CSS 3.4 via `@astrojs/tailwind`
 - **Interactivity:** React 18 + Framer Motion 11 (used only in `AnimatedPostCard.tsx`)
+- **Animations:** AOS (Animate On Scroll) for scroll-triggered animations
 - **Math Rendering:** KaTeX via `remark-math` + `rehype-katex`
 - **Language:** TypeScript (strict mode)
 - **Deployment:** GitHub Pages via GitHub Actions
@@ -65,20 +66,27 @@ Located in `src/lib/`:
 | File | Purpose |
 |------|---------|
 | `astro.config.mjs` | Site URL (`yanmengli123.github.io`), base path (`/ymllblog`), integrations, KaTeX config |
+| `tailwind.config.mjs` | Design system: Matery-inspired purple-to-green gradient theme |
 | `src/content/config.ts` | Content collection schema (blog posts) |
 | `src/lib/posts.ts` | Post query functions |
-| `src/layouts/Layout.astro` | Base HTML, SEO meta, OG tags, JSON-LD, KaTeX CSS, font loading |
-| `src/layouts/PostLayout.astro` | Blog post layout with TOC, author info, related posts, math styling |
+| `src/layouts/Layout.astro` | Base HTML, SEO meta, OG tags, JSON-LD, AOS init, KaTeX CSS |
+| `src/layouts/PostLayout.astro` | Blog post layout with TOC, reading progress, author info, related posts |
 | `src/components/Header.astro` | Navigation with scroll effects, mobile menu |
-| `src/components/TableOfContents.astro` | Auto-generated TOC from headings |
+| `src/components/HeroSection.astro` | Homepage hero with gradient background |
+| `src/components/StatsChart.astro` | Dynamic statistics dashboard with real data from content collections |
 | `.github/workflows/deploy.yml` | GitHub Pages deployment pipeline |
 
-## Design System
+## Design System (Matery-Inspired)
 
-- **Primary color:** Emerald (#10b981) — defined in `tailwind.config.mjs`
+- **Primary gradient:** Purple (#bf30ac) to Green (#0f9d58) — used on nav, footer, accents
+- **Accent color:** Vue.js green (#42b983)
+- **Card shadows:** `0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07)`
+- **Tag colors:** 13 soft pastel colors for tag chips
+- **Category gradients:** 7 distinct gradient combinations
+- **Buttons:** Pill-shaped with `border-radius: 30px`
+- **Animations:** AOS library for scroll-triggered animations
 - **Fonts:** Inter (sans), Playfair Display (serif) — loaded via Google Fonts
-- **Utility classes:** `.glass` (frosted glass), `.gradient-text`, `.hover-lift`, `.animate-on-scroll`
-- **Math blocks:** Green left border with light green background
+- **Utility classes:** `.glass`, `.gradient-text`, `.hover-lift`, `.shadow-card`
 
 ## Deployment
 
