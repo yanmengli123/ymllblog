@@ -9,58 +9,97 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 <Layout title="404 - 页面未找到 - YMLL Blog" description="抱歉，您访问的页面不存在">
   <Header />
 
-  <main class="pt-24 pb-16 min-h-screen flex flex-col">
-    <div class="flex-1 flex items-center justify-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center">
-        {/* Animated 404 */}
-        <div class="relative mb-8">
-          <div class="text-[12rem] md:text-[16rem] font-bold text-stone-100 select-none">
+  <main class="pt-20 pb-16 min-h-screen flex flex-col">
+    <!-- Matery 风格 404 页面 -->
+    <div class="flex-1 flex items-center justify-center">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <!-- 背景装饰 -->
+        <div class="relative">
+          <!-- 大数字 -->
+          <div class="text-[10rem] md:text-[14rem] font-bold text-stone-100 select-none leading-none">
             404
           </div>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <div class="text-6xl md:text-8xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              404
+
+          <!-- 内容覆盖 -->
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <!-- 动画图标 -->
+            <div class="flex gap-4 mb-8">
+              <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center animate-bounce" style="animation-delay: 0s;">
+                <span class="text-3xl">🚀</span>
+              </div>
+              <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center animate-bounce" style="animation-delay: 0.1s;">
+                <span class="text-3xl">🌙</span>
+              </div>
+              <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center animate-bounce" style="animation-delay: 0.2s;">
+                <span class="text-3xl">✨</span>
+              </div>
+            </div>
+
+            <!-- 标题 -->
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">
+              <span class="bg-gradient-to-r from-purple-500 to-green-500 bg-clip-text text-transparent">
+                页面去旅行了
+              </span>
+            </h1>
+
+            <!-- 描述 -->
+            <p class="text-lg text-stone-600 mb-8 max-w-md mx-auto">
+              抱歉，您访问的页面似乎已经离开了这个星球。也许它正在某个角落等待被发现。
+            </p>
+
+            <!-- 按钮 -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a
+                href={`${base}/`}
+                class="px-8 py-4 bg-gradient-to-r from-purple-500 to-green-500 text-white font-bold rounded-btn shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 inline-flex items-center gap-2"
+              >
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                返回首页
+              </a>
+              <a
+                href={`${base}/blog`}
+                class="px-8 py-4 bg-white text-stone-700 font-bold rounded-btn border-2 border-stone-200 hover:border-purple-300 shadow-sm hover:shadow-md transition-all hover:-translate-y-1"
+              >
+                浏览文章
+              </a>
             </div>
           </div>
         </div>
 
-        <h1 class="text-3xl md:text-4xl font-bold text-stone-900 mb-4">
-          页面去旅行了
-        </h1>
-
-        <p class="text-lg text-stone-600 mb-8 max-w-md mx-auto">
-          抱歉，您访问的页面似乎已经离开了这个星球。也许它正在某个角落等待被发现。
-        </p>
-
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href={`${base}/`}
-            class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium rounded-2xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all hover:-translate-y-0.5 inline-flex items-center gap-2"
-          >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            返回首页
-          </a>
-          <a
-            href={`${base}/blog`}
-            class="px-8 py-4 bg-white text-stone-700 font-medium rounded-2xl border border-stone-200 hover:border-stone-300 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
-          >
-            浏览文章
-          </a>
-        </div>
-
-        {/* Fun illustration */}
-        <div class="mt-16 flex justify-center gap-4">
-          <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center animate-bounce" style="animation-delay: 0s;">
-            <span class="text-3xl">🚀</span>
-          </div>
-          <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center animate-bounce" style="animation-delay: 0.1s;">
-            <span class="text-3xl">🌙</span>
-          </div>
-          <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center animate-bounce" style="animation-delay: 0.2s;">
-            <span class="text-3xl">✨</span>
-          </div>
+        <!-- 搜索建议 -->
+        <div class="mt-16 p-6 bg-white rounded-2xl shadow-card max-w-md mx-auto">
+          <h3 class="text-lg font-bold text-stone-900 mb-4">🔍 找不到页面？试试这些：</h3>
+          <ul class="text-left space-y-3">
+            <li>
+              <a href={`${base}/blog`} class="flex items-center gap-3 p-3 rounded-lg hover:bg-stone-50 transition-colors">
+                <span class="text-xl">📚</span>
+                <div>
+                  <div class="font-medium text-stone-900">浏览博客文章</div>
+                  <div class="text-sm text-stone-500">查看所有技术文章</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href={`${base}/tags`} class="flex items-center gap-3 p-3 rounded-lg hover:bg-stone-50 transition-colors">
+                <span class="text-xl">🏷️</span>
+                <div>
+                  <div class="font-medium text-stone-900">探索标签</div>
+                  <div class="text-sm text-stone-500">按标签查找内容</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href={`${base}/about`} class="flex items-center gap-3 p-3 rounded-lg hover:bg-stone-50 transition-colors">
+                <span class="text-xl">👤</span>
+                <div>
+                  <div class="font-medium text-stone-900">了解作者</div>
+                  <div class="text-sm text-stone-500">关于我的更多信息</div>
+                </div>
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -68,3 +107,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
   <Footer />
 </Layout>
+
+<style>
+  .shadow-card {
+    box-shadow: 0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07);
+  }
+</style>

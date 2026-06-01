@@ -14,6 +14,9 @@ const links = {
     { label: 'RSS', href: `${base}/rss.xml`, icon: 'rss' },
   ],
 };
+
+// 网站建立时间 (用于计算运行时间)
+const siteStartDate = '2024-01-01';
 ---
 
 <footer class="relative mt-20 overflow-hidden">
@@ -104,15 +107,72 @@ const links = {
         </div>
       </div>
 
-      <!-- 版权 -->
-      <div class="border-t border-white/20 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <p class="text-xs text-white/60">
-          &copy; {currentYear} YMLL Blog. All rights reserved.
-        </p>
-        <p class="text-xs text-white/60">
-          使用 <span class="text-yellow-300">Astro</span> + <span class="text-yellow-300">Tailwind CSS</span> 构建
-        </p>
+      <!-- 版权信息 -->
+      <div class="border-t border-white/20 pt-6">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p class="text-xs text-white/60">
+            &copy; 2024-{currentYear} YMLL Blog. All rights reserved.
+          </p>
+          <div class="flex items-center gap-4 text-xs text-white/60">
+            <span>
+              使用 <span class="text-yellow-300">Astro</span> + <span class="text-yellow-300">Tailwind CSS</span> 构建
+            </span>
+          </div>
+        </div>
+
+        <!-- 网站运行时间 -->
+        <div class="text-center mt-4">
+          <p class="text-xs text-white/50">
+            本站已运行 <span id="site-runtime" class="text-yellow-300">计算中...</span>
+          </p>
+        </div>
+
+        <!-- 访客统计 -->
+        <div class="text-center mt-2">
+          <p class="text-xs text-white/50">
+            <span id="busuanzi_container_site_pv" style="display: inline;">
+              本站总访问量 <span id="busuanzi_value_site_pv" class="text-yellow-300">--</span> 次
+            </span>
+            <span class="mx-2">·</span>
+            <span id="busuanzi_container_site_uv" style="display: inline;">
+              访客数 <span id="busuanzi_value_site_uv" class="text-yellow-300">--</span> 人
+            </span>
+          </p>
+        </div>
       </div>
     </div>
   </div>
 </footer>
+
+<script is:inline>
+// 网站运行时间计算
+(function() {
+  var startDate = new Date('2024-01-01');
+  var runtimeElement = document.getElementById('site-runtime');
+
+  function updateRuntime() {
+    var now = new Date();
+    var diff = now - startDate;
+
+    var years = Math.floor(diff / (365 * 24 * 60 * 60 * 1000));
+    var days = Math.floor((diff % (365 * 24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000));
+    var hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+    var minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+    var seconds = Math.floor((diff % (60 * 1000)) / 1000);
+
+    var runtime = '';
+    if (years > 0) runtime += years + ' 年 ';
+    runtime += days + ' 天 ' + hours + ' 小时 ' + minutes + ' 分钟 ' + seconds + ' 秒';
+
+    if (runtimeElement) {
+      runtimeElement.textContent = runtime;
+    }
+  }
+
+  updateRuntime();
+  setInterval(updateRuntime, 1000);
+})();
+</script>
+
+<!-- 不蒜子访客统计 -->
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>

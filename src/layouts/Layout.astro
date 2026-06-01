@@ -127,6 +127,69 @@ const jsonLD = generateJSONLD({
       });
     </script>
 
+    {/* 动态标签栏 - Matery 风格 */}
+    <script is:inline>
+      (function() {
+        var OriginTitle = document.title;
+        var titleTimer;
+
+        document.addEventListener('visibilitychange', function() {
+          if (document.hidden) {
+            document.title = 'Σ(っ °Д °;)っ 喔哟，崩溃啦！';
+            clearTimeout(titleTimer);
+          } else {
+            document.title = 'φ(゜▽゜*)♪ 咦，又好了！';
+            titleTimer = setTimeout(function() {
+              document.title = OriginTitle;
+            }, 3000);
+          }
+        });
+      })();
+    </script>
+
+    {/* 代码块复制按钮 - Matery 风格 */}
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', function() {
+        // 为所有代码块添加复制按钮
+        document.querySelectorAll('pre').forEach(function(pre) {
+          // 创建复制按钮
+          var copyBtn = document.createElement('button');
+          copyBtn.className = 'code-copy-btn';
+          copyBtn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>';
+          copyBtn.title = '复制代码';
+          copyBtn.style.cssText = 'position:absolute;top:8px;right:40px;padding:4px 8px;background:rgba(255,255,255,0.1);border:none;border-radius:6px;cursor:pointer;color:#6c7086;transition:all 0.2s;z-index:10;';
+
+          copyBtn.addEventListener('mouseenter', function() {
+            this.style.background = 'rgba(255,255,255,0.2)';
+            this.style.color = '#cdd6f4';
+          });
+
+          copyBtn.addEventListener('mouseleave', function() {
+            this.style.background = 'rgba(255,255,255,0.1)';
+            this.style.color = '#6c7086';
+          });
+
+          copyBtn.addEventListener('click', function() {
+            var code = pre.querySelector('code');
+            if (code) {
+              var text = code.textContent;
+              navigator.clipboard.writeText(text).then(function() {
+                copyBtn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+                copyBtn.style.color = '#a6e3a1';
+                setTimeout(function() {
+                  copyBtn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>';
+                  copyBtn.style.color = '#6c7086';
+                }, 2000);
+              });
+            }
+          });
+
+          pre.style.position = 'relative';
+          pre.appendChild(copyBtn);
+        });
+      });
+    </script>
+
     {/* Smooth scroll script */}
     <script>
       document.addEventListener('DOMContentLoaded', () => {
