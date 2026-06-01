@@ -105,12 +105,31 @@ const jsonLD = generateJSONLD({
     <script type="application/ld+json" set:html={JSON.stringify(jsonLD)} />
   </head>
   <body class="bg-stone-50 text-stone-900 font-sans antialiased selection:bg-emerald-500 selection:text-white">
-    {/* Background gradient */}
+    {/* 页面加载动画 - Matery 风格 */}
+    <div id="page-loader" class="fixed inset-0 z-[9999] bg-white flex items-center justify-center transition-all duration-500">
+      <div class="text-center">
+        {/* Logo */}
+        <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-500 to-green-500 flex items-center justify-center shadow-lg animate-pulse">
+          <span class="text-white font-bold text-2xl">Y</span>
+        </div>
+        {/* 进度条 */}
+        <div class="w-48 h-1.5 bg-stone-200 rounded-full overflow-hidden mb-4">
+          <div id="loader-progress" class="h-full bg-gradient-to-r from-purple-500 to-green-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        {/* 提示文字 */}
+        <p class="text-sm text-stone-500">正在加载精彩内容...</p>
+      </div>
+    </div>
+
+    {/* 背景装饰 */}
     <div class="fixed inset-0 -z-10">
       <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-white to-amber-50/30"></div>
       <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-b from-emerald-100/20 to-transparent rounded-full blur-3xl"></div>
       <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-t from-amber-100/20 to-transparent rounded-full blur-3xl"></div>
     </div>
+
+    {/* 鼠标点击特效画布 */}
+    <canvas id="click-effect-canvas" class="fixed inset-0 pointer-events-none z-[9998]"></canvas>
 
     <slot />
 
@@ -127,132 +146,301 @@ const jsonLD = generateJSONLD({
       });
     </script>
 
-    {/* 动态标签栏 - Matery 风格 */}
+    {/* ========== Matery 高级功能 ========== */}
     <script is:inline>
-      (function() {
-        var OriginTitle = document.title;
-        var titleTimer;
+    (function() {
+      'use strict';
 
-        document.addEventListener('visibilitychange', function() {
-          if (document.hidden) {
-            document.title = 'Σ(っ °Д °;)っ 喔哟，崩溃啦！';
-            clearTimeout(titleTimer);
-          } else {
-            document.title = 'φ(゜▽゜*)♪ 咦，又好了！';
-            titleTimer = setTimeout(function() {
-              document.title = OriginTitle;
-            }, 3000);
+      // ============ 1. 页面加载动画 ============
+      var loader = document.getElementById('page-loader');
+      var progress = document.getElementById('loader-progress');
+      var loadPercent = 0;
+
+      function updateLoader() {
+        loadPercent += Math.random() * 15 + 5;
+        if (loadPercent > 90) loadPercent = 90;
+        if (progress) progress.style.width = loadPercent + '%';
+      }
+
+      var loaderInterval = setInterval(updateLoader, 200);
+
+      window.addEventListener('load', function() {
+        clearInterval(loaderInterval);
+        if (progress) progress.style.width = '100%';
+        setTimeout(function() {
+          if (loader) {
+            loader.style.opacity = '0';
+            loader.style.visibility = 'hidden';
+            setTimeout(function() { loader.style.display = 'none'; }, 500);
           }
+        }, 300);
+      });
+
+      // ============ 2. 动态标签栏 ============
+      var OriginTitle = document.title;
+      var titleTimer;
+
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+          document.title = 'Σ(っ °Д °;)っ 喔哟，崩溃啦！';
+          clearTimeout(titleTimer);
+        } else {
+          document.title = 'φ(゜▽゜*)♪ 咦，又好了！';
+          titleTimer = setTimeout(function() {
+            document.title = OriginTitle;
+          }, 3000);
+        }
+      });
+
+      // ============ 3. 鼠标点击特效（烟花） ============
+      var canvas = document.getElementById('click-effect-canvas');
+      if (canvas) {
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+        var colors = ['#bf30ac', '#0f9d58', '#42b983', '#FF5E3A', '#FF2A68', '#f59e0b', '#8b5cf6'];
+
+        function resizeCanvas() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function createParticles(x, y) {
+          var count = 20 + Math.floor(Math.random() * 15);
+          for (var i = 0; i < count; i++) {
+            var angle = (Math.PI * 2 * i) / count;
+            var speed = 2 + Math.random() * 4;
+            particles.push({
+              x: x, y: y,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed,
+              life: 1,
+              decay: 0.015 + Math.random() * 0.01,
+              size: 2 + Math.random() * 3,
+              color: colors[Math.floor(Math.random() * colors.length)]
+            });
+          }
+        }
+
+        document.addEventListener('click', function(e) {
+          createParticles(e.clientX, e.clientY);
         });
-      })();
-    </script>
 
-    {/* 代码块复制按钮 - Matery 风格 */}
-    <script is:inline>
-      document.addEventListener('DOMContentLoaded', function() {
-        // 为所有代码块添加复制按钮
-        document.querySelectorAll('pre').forEach(function(pre) {
-          // 创建复制按钮
-          var copyBtn = document.createElement('button');
-          copyBtn.className = 'code-copy-btn';
-          copyBtn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>';
-          copyBtn.title = '复制代码';
-          copyBtn.style.cssText = 'position:absolute;top:8px;right:40px;padding:4px 8px;background:rgba(255,255,255,0.1);border:none;border-radius:6px;cursor:pointer;color:#6c7086;transition:all 0.2s;z-index:10;';
+        function animateParticles() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          copyBtn.addEventListener('mouseenter', function() {
-            this.style.background = 'rgba(255,255,255,0.2)';
-            this.style.color = '#cdd6f4';
-          });
+          var alive = [];
+          for (var i = 0; i < particles.length; i++) {
+            var p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.1; // gravity
+            p.life -= p.decay;
 
-          copyBtn.addEventListener('mouseleave', function() {
-            this.style.background = 'rgba(255,255,255,0.1)';
-            this.style.color = '#6c7086';
-          });
-
-          copyBtn.addEventListener('click', function() {
-            var code = pre.querySelector('code');
-            if (code) {
-              var text = code.textContent;
-              navigator.clipboard.writeText(text).then(function() {
-                copyBtn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-                copyBtn.style.color = '#a6e3a1';
-                setTimeout(function() {
-                  copyBtn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>';
-                  copyBtn.style.color = '#6c7086';
-                }, 2000);
-              });
+            if (p.life > 0) {
+              ctx.globalAlpha = p.life;
+              ctx.fillStyle = p.color;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+              ctx.fill();
+              alive.push(p);
             }
-          });
-
-          pre.style.position = 'relative';
-          pre.appendChild(copyBtn);
-        });
-
-        // 为代码块添加行号
-        document.querySelectorAll('pre code').forEach(function(codeBlock) {
-          var lines = codeBlock.textContent.split('\n');
-          var lineNumbers = document.createElement('div');
-          lineNumbers.className = 'line-numbers';
-          lineNumbers.style.cssText = 'position:absolute;left:0;top:0;padding:1.5rem 0;width:2.5rem;text-align:right;color:#4b5263;font-size:0.75rem;line-height:1.7;user-select:none;border-right:1px solid #313244;';
-
-          for (var i = 1; i <= lines.length; i++) {
-            var lineNum = document.createElement('div');
-            lineNum.textContent = i;
-            lineNumbers.appendChild(lineNum);
           }
+          particles = alive;
+          ctx.globalAlpha = 1;
+          requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+      }
 
-          codeBlock.parentElement.style.position = 'relative';
-          codeBlock.parentElement.insertBefore(lineNumbers, codeBlock);
-          codeBlock.style.paddingLeft = '3.5rem';
+      // ============ 4. 代码块增强 ============
+      document.querySelectorAll('pre').forEach(function(pre) {
+        // 复制按钮
+        var copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.innerHTML = '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>';
+        copyBtn.title = '复制代码';
+        copyBtn.style.cssText = 'position:absolute;top:8px;right:8px;padding:6px 10px;background:rgba(255,255,255,0.1);border:none;border-radius:6px;cursor:pointer;color:#6c7086;transition:all 0.2s;z-index:10;display:flex;align-items:center;justify-content:center;';
+
+        copyBtn.addEventListener('mouseenter', function() {
+          this.style.background = 'rgba(255,255,255,0.2)';
+          this.style.color = '#cdd6f4';
+        });
+        copyBtn.addEventListener('mouseleave', function() {
+          this.style.background = 'rgba(255,255,255,0.1)';
+          this.style.color = '#6c7086';
         });
 
-        // 图片点击放大功能 - Matery 风格
-        var overlay = document.createElement('div');
-        overlay.id = 'image-overlay';
-        overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;cursor:zoom-out;justify-content:center;align-items:center;';
-        overlay.innerHTML = '<img id="overlay-img" style="max-width:90%;max-height:90%;object-fit:contain;border-radius:8px;" />';
-        document.body.appendChild(overlay);
-
-        var overlayImg = document.getElementById('overlay-img');
-
-        document.querySelectorAll('.prose img, article img').forEach(function(img) {
-          img.style.cursor = 'zoom-in';
-          img.addEventListener('click', function() {
-            overlayImg.src = this.src;
-            overlay.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-          });
-        });
-
-        overlay.addEventListener('click', function() {
-          overlay.style.display = 'none';
-          document.body.style.overflow = '';
-        });
-
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && overlay.style.display === 'flex') {
-            overlay.style.display = 'none';
-            document.body.style.overflow = '';
+        copyBtn.addEventListener('click', function() {
+          var code = pre.querySelector('code');
+          if (code) {
+            navigator.clipboard.writeText(code.textContent).then(function() {
+              copyBtn.innerHTML = '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+              copyBtn.style.color = '#a6e3a1';
+              setTimeout(function() {
+                copyBtn.innerHTML = '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>';
+                copyBtn.style.color = '#6c7086';
+              }, 2000);
+            });
           }
+        });
+
+        pre.style.position = 'relative';
+        pre.appendChild(copyBtn);
+      });
+
+      // ============ 5. 图片点击放大 ============
+      var overlay = document.createElement('div');
+      overlay.id = 'image-overlay';
+      overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;cursor:zoom-out;justify-content:center;align-items:center;';
+      overlay.innerHTML = '<img id="overlay-img" style="max-width:90%;max-height:90%;object-fit:contain;border-radius:8px;" /><button id="overlay-close" style="position:absolute;top:20px;right:20px;background:none;border:none;color:white;font-size:2rem;cursor:pointer;">✕</button>';
+      document.body.appendChild(overlay);
+
+      var overlayImg = document.getElementById('overlay-img');
+      var overlayClose = document.getElementById('overlay-close');
+
+      document.querySelectorAll('.prose img, article img').forEach(function(img) {
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', function() {
+          overlayImg.src = this.src;
+          overlay.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
         });
       });
-    </script>
 
-    {/* Smooth scroll script */}
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('animate-fade-in-up');
-            }
-          });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-        document.querySelectorAll('.animate-on-scroll').forEach((el) => {
-          observer.observe(el);
-        });
+      if (overlayClose) overlayClose.addEventListener('click', closeOverlay);
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeOverlay();
       });
+
+      function closeOverlay() {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeOverlay();
+      });
+
+      // ============ 6. 成就系统 ============
+      var achievements = JSON.parse(localStorage.getItem('ymll_achievements') || '[]');
+
+      function hasAchievement(id) {
+        return achievements.some(function(a) { return a.id === id; });
+      }
+
+      function unlockAchievement(id, title, desc) {
+        if (hasAchievement(id)) return;
+        achievements.push({ id: id, title: title, desc: desc, time: Date.now() });
+        localStorage.setItem('ymll_achievements', JSON.stringify(achievements));
+        showAchievementToast(title, desc);
+      }
+
+      function showAchievementToast(title, desc) {
+        var toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:white;border-left:4px solid #0f9d58;padding:16px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.15);display:flex;align-items:center;gap:12px;transform:translateX(200%);transition:transform 0.4s;z-index:10000;max-width:300px;';
+        toast.innerHTML = '<div style="font-size:1.5rem;">🏆</div><div><strong style="display:block;color:#1a1a1a;">' + title + '</strong><p style="margin:0;font-size:0.875rem;color:#666;">' + desc + '</p></div>';
+        document.body.appendChild(toast);
+
+        setTimeout(function() { toast.style.transform = 'translateX(0)'; }, 100);
+        setTimeout(function() {
+          toast.style.transform = 'translateX(200%)';
+          setTimeout(function() { toast.remove(); }, 400);
+        }, 4000);
+      }
+
+      // 成就检查
+      if (!hasAchievement('first_visit')) {
+        setTimeout(function() {
+          unlockAchievement('first_visit', '🎉 初次相遇', '感谢你来到我的小世界');
+        }, 3000);
+      }
+
+      // 阅读成就
+      var readCount = parseInt(localStorage.getItem('ymll_read_count') || '0');
+      if (readCount >= 5 && !hasAchievement('reader_lv1')) {
+        unlockAchievement('reader_lv1', '📚 初级读者', '已阅读 5 篇文章');
+      }
+      if (readCount >= 10 && !hasAchievement('reader_lv2')) {
+        unlockAchievement('reader_lv2', '📖 中级读者', '已阅读 10 篇文章');
+      }
+
+      // 深夜访客
+      var hour = new Date().getHours();
+      if ((hour >= 23 || hour <= 5) && !hasAchievement('night_owl')) {
+        setTimeout(function() {
+          unlockAchievement('night_owl', '🦉 夜猫子', '深夜还在探索知识');
+        }, 5000);
+      }
+
+      // ============ 7. 控制台彩蛋 ============
+      console.log('%c╔════════════════════════════════════════╗', 'color: #0f9d58; font-weight: bold;');
+      console.log('%c║  🎉 欢迎来到 YMLL Blog 源代码！       ║', 'color: #0f9d58; font-weight: bold;');
+      console.log('%c║                                        ║', 'color: #0f9d58; font-weight: bold;');
+      console.log('%c║  👨‍💻 开发者: YMLL                       ║', 'color: #0f9d58; font-weight: bold;');
+      console.log('%c║  🌐 博客: https://yanmengli123.github.io/ymllblog  ║', 'color: #0f9d58; font-weight: bold;');
+      console.log('%c║  💬 交流: 欢迎留言~                    ║', 'color: #0f9d58; font-weight: bold;');
+      console.log('%c║                                        ║', 'color: #0f9d58; font-weight: bold;');
+      console.log('%c║  ✨ 试试输入: blog.help()              ║', 'color: #bf30ac; font-weight: bold;');
+      console.log('%c╚════════════════════════════════════════╝', 'color: #0f9d58; font-weight: bold;');
+
+      window.blog = {
+        help: function() {
+          console.log('%c📖 可用命令:', 'color: #0f9d58; font-weight: bold; font-size: 14px;');
+          console.log('%c  blog.stats()    - 查看博客统计', 'color: #42b983;');
+          console.log('%c  blog.achievements() - 查看成就', 'color: #42b983;');
+          console.log('%c  blog.theme()    - 切换主题', 'color: #42b983;');
+          console.log('%c  blog.secret()   - 隐藏彩蛋', 'color: #bf30ac;');
+        },
+        stats: function() {
+          console.log('%c📊 博客统计:', 'color: #0f9d58; font-weight: bold; font-size: 14px;');
+          console.log('%c  📄 文章: 9 篇', 'color: #42b983;');
+          console.log('%c  🏷️  标签: 22 个', 'color: #42b983;');
+          console.log('%c  ⏱️  加载时间: ' + performance.now().toFixed(2) + 'ms', 'color: #42b983;');
+        },
+        achievements: function() {
+          var all = JSON.parse(localStorage.getItem('ymll_achievements') || '[]');
+          console.log('%c🏆 已解锁成就 (' + all.length + '):', 'color: #bf30ac; font-weight: bold; font-size: 14px;');
+          all.forEach(function(a) {
+            console.log('%c  ' + a.title + ' - ' + a.desc, 'color: #42b983;');
+          });
+          if (all.length === 0) console.log('%c  继续探索来解锁成就吧！', 'color: #999;');
+        },
+        theme: function() {
+          document.documentElement.classList.toggle('dark');
+          console.log('%c🎨 主题已切换！', 'color: #0f9d58; font-weight: bold;');
+        },
+        secret: function() {
+          console.log('%c🔓 秘密解锁！', 'color: #bf30ac; font-weight: bold; font-size: 16px;');
+          console.log('%c🎁 源代码: https://github.com/yanmengli123/ymllblog', 'color: #42b983;');
+          document.body.style.animation = 'rainbow 2s linear';
+          setTimeout(function() { document.body.style.animation = ''; }, 2000);
+        }
+      };
+
+      // ============ 8. 返回顶部按钮 ============
+      var backToTop = document.createElement('button');
+      backToTop.id = 'back-to-top';
+      backToTop.innerHTML = '↑';
+      backToTop.style.cssText = 'position:fixed;bottom:80px;right:20px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#bf30ac,#0f9d58);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);opacity:0;transform:translateY(20px);transition:all 0.3s;z-index:100;';
+      document.body.appendChild(backToTop);
+
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 500) {
+          backToTop.style.opacity = '1';
+          backToTop.style.transform = 'translateY(0)';
+        } else {
+          backToTop.style.opacity = '0';
+          backToTop.style.transform = 'translateY(20px)';
+        }
+      });
+
+      backToTop.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+    })();
     </script>
   </body>
 </html>
@@ -325,7 +513,7 @@ const jsonLD = generateJSONLD({
       content: attr(data-lang);
       position: absolute;
       top: 12px;
-      right: 16px;
+      right: 50px;
       font-size: 12px;
       color: #6c7086;
       text-transform: uppercase;
@@ -352,15 +540,6 @@ const jsonLD = generateJSONLD({
       border: 1px solid #bbf7d0;
     }
 
-    /* 代码高亮色 */
-    pre code .keyword { color: #cba6f7; }
-    pre code .string { color: #a6e3a1; }
-    pre code .comment { color: #6c7086; font-style: italic; }
-    pre code .function { color: #89b4fa; }
-    pre code .number { color: #fab387; }
-    pre code .operator { color: #89dceb; }
-    pre code .class { color: #f9e2af; }
-
     .animate-on-scroll {
       opacity: 0;
       transform: translateY(20px);
@@ -382,6 +561,11 @@ const jsonLD = generateJSONLD({
     }
   }
 
+  @keyframes rainbow {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
@@ -399,12 +583,5 @@ const jsonLD = generateJSONLD({
 
   ::-webkit-scrollbar-thumb:hover {
     background: #a8a29e;
-  }
-
-  /* Smooth transitions for theme */
-  * {
-    transition-property: background-color, border-color, color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
   }
 </style>
