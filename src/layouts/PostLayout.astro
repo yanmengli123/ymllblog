@@ -3,6 +3,7 @@
 import Layout from './Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import MermaidSupport from '../components/MermaidSupport.astro';
 import { getRelatedPosts } from '../lib/posts';
 import { getPageURL } from '../lib/seo';
 
@@ -440,6 +441,7 @@ const readingTime = 5;
   </button>
 
   <Footer />
+  <MermaidSupport />
 </Layout>
 
 <script is:inline>

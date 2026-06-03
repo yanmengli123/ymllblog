@@ -16,6 +16,8 @@ for (const component of [
   'src/components/ProfileCard.astro',
   'src/components/SiteStatsCard.astro',
   'src/components/PostCalendarCard.astro',
+  'src/components/OfficialWidgetsCard.astro',
+  'src/components/MermaidSupport.astro',
 ]) {
   assert.ok(existsSync(join(root, component)), `${component} should exist`);
 }
@@ -26,10 +28,11 @@ assert.match(index, /<MusicPlayer[^>]+variant="sidebar"/, 'left sidebar should i
 assert.match(index, /<SettingsPanel[^>]+variant="sidebar"/, 'right sidebar should include sidebar settings panel');
 assert.match(index, /<SiteStatsCard\s*\/>/, 'right sidebar should include site statistics');
 assert.match(index, /<PostCalendarCard\s*\/>/, 'right sidebar should include post calendar');
+assert.match(index, /<OfficialWidgetsCard\s*\/>/, 'right sidebar should include official widgets card');
 assert.match(
   index,
-  /<SiteStatsCard\s*\/>[\s\S]*<PostCalendarCard\s*\/>[\s\S]*<SettingsPanel[^>]+variant="sidebar"/,
-  'right sidebar should show stats and the calendar before the tall settings panel'
+  /<SiteStatsCard\s*\/>[\s\S]*<PostCalendarCard\s*\/>[\s\S]*<OfficialWidgetsCard\s*\/>[\s\S]*<SettingsPanel[^>]+variant="sidebar"/,
+  'right sidebar should show stats, calendar, and official widgets before the tall settings panel'
 );
 
 const calendar = read('src/components/PostCalendarCard.astro');
@@ -76,5 +79,21 @@ const featuredPosts = read('src/components/FeaturedPosts.astro');
 assert.match(featuredPosts, /id="featured-posts"/, 'featured posts should expose a layout target');
 assert.match(featuredPosts, /layout-change/, 'featured posts should respond to layout-change events');
 assert.match(featuredPosts, /data-post-layout/, 'featured posts should keep the current post layout in DOM');
+
+const officialWidgets = read('src/components/OfficialWidgetsCard.astro');
+assert.match(officialWidgets, /id="official-widgets-card"/, 'official widgets card should expose a stable id');
+assert.match(officialWidgets, /github\.com\/yanmengli123\/ymllblog/, 'official widgets should link to the GitHub repository');
+assert.match(officialWidgets, /\/rss\.xml/, 'official widgets should include RSS entry');
+assert.match(officialWidgets, /\/sitemap-index\.xml|\/sitemap-0\.xml|\/sitemap\.xml/, 'official widgets should include sitemap entry');
+assert.match(officialWidgets, /Astro/, 'official widgets should mention Astro as the static-site framework');
+
+const postLayout = read('src/layouts/PostLayout.astro');
+assert.match(postLayout, /import MermaidSupport/, 'post layout should import Mermaid support');
+assert.match(postLayout, /<MermaidSupport\s*\/>/, 'post layout should render Mermaid support');
+
+const mermaidSupport = read('src/components/MermaidSupport.astro');
+assert.match(mermaidSupport, /import\('mermaid'\)/, 'Mermaid support should dynamically load the official mermaid package');
+assert.match(mermaidSupport, /language-mermaid/, 'Mermaid support should transform mermaid code fences');
+assert.match(mermaidSupport, /mermaid\.run/, 'Mermaid support should render diagrams through Mermaid');
 
 console.log('home layout structure tests passed');

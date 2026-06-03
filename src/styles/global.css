@@ -411,6 +411,19 @@
   .note-danger { border-color: #ef4444; background: rgba(239, 68, 68, 0.08); }
   .note-primary { border-color: var(--primary); background: var(--purple-light-1); }
 
+  .mermaid-diagram {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    padding: 1rem;
+  }
+
+  .dark .mermaid-diagram {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
   /* ========== 字体大小 ========== */
   .text-sm { font-size: 0.875rem; }
   .text-base { font-size: 1rem; }
