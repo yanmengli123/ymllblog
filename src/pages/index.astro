@@ -140,19 +140,19 @@ const tags = Array.from(tagMap.entries())
         const settings = JSON.parse(localStorage.getItem('ymll_user_settings') || 'null');
         const body = document.body;
         // 始终先清除所有背景类
-        body.classList.remove('bg-aurora', 'bg-gradient', 'bg-waves', 'bg-mesh', 'bg-stars', 'bg-image', 'bg-solid', 'bg-particles');
+        body.classList.remove('theme-bg-aurora', 'theme-bg-gradient', 'theme-bg-waves', 'theme-bg-mesh', 'theme-bg-stars', 'theme-bg-image', 'theme-bg-solid', 'theme-bg-particles');
         if (settings && settings.backgroundMode) {
-          body.classList.add('bg-' + settings.backgroundMode);
+          body.classList.add('theme-bg-' + settings.backgroundMode);
           if (settings.backgroundMode === 'image' && settings.customBackground) {
             body.style.setProperty('--custom-bg-image', `url('${settings.customBackground}')`);
           }
         } else {
           // 默认使用蓝紫渐变
-          body.classList.add('bg-gradient');
+          body.classList.add('theme-bg-gradient');
         }
       } catch (e) {
         // 默认使用蓝紫渐变
-        document.body.classList.add('bg-gradient');
+        document.body.classList.add('theme-bg-gradient');
       }
     })();
   </script>

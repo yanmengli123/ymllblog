@@ -1,5 +1,6 @@
 ---
 import { getPageURL, getImageURL, generateJSONLD } from '../lib/seo';
+import '../styles/global.css';
 
 interface Props {
   title?: string;
@@ -104,7 +105,7 @@ const jsonLD = generateJSONLD({
     {/* JSON-LD */}
     <script type="application/ld+json" set:html={JSON.stringify(jsonLD)} />
   </head>
-  <body class="text-stone-900 font-sans antialiased bg-gradient" style="color: #333;">
+  <body class="text-stone-900 font-sans antialiased theme-bg-gradient" style="color: #333;">
     {/* 页面加载动画 - dlog.com.cn 紫色风格 */}
     <div id="page-loader" class="fixed inset-0 z-[9999] bg-white flex items-center justify-center transition-all duration-500">
       <div class="text-center">
@@ -574,127 +575,7 @@ const jsonLD = generateJSONLD({
 </html>
 
 <style is:global>
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-
-  @layer base {
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    ::selection {
-      background-color: #8163bd;
-      color: white;
-    }
-  }
-
-  @layer components {
-    .glass {
-      @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg shadow-black/5;
-    }
-
-    .glass-dark {
-      @apply bg-stone-900/80 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20;
-    }
-
-    .gradient-text {
-      @apply bg-gradient-to-r from-purple-600 to-emerald-600 bg-clip-text text-transparent;
-    }
-
-    .hover-lift {
-      @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
-    }
-
-    /* macOS 风格代码块 */
-    pre {
-      position: relative;
-      background: #1e1e2e;
-      border-radius: 12px;
-      padding: 1.5rem;
-      padding-top: 2.5rem;
-      margin: 1.5rem 0;
-      overflow-x: auto;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    }
-
-    pre::before {
-      content: '';
-      position: absolute;
-      top: 12px;
-      left: 16px;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #ff5f57;
-      box-shadow:
-        20px 0 0 #ffbd2e,
-        40px 0 0 #28c840;
-    }
-
-    pre::after {
-      content: attr(data-lang);
-      position: absolute;
-      top: 12px;
-      right: 50px;
-      font-size: 12px;
-      color: #6c7086;
-      text-transform: uppercase;
-    }
-
-    pre code {
-      background: none;
-      padding: 0;
-      border-radius: 0;
-      color: #cdd6f4;
-      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
-      font-size: 0.875rem;
-      line-height: 1.7;
-    }
-
-    /* 行内代码 */
-    code:not(pre code) {
-      background: rgba(99, 99, 172, 0.05);
-      color: #79589f;
-      padding: 0.125rem 0.375rem;
-      border-radius: 6px;
-      font-size: 0.875em;
-      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
-      border: 1px solid rgba(99, 99, 172, 0.1);
-    }
-
-    .animate-on-scroll {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    .animate-fade-in-up {
-      animation: fadeInUp 0.6s ease-out forwards;
-    }
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes rainbow {
-    0% { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(360deg); }
-  }
-
-  /* Custom scrollbar */
+  /* Custom scrollbar - additional styling */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;

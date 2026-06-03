@@ -232,11 +232,11 @@ export function applyBackground(mode: BackgroundMode, customImage: string) {
   const body = document.body;
   // 清除所有背景类
   body.classList.remove(
-    'bg-gradient', 'bg-aurora', 'bg-particles', 'bg-waves',
-    'bg-mesh', 'bg-stars', 'bg-image', 'bg-solid',
+    'theme-bg-gradient', 'theme-bg-aurora', 'theme-bg-particles', 'theme-bg-waves',
+    'theme-bg-mesh', 'theme-bg-stars', 'theme-bg-image', 'theme-bg-solid',
     'wallpaper-light', 'wallpaper-dark', 'wallpaper-gradient'
   );
-  body.classList.add(`bg-${mode}`);
+  body.classList.add(`theme-bg-${mode}`);
 
   if (mode === 'image' && customImage) {
     body.style.setProperty('--custom-bg-image', `url('${customImage}')`);
