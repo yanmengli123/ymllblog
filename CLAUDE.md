@@ -22,9 +22,10 @@ YMLL Blog — a Chinese-language personal tech/design blog built as a fully stat
 npm run dev      # Dev server at http://localhost:4321/ymllblog
 npm run build    # Static build to dist/
 npm run preview  # Preview built site locally
+node tests/home-layout.test.mjs  # Run the Node-built-in home layout smoke test
 ```
 
-No linting, no tests, no pre-commit hooks. CI only runs `npm ci && npm run build`.
+No linting, no pre-commit hooks. CI only runs `npm ci && npm run build`. Tests use only Node's `node:assert` — no test framework installed.
 
 ## Architecture
 
@@ -95,6 +96,30 @@ To add a new background mode: extend `BACKGROUND_MODES` in `theme.ts` AND add a 
 
 `Announcement.astro` accepts a `variant` prop: `'floating'` (default, fixed position) or `'sidebar'` (used inside a parent container).
 
+### Home Page Layout (newer pattern)
+The home page uses a 3-column layout: left sidebar + central article feed + right sidebar. Wrapper is `HomeSidebarLayout` (referenced as a class/component in `src/pages/index.astro`); each side has a fixed `id`:
+- `#home-left-sidebar` — `ProfileCard` and friends
+- `#home-feed` — `<main>` with `FeaturedPosts`
+- `#home-right-sidebar` — `SiteStatsCard`, `PostCalendarCard`, `Announcement` (sidebar variant), etc.
+
+Required sidebar components (asserted by `tests/home-layout.test.mjs`):
+- `src/components/ProfileCard.astro`
+- `src/components/SiteStatsCard.astro`
+- `src/components/PostCalendarCard.astro`
+
+`FeaturedPosts.astro` reads the saved `postLayout` from localStorage and swaps the grid class. It listens for the `layout-change` custom event dispatched by `SettingsPanel` when the user picks a new layout. Supported layouts and their classes:
+
+```js
+const layoutClasses = {
+  grid:    'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6',
+  list:    'grid grid-cols-1 gap-4',
+  card:    'grid grid-cols-1 md:grid-cols-2 gap-6',
+  masonry: 'columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6',
+};
+```
+
+In `list` mode, the primary featured post is hidden via `primary.classList.toggle('hidden', true)`.
+
 ### Helper Functions (`src/lib/`)
 - `posts.ts` — Content collection queries
 - `reading-time.ts` — Reading time calculation
@@ -129,7 +154,7 @@ To add a new background mode: extend `BACKGROUND_MODES` in `theme.ts` AND add a 
 
 ## Known Issues / Gotchas
 
-1. **No tests, linting, or pre-commit hooks** — CI only builds
+1. **No linting or pre-commit hooks** — CI only builds
 2. **Dark mode toggle** in code but mostly unused; personalization uses light/dark/auto via `<html class="dark">`
 3. **`doublesevenshop.github.io-master/`** in repo is a reference copy of dlog.com.cn source — do not modify, used as design inspiration
 4. **localStorage settings** apply client-side only — first paint always shows defaults until JS hydrates
@@ -138,3 +163,5 @@ To add a new background mode: extend `BACKGROUND_MODES` in `theme.ts` AND add a 
 7. **Setting panel buttons** use inline `style="border-color: ..."` for active state — overrides Tailwind classes; reset with `borderColor = 'transparent'` in `updateActiveButton()`
 8. **CSS class naming:** Never use `bg-X`, `text-X`, `font-X` for custom utility classes — they collide with Tailwind. Prefix with `theme-` or another unique namespace.
 9. **`global.css` must be imported** in `Layout.astro` frontmatter or none of its rules ship to the build
+10. **Home layout test:** `tests/home-layout.test.mjs` asserts that `index.astro` uses `HomeSidebarLayout` and contains `#home-left-sidebar`, `#home-feed`, `#home-right-sidebar`. If you restructure the home page, update the test too.
+11. **Featured post in list layout:** the primary featured post is hidden when `postLayout === 'list'`; do not add it back without considering that path.
