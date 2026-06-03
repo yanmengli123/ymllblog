@@ -7,6 +7,11 @@ import HeroSection from '../components/HeroSection.astro';
 import FeaturedPosts from '../components/FeaturedPosts.astro';
 import TagsSection from '../components/TagsSection.astro';
 import StatsChart from '../components/StatsChart.astro';
+import SettingsPanel from '../components/SettingsPanel.astro';
+import MusicPlayer from '../components/MusicPlayer.astro';
+import Announcement from '../components/Announcement.astro';
+import FloatingAvatar from '../components/FloatingAvatar.astro';
+import ParticlesBg from '../components/ParticlesBg.astro';
 
 // 获取精选文章
 const allPosts = await getCollection('blog', ({ data }) => !data.draft);
@@ -40,6 +45,9 @@ const tags = Array.from(tagMap.entries())
 ---
 
 <Layout title="YMLL Blog - 首页" description="探索技术与设计的交汇点，记录成长与思考">
+  {/* 粒子背景层 */}
+  <ParticlesBg />
+
   <Header />
 
   <main>
@@ -59,6 +67,18 @@ const tags = Array.from(tagMap.entries())
   </main>
 
   <Footer />
+
+  {/* 个性化设置面板 */}
+  <SettingsPanel />
+
+  {/* 浮动头像 */}
+  <FloatingAvatar />
+
+  {/* 音乐播放器 */}
+  <MusicPlayer />
+
+  {/* 公告 */}
+  <Announcement />
 
   {/* 滚动动画脚本 */}
   <script>
@@ -113,5 +133,26 @@ const tags = Array.from(tagMap.entries())
 
       window.addEventListener('scroll', parallax);
     });
+
+    // 主题初始应用
+    (function() {
+      try {
+        const settings = JSON.parse(localStorage.getItem('ymll_user_settings') || 'null');
+        if (settings) {
+          // 应用背景模式
+          const body = document.body;
+          body.classList.remove('bg-aurora', 'bg-gradient', 'bg-waves', 'bg-mesh', 'bg-stars', 'bg-image', 'bg-solid', 'bg-particles');
+          if (settings.backgroundMode) {
+            body.classList.add('bg-' + settings.backgroundMode);
+          }
+          if (settings.backgroundMode === 'image' && settings.customBackground) {
+            body.style.setProperty('--custom-bg-image', `url('${settings.customBackground}')`);
+          }
+        }
+      } catch (e) {
+        // 默认使用极光
+        document.body.classList.add('bg-aurora');
+      }
+    })();
   </script>
 </Layout>

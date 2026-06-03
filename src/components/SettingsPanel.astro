@@ -1,11 +1,18 @@
 ---
-// 设置面板组件
+import {
+  COLOR_THEMES,
+  BACKGROUND_MODES,
+  BANNER_MODES,
+  POST_LAYOUTS,
+  DEFAULT_SETTINGS,
+  type UserSettings,
+} from '../lib/theme';
 ---
 
 <div id="settings-panel" class="fixed right-0 top-1/2 -translate-y-1/2 z-[999] transition-transform duration-300 translate-x-[calc(100%-3rem)] hover:translate-x-0">
   <div class="relative">
     <!-- 触发按钮 -->
-    <button id="settings-trigger" class="absolute -left-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-l-2xl shadow-2xl flex items-center justify-center text-white"
+    <button id="settings-trigger" class="absolute -left-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-l-2xl shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform"
             style="background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));">
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -14,91 +21,250 @@
     </button>
 
     <!-- 面板内容 -->
-    <div class="glass-board w-80 rounded-l-2xl shadow-2xl overflow-hidden">
-      <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+    <div class="glass-board w-80 rounded-l-2xl shadow-2xl overflow-hidden" style="max-height: 90vh;">
+      <div class="p-6 space-y-5 overflow-y-auto" style="max-height: 90vh;">
+
         <!-- 标题 -->
         <div class="flex items-center gap-2 pb-2 border-b border-stone-200/50">
           <span class="text-xl">⚙️</span>
-          <h3 class="text-lg font-bold text-stone-800 dark:text-stone-100">设置面板</h3>
+          <h3 class="text-lg font-bold" style="color: var(--text-primary);">个性化设置</h3>
+        </div>
+
+        <!-- 主题模式 -->
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+            🌓 主题模式
+          </label>
+          <div class="grid grid-cols-3 gap-2">
+            <button data-theme-mode="light" class="theme-mode-btn px-3 py-2 rounded-lg text-xs transition-all" style="background: rgba(255,255,255,0.5); color: #333;">
+              ☀️ 浅色
+            </button>
+            <button data-theme-mode="dark" class="theme-mode-btn px-3 py-2 rounded-lg text-xs transition-all" style="background: rgba(0,0,0,0.7); color: white;">
+              🌙 暗黑
+            </button>
+            <button data-theme-mode="auto" class="theme-mode-btn px-3 py-2 rounded-lg text-xs transition-all" style="background: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(0,0,0,0.7)); color: white;">
+              ⚙️ 跟随
+            </button>
+          </div>
         </div>
 
         <!-- 主题色 -->
         <div>
-          <label class="block text-sm font-medium text-stone-700 dark:text-stone-200 mb-3">
-            🎨 主题色相
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+            🎨 主题色
           </label>
-          <input
-            type="range"
-            id="theme-hue"
-            min="0"
-            max="360"
-            value="150"
-            class="w-full h-2 rounded-full appearance-none cursor-pointer"
-            style="background: linear-gradient(to right, hsl(0,60%,45%), hsl(60,60%,45%), hsl(120,60%,45%), hsl(180,60%,45%), hsl(240,60%,45%), hsl(300,60%,45%), hsl(360,60%,45%));"
-          />
-          <div class="text-center text-sm text-stone-500 mt-1" id="hue-value">150°</div>
-        </div>
+          <div class="grid grid-cols-4 gap-2">
+            {Object.values(COLOR_THEMES).map(theme => (
+              <button
+                data-color-theme={theme.name}
+                class="color-theme-btn px-2 py-2 rounded-lg text-xs transition-all hover:scale-105"
+                style={`background: hsl(${theme.hue}, ${theme.saturation}%, 95%); color: hsl(${theme.hue}, ${theme.saturation}%, 30%); border: 2px solid transparent;`}
+                title={theme.label}
+              >
+                <span class="block w-4 h-4 rounded-full mx-auto mb-1" style={`background: hsl(${theme.hue}, ${theme.saturation}%, ${theme.lightness}%);`}></span>
+                {theme.label.split(' ')[0]}
+              </button>
+            ))}
+          </div>
 
-        <!-- 壁纸模式 -->
-        <div>
-          <label class="block text-sm font-medium text-stone-700 dark:text-stone-200 mb-3">
-            🖼️ 壁纸模式
-          </label>
-          <div class="space-y-2">
-            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
-              <input type="radio" name="wallpaper" value="gradient" checked class="accent-emerald-500" />
-              <span class="text-sm text-stone-700 dark:text-stone-200">渐变背景</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
-              <input type="radio" name="wallpaper" value="dark" class="accent-emerald-500" />
-              <span class="text-sm text-stone-700 dark:text-stone-200">深色全屏</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
-              <input type="radio" name="wallpaper" value="light" class="accent-emerald-500" />
-              <span class="text-sm text-stone-700 dark:text-stone-200">浅色全屏</span>
-            </label>
+          <!-- 自定义色相 -->
+          <div class="mt-3">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs" style="color: var(--text-secondary);">色相</span>
+              <span id="hue-value" class="text-xs" style="color: var(--text-secondary);">262°</span>
+            </div>
+            <input
+              type="range"
+              id="theme-hue"
+              min="0"
+              max="360"
+              value="262"
+              class="w-full h-2 rounded-full appearance-none cursor-pointer"
+              style="background: linear-gradient(to right, hsl(0,60%,45%), hsl(60,60%,45%), hsl(120,60%,45%), hsl(180,60%,45%), hsl(240,60%,45%), hsl(300,60%,45%), hsl(360,60%,45%));"
+            />
           </div>
         </div>
 
-        <!-- 横幅设置 -->
+        <!-- 动态背景 -->
         <div>
-          <label class="block text-sm font-medium text-stone-700 dark:text-stone-200 mb-3">
-            📐 横幅设置
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+            🌌 动态背景
           </label>
-          <div class="space-y-3">
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
-              <span class="text-sm text-stone-700 dark:text-stone-200">显示横幅标题</span>
-              <input type="checkbox" id="show-hero" checked class="w-5 h-5 accent-emerald-500" />
+          <div class="grid grid-cols-2 gap-2">
+            {Object.values(BACKGROUND_MODES).map(bg => (
+              <button
+                data-bg-mode={bg.name}
+                class="bg-mode-btn px-2 py-2 rounded-lg text-xs transition-all text-left"
+                style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent;"
+              >
+                {bg.label}
+                <span class="block text-[10px] mt-0.5" style="color: var(--text-secondary);">{bg.description}</span>
+              </button>
+            ))}
+          </div>
+
+          <!-- 自定义背景图 -->
+          <div class="mt-3">
+            <label class="text-xs block mb-1" style="color: var(--text-secondary);">自定义背景图 URL</label>
+            <input
+              type="url"
+              id="custom-bg-url"
+              placeholder="https://example.com/bg.jpg"
+              class="w-full px-3 py-2 rounded-lg text-xs outline-none"
+              style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border-color);"
+            />
+          </div>
+        </div>
+
+        <!-- 横幅模式 -->
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+            🖼️ 横幅模式
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            {Object.values(BANNER_MODES).map(mode => (
+              <button
+                data-banner-mode={mode.name}
+                class="banner-mode-btn px-2 py-2 rounded-lg text-xs transition-all"
+                style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent;"
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- 组件开关 -->
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+            🧩 组件开关
+          </label>
+          <div class="space-y-2">
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
+              <span class="text-xs" style="color: var(--text-primary);">首页横幅标题</span>
+              <input type="checkbox" id="show-hero" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
             </label>
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
-              <span class="text-sm text-stone-700 dark:text-stone-200">水波纹动画</span>
-              <input type="checkbox" id="show-wave" checked class="w-5 h-5 accent-emerald-500" />
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
+              <span class="text-xs" style="color: var(--text-primary);">水波纹动画</span>
+              <input type="checkbox" id="show-wave" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
             </label>
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
-              <span class="text-sm text-stone-700 dark:text-stone-200">毛玻璃内容区</span>
-              <input type="checkbox" id="show-glass" checked class="w-5 h-5 accent-emerald-500" />
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
+              <span class="text-xs" style="color: var(--text-primary);">毛玻璃内容区</span>
+              <input type="checkbox" id="show-glass" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            </label>
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
+              <span class="text-xs" style="color: var(--text-primary);">音乐播放器</span>
+              <input type="checkbox" id="show-music" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            </label>
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
+              <span class="text-xs" style="color: var(--text-primary);">公告弹窗</span>
+              <input type="checkbox" id="show-announcement" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            </label>
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
+              <span class="text-xs" style="color: var(--text-primary);">浮动头像</span>
+              <input type="checkbox" id="show-avatar" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            </label>
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
+              <span class="text-xs" style="color: var(--text-primary);">粒子背景</span>
+              <input type="checkbox" id="show-particles" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            </label>
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
+              <span class="text-xs" style="color: var(--text-primary);">页面动画</span>
+              <input type="checkbox" id="animations-enabled" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
             </label>
           </div>
         </div>
 
         <!-- 文章布局 -->
         <div>
-          <label class="block text-sm font-medium text-stone-700 dark:text-stone-200 mb-3">
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
             📰 文章布局
           </label>
-          <div class="flex gap-2">
-            <button class="layout-btn flex-1 py-2 px-3 rounded-lg text-sm transition-colors" data-layout="list">
-              ☰ 列表
-            </button>
-            <button class="layout-btn flex-1 py-2 px-3 rounded-lg text-sm transition-colors" data-layout="grid">
-              ▦ 网格
-            </button>
+          <div class="grid grid-cols-2 gap-2">
+            {Object.values(POST_LAYOUTS).map(layout => (
+              <button
+                data-layout={layout.name}
+                class="layout-btn px-2 py-2 rounded-lg text-xs transition-all"
+                style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent;"
+              >
+                {layout.icon} {layout.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        <!-- 重置设置 -->
-        <div class="pt-4 border-t border-stone-200/50">
-          <button id="reset-settings" class="w-full py-2 px-4 rounded-lg bg-stone-200/80 dark:bg-stone-700/80 text-stone-700 dark:text-stone-200 hover:bg-stone-300/80 dark:hover:bg-stone-600/80 transition-colors text-sm">
+        <!-- 字体 -->
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+            🔤 字体
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <button data-font="sans" class="font-btn px-2 py-2 rounded-lg text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent;">无衬线</button>
+            <button data-font="serif" class="font-btn px-2 py-2 rounded-lg text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent; font-family: serif;">衬线体</button>
+            <button data-font="mono" class="font-btn px-2 py-2 rounded-lg text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent; font-family: monospace;">等宽体</button>
+            <button data-font="rounded" class="font-btn px-2 py-2 rounded-lg text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent;">圆润体</button>
+          </div>
+
+          <div class="mt-2 flex gap-2">
+            <button data-fsize="sm" class="fsize-btn px-3 py-1 rounded text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid transparent;">小</button>
+            <button data-fsize="base" class="fsize-btn px-3 py-1 rounded text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid transparent;">中</button>
+            <button data-fsize="lg" class="fsize-btn px-3 py-1 rounded text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid transparent;">大</button>
+          </div>
+        </div>
+
+        <!-- 自定义内容 -->
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+            ✏️ 自定义内容
+          </label>
+          <div class="space-y-2">
+            <input
+              type="text"
+              id="custom-greeting"
+              placeholder="问候语（默认：都是风景，幸会！）"
+              class="w-full px-3 py-2 rounded-lg text-xs outline-none"
+              style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border-color);"
+            />
+            <input
+              type="text"
+              id="custom-announcement"
+              placeholder="公告内容"
+              class="w-full px-3 py-2 rounded-lg text-xs outline-none"
+              style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border-color);"
+            />
+            <input
+              type="url"
+              id="custom-avatar"
+              placeholder="自定义头像 URL"
+              class="w-full px-3 py-2 rounded-lg text-xs outline-none"
+              style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border-color);"
+            />
+          </div>
+        </div>
+
+        <!-- 自定义 CSS -->
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+            🎨 自定义 CSS
+          </label>
+          <textarea
+            id="custom-css"
+            placeholder="/* 在此输入自定义 CSS */&#10;.my-class { color: red; }"
+            rows="3"
+            class="w-full px-3 py-2 rounded-lg text-xs outline-none font-mono"
+            style="background: rgba(0,0,0,0.3); color: #cdd6f4; border: 1px solid var(--border-color); resize: vertical;"
+          ></textarea>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="pt-4 border-t border-stone-200/30 space-y-2">
+          <button id="export-settings" class="w-full py-2 px-4 rounded-lg text-xs transition-colors" style="background: hsl(var(--primary-hue), 40%, 95%); color: var(--primary);">
+            📤 导出设置
+          </button>
+          <button id="import-settings" class="w-full py-2 px-4 rounded-lg text-xs transition-colors" style="background: hsl(var(--primary-hue), 40%, 95%); color: var(--primary);">
+            📥 导入设置
+          </button>
+          <button id="reset-settings" class="w-full py-2 px-4 rounded-lg text-xs transition-colors" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
             🔄 重置默认设置
           </button>
         </div>
@@ -108,101 +274,304 @@
 </div>
 
 <script>
-  // 设置面板交互
-  const settingsPanel = document.getElementById('settings-panel');
-  const settingsTrigger = document.getElementById('settings-trigger');
+  import {
+    loadSettings,
+    saveSettings,
+    resetSettings,
+    applyAllSettings,
+    applyColorTheme,
+    applyThemeMode,
+    applyFont,
+    applyBackground,
+    applyBanner,
+    COLOR_THEMES,
+    DEFAULT_SETTINGS,
+    type UserSettings,
+  } from '../lib/theme';
 
-  let isPanelOpen = false;
+  (function() {
+    let settings = loadSettings();
 
-  // 鼠标悬停展开
-  let hoverTimeout;
-  settingsPanel?.addEventListener('mouseenter', () => {
-    clearTimeout(hoverTimeout);
-    settingsPanel.style.transform = 'translateY(-50%) translateX(0)';
-    isPanelOpen = true;
-  });
+    // 应用初始设置
+    applyAllSettings(settings);
+    syncUIFromSettings();
 
-  settingsPanel?.addEventListener('mouseleave', () => {
-    hoverTimeout = setTimeout(() => {
-      settingsPanel.style.transform = 'translateY(-50%) translateX(calc(100% - 3rem))';
-      isPanelOpen = false;
-    }, 500);
-  });
+    // 同步 UI
+    function syncUIFromSettings() {
+      // 主题模式按钮
+      updateActiveButton('.theme-mode-btn', 'data-theme-mode', settings.themeMode);
+      // 主题色按钮
+      updateActiveButton('.color-theme-btn', 'data-color-theme', settings.colorTheme);
+      // 背景模式按钮
+      updateActiveButton('.bg-mode-btn', 'data-bg-mode', settings.backgroundMode);
+      // 横幅模式按钮
+      updateActiveButton('.banner-mode-btn', 'data-banner-mode', settings.bannerMode);
+      // 布局按钮
+      updateActiveButton('.layout-btn', 'data-layout', settings.postLayout);
+      // 字体按钮
+      updateActiveButton('.font-btn', 'data-font', settings.fontFamily);
+      updateActiveButton('.fsize-btn', 'data-fsize', settings.fontSize);
 
-  // 主题色调整
-  const themeHue = document.getElementById('theme-hue');
-  const hueValue = document.getElementById('hue-value');
+      // 滑块
+      const hueInput = document.getElementById('theme-hue') as HTMLInputElement | null;
+      const hueValue = document.getElementById('hue-value');
+      if (hueInput) hueInput.value = String(settings.hue);
+      if (hueValue) hueValue.textContent = settings.hue + '°';
 
-  function setHue(hue) {
-    document.documentElement.style.setProperty('--primary-hue', hue);
-    localStorage.setItem('theme-hue', hue);
-    if (hueValue) hueValue.textContent = hue + '°';
-  }
+      // 复选框
+      setCheckbox('show-hero', settings.showHero);
+      setCheckbox('show-wave', settings.showWave);
+      setCheckbox('show-glass', settings.showGlass);
+      setCheckbox('show-music', settings.showMusicPlayer);
+      setCheckbox('show-announcement', settings.showAnnouncement);
+      setCheckbox('show-avatar', settings.showAvatar !== false);
+      setCheckbox('show-particles', settings.showParticles);
+      setCheckbox('animations-enabled', settings.animationsEnabled);
 
-  themeHue?.addEventListener('input', (e) => {
-    setHue(e.target.value);
-  });
+      // 自定义内容
+      const greetingInput = document.getElementById('custom-greeting') as HTMLInputElement | null;
+      const announcementInput = document.getElementById('custom-announcement') as HTMLInputElement | null;
+      const avatarInput = document.getElementById('custom-avatar') as HTMLInputElement | null;
+      const bgInput = document.getElementById('custom-bg-url') as HTMLInputElement | null;
+      const cssInput = document.getElementById('custom-css') as HTMLTextAreaElement | null;
 
-  // 壁纸模式
-  document.querySelectorAll('input[name="wallpaper"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      const value = e.target.value;
-      document.body.classList.remove('wallpaper-gradient', 'wallpaper-dark', 'wallpaper-light');
-      document.body.classList.add('wallpaper-' + value);
-      localStorage.setItem('wallpaper', value);
-    });
-  });
+      if (greetingInput) greetingInput.value = settings.customGreeting || '';
+      if (announcementInput) announcementInput.value = settings.customAnnouncement || '';
+      if (avatarInput) avatarInput.value = settings.customAvatar || '';
+      if (bgInput) bgInput.value = settings.customBackground || '';
+      if (cssInput) cssInput.value = settings.customCSS || '';
+    }
 
-  // 横幅设置
-  const showHero = document.getElementById('show-hero');
-  showHero?.addEventListener('change', (e) => {
-    const hero = document.querySelector('section');
-    if (hero) hero.style.display = e.target.checked ? '' : 'none';
-    localStorage.setItem('show-hero', e.target.checked);
-  });
-
-  const showWave = document.getElementById('show-wave');
-  showWave?.addEventListener('change', (e) => {
-    const wave = document.querySelector('.wave-container');
-    if (wave) wave.style.display = e.target.checked ? '' : 'none';
-    localStorage.setItem('show-wave', e.target.checked);
-  });
-
-  // 文章布局
-  document.querySelectorAll('.layout-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const layout = e.currentTarget.getAttribute('data-layout');
-      localStorage.setItem('post-layout', layout);
-      document.querySelectorAll('.layout-btn').forEach(b => {
-        b.classList.remove('bg-emerald-500', 'text-white');
-        b.classList.add('bg-stone-200/80', 'dark:bg-stone-700/80');
+    function updateActiveButton(selector: string, attr: string, value: string) {
+      const buttons = document.querySelectorAll(selector);
+      buttons.forEach((btn: Element) => {
+        const htmlBtn = btn as HTMLElement;
+        if (htmlBtn.getAttribute(attr) === value) {
+          htmlBtn.style.borderColor = 'var(--primary)';
+          htmlBtn.style.background = 'hsl(var(--primary-hue), 40%, 95%)';
+        } else {
+          htmlBtn.style.borderColor = 'transparent';
+          htmlBtn.style.background = 'rgba(255,255,255,0.05)';
+        }
       });
-      e.currentTarget.classList.add('bg-emerald-500', 'text-white');
-      e.currentTarget.classList.remove('bg-stone-200/80', 'dark:bg-stone-700/80');
+    }
+
+    function setCheckbox(id: string, checked: boolean) {
+      const el = document.getElementById(id) as HTMLInputElement | null;
+      if (el) el.checked = checked;
+    }
+
+    // 主题模式
+    document.querySelectorAll('.theme-mode-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const mode = (e.currentTarget as HTMLElement).getAttribute('data-theme-mode') as any;
+        settings = saveSettings({ themeMode: mode });
+        applyThemeMode(mode);
+        syncUIFromSettings();
+      });
     });
-  });
 
-  // 重置设置
-  document.getElementById('reset-settings')?.addEventListener('click', () => {
-    localStorage.removeItem('theme-hue');
-    localStorage.removeItem('wallpaper');
-    localStorage.removeItem('show-hero');
-    localStorage.removeItem('show-wave');
-    localStorage.removeItem('post-layout');
-    location.reload();
-  });
+    // 主题色
+    document.querySelectorAll('.color-theme-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const name = (e.currentTarget as HTMLElement).getAttribute('data-color-theme') as any;
+        const theme = COLOR_THEMES[name];
+        if (theme) {
+          settings = saveSettings({
+            colorTheme: name,
+            hue: theme.hue,
+            saturation: theme.saturation,
+            lightness: theme.lightness,
+          });
+          applyColorTheme(settings);
+          syncUIFromSettings();
+        }
+      });
+    });
 
-  // 加载保存的设置
-  const savedHue = localStorage.getItem('theme-hue');
-  if (savedHue) {
-    setHue(savedHue);
-    if (themeHue) themeHue.value = savedHue;
-  }
+    // 色相滑块
+    const hueInput = document.getElementById('theme-hue');
+    hueInput?.addEventListener('input', (e) => {
+      const hue = parseInt((e.target as HTMLInputElement).value);
+      const theme = COLOR_THEMES[settings.colorTheme] || COLOR_THEMES.purple;
+      settings = saveSettings({
+        hue,
+        saturation: theme.saturation,
+        lightness: theme.lightness,
+      });
+      applyColorTheme(settings);
+      const hueValue = document.getElementById('hue-value');
+      if (hueValue) hueValue.textContent = hue + '°';
+    });
 
-  const savedWallpaper = localStorage.getItem('wallpaper');
-  if (savedWallpaper) {
-    document.body.classList.add('wallpaper-' + savedWallpaper);
-    const radio = document.querySelector(`input[name="wallpaper"][value="${savedWallpaper}"]`);
-    if (radio) radio.checked = true;
-  }
+    // 背景模式
+    document.querySelectorAll('.bg-mode-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const mode = (e.currentTarget as HTMLElement).getAttribute('data-bg-mode') as any;
+        settings = saveSettings({ backgroundMode: mode });
+        applyBackground(mode, settings.customBackground);
+        syncUIFromSettings();
+      });
+    });
+
+    // 自定义背景 URL
+    const bgInput = document.getElementById('custom-bg-url');
+    let bgDebounce: any;
+    bgInput?.addEventListener('input', (e) => {
+      clearTimeout(bgDebounce);
+      bgDebounce = setTimeout(() => {
+        const url = (e.target as HTMLInputElement).value;
+        settings = saveSettings({ customBackground: url, backgroundMode: 'image' });
+        applyBackground('image', url);
+        syncUIFromSettings();
+      }, 500);
+    });
+
+    // 横幅模式
+    document.querySelectorAll('.banner-mode-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const mode = (e.currentTarget as HTMLElement).getAttribute('data-banner-mode') as any;
+        settings = saveSettings({ bannerMode: mode });
+        applyBanner(mode);
+        syncUIFromSettings();
+      });
+    });
+
+    // 复选框
+    ['show-hero', 'show-wave', 'show-glass', 'show-music', 'show-announcement', 'show-particles', 'animations-enabled'].forEach(id => {
+      const el = document.getElementById(id);
+      el?.addEventListener('change', (e) => {
+        const checked = (e.target as HTMLInputElement).checked;
+        const map: Record<string, any> = {
+          'show-hero': { showHero: checked },
+          'show-wave': { showWave: checked },
+          'show-glass': { showGlass: checked },
+          'show-music': { showMusicPlayer: checked },
+          'show-announcement': { showAnnouncement: checked },
+          'show-particles': { showParticles: checked },
+          'animations-enabled': { animationsEnabled: checked },
+        };
+        settings = saveSettings(map[id]);
+        applyAllSettings(settings);
+      });
+    });
+
+    const avatarEl = document.getElementById('show-avatar');
+    avatarEl?.addEventListener('change', (e) => {
+      const checked = (e.target as HTMLInputElement).checked;
+      settings = saveSettings({ showAvatar: checked });
+      const avatar = document.getElementById('floating-avatar');
+      if (avatar) avatar.style.display = checked ? '' : 'none';
+    });
+
+    // 布局
+    document.querySelectorAll('.layout-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const layout = (e.currentTarget as HTMLElement).getAttribute('data-layout') as any;
+        settings = saveSettings({ postLayout: layout });
+        syncUIFromSettings();
+        // 触发布局变更事件
+        window.dispatchEvent(new CustomEvent('layout-change', { detail: layout }));
+      });
+    });
+
+    // 字体
+    document.querySelectorAll('.font-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const font = (e.currentTarget as HTMLElement).getAttribute('data-font') as any;
+        settings = saveSettings({ fontFamily: font });
+        applyFont(font, settings.fontSize);
+        syncUIFromSettings();
+      });
+    });
+
+    document.querySelectorAll('.fsize-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const size = (e.currentTarget as HTMLElement).getAttribute('data-fsize') as any;
+        settings = saveSettings({ fontSize: size });
+        applyFont(settings.fontFamily, size);
+        syncUIFromSettings();
+      });
+    });
+
+    // 自定义内容
+    function debounceInput(id: string, key: keyof UserSettings, callback?: (value: string) => void) {
+      const el = document.getElementById(id);
+      let timer: any;
+      el?.addEventListener('input', (e) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          const value = (e.target as HTMLInputElement).value;
+          settings = saveSettings({ [key]: value } as any);
+          if (callback) callback(value);
+        }, 300);
+      });
+    }
+
+    debounceInput('custom-greeting', 'customGreeting', (val) => {
+      const heroTitle = document.querySelector('h1');
+      if (heroTitle && val) heroTitle.textContent = val;
+      const bio = document.getElementById('avatar-bio');
+      if (bio && val) bio.textContent = val;
+    });
+
+    debounceInput('custom-announcement', 'customAnnouncement', (val) => {
+      const textEl = document.getElementById('announcement-text');
+      if (textEl && val) textEl.textContent = val;
+    });
+
+    debounceInput('custom-avatar', 'customAvatar', (val) => {
+      const img = document.getElementById('avatar-img') as HTMLImageElement;
+      if (img && val) img.src = val;
+    });
+
+    debounceInput('custom-css', 'customCSS', () => {
+      applyAllSettings(settings);
+    });
+
+    // 导出设置
+    document.getElementById('export-settings')?.addEventListener('click', () => {
+      const data = JSON.stringify(settings, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ymll-blog-settings-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // 导入设置
+    document.getElementById('import-settings')?.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = (e: any) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const imported = JSON.parse(ev.target?.result as string);
+            settings = saveSettings(imported);
+            applyAllSettings(settings);
+            syncUIFromSettings();
+            alert('✅ 设置已导入！');
+          } catch {
+            alert('❌ 导入失败：文件格式错误');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    });
+
+    // 重置
+    document.getElementById('reset-settings')?.addEventListener('click', () => {
+      if (confirm('确定要重置所有设置为默认值吗？')) {
+        resetSettings();
+        location.reload();
+      }
+    });
+  })();
 </script>

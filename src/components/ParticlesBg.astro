@@ -1,0 +1,135 @@
+---
+// 动态粒子背景组件
+---
+
+<canvas id="particles-canvas" class="fixed inset-0 -z-1 pointer-events-none" style="display: none;"></canvas>
+
+<script>
+  (function() {
+    const canvas = document.getElementById('particles-canvas') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let particles: Array<{
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      size: number;
+      hue: number;
+      alpha: number;
+    }> = [];
+    let animationId: number;
+    let isVisible = false;
+
+    function getHue() {
+      const hue = getComputedStyle(document.documentElement).getPropertyValue('--primary-hue').trim();
+      return parseInt(hue) || 262;
+    }
+
+    function resize() {
+      canvas!.width = window.innerWidth;
+      canvas!.height = window.innerHeight;
+    }
+
+    function createParticles() {
+      particles = [];
+      const count = Math.min(80, Math.floor(window.innerWidth * window.innerHeight / 15000));
+      const baseHue = getHue();
+
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * canvas!.width,
+          y: Math.random() * canvas!.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          size: Math.random() * 2 + 1,
+          hue: baseHue + (Math.random() - 0.5) * 60,
+          alpha: Math.random() * 0.5 + 0.3,
+        });
+      }
+    }
+
+    function draw() {
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+      const baseHue = getHue();
+
+      particles.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // 边界反弹
+        if (p.x < 0 || p.x > canvas!.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas!.height) p.vy *= -1;
+
+        // 绘制粒子
+        ctx!.beginPath();
+        ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx!.fillStyle = `hsla(${baseHue + (p.hue - baseHue)}, 80%, 60%, ${p.alpha})`;
+        ctx!.fill();
+
+        // 连接线
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 120) {
+            ctx!.beginPath();
+            ctx!.moveTo(p.x, p.y);
+            ctx!.lineTo(p2.x, p2.y);
+            ctx!.strokeStyle = `hsla(${baseHue}, 80%, 60%, ${0.15 * (1 - dist / 120)})`;
+            ctx!.lineWidth = 0.5;
+            ctx!.stroke();
+          }
+        }
+      });
+
+      animationId = requestAnimationFrame(draw);
+    }
+
+    function start() {
+      if (isVisible) return;
+      isVisible = true;
+      canvas!.style.display = '';
+      resize();
+      createParticles();
+      draw();
+    }
+
+    function stop() {
+      isVisible = false;
+      canvas!.style.display = 'none';
+      cancelAnimationFrame(animationId);
+    }
+
+    window.addEventListener('resize', () => {
+      if (isVisible) {
+        resize();
+        createParticles();
+      }
+    });
+
+    // 暴露 API
+    (window as any).particlesBg = { start, stop };
+
+    // 自动检测当前背景模式
+    function checkMode() {
+      const body = document.body;
+      if (body.classList.contains('bg-particles') || body.classList.contains('bg-aurora')) {
+        start();
+      } else {
+        stop();
+      }
+    }
+
+    // 初始检查
+    checkMode();
+
+    // 监听 body 类变化
+    const observer = new MutationObserver(checkMode);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  })();
+</script>
