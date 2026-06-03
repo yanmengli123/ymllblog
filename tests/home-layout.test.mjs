@@ -26,6 +26,25 @@ assert.match(index, /<MusicPlayer[^>]+variant="sidebar"/, 'left sidebar should i
 assert.match(index, /<SettingsPanel[^>]+variant="sidebar"/, 'right sidebar should include sidebar settings panel');
 assert.match(index, /<SiteStatsCard\s*\/>/, 'right sidebar should include site statistics');
 assert.match(index, /<PostCalendarCard\s*\/>/, 'right sidebar should include post calendar');
+assert.match(
+  index,
+  /<SiteStatsCard\s*\/>[\s\S]*<PostCalendarCard\s*\/>[\s\S]*<SettingsPanel[^>]+variant="sidebar"/,
+  'right sidebar should show stats and the calendar before the tall settings panel'
+);
+
+const calendar = read('src/components/PostCalendarCard.astro');
+for (const pattern of [
+  /id="post-calendar-card"/,
+  /class="calendar-header"/,
+  /class="calendar-weekdays"/,
+  /class:list=\{\[\s*'calendar-day'/,
+  /data-post-count=\{day.count\}/,
+  /id="calendar-prev-month"/,
+  /id="calendar-next-month"/,
+  /data-calendar-month/,
+]) {
+  assert.match(calendar, pattern, `calendar should include ${pattern}`);
+}
 
 const music = read('src/components/MusicPlayer.astro');
 assert.match(music, /interface Props[\s\S]*variant\?: 'floating' \| 'sidebar'/, 'music player should support floating and sidebar variants');

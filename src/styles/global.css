@@ -290,8 +290,8 @@
       position: sticky;
       top: 5.5rem;
       align-self: start;
-      max-height: calc(100vh - 6.5rem);
-      overflow-y: auto;
+      max-height: none;
+      overflow-y: visible;
       padding-bottom: 0.25rem;
     }
 
