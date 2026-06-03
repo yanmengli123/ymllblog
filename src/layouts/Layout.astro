@@ -104,28 +104,27 @@ const jsonLD = generateJSONLD({
     {/* JSON-LD */}
     <script type="application/ld+json" set:html={JSON.stringify(jsonLD)} />
   </head>
-  <body class="bg-stone-50 text-stone-900 font-sans antialiased selection:bg-emerald-500 selection:text-white">
-    {/* 页面加载动画 - Matery 风格 */}
+  <body class="bg-stone-50 text-stone-900 font-sans antialiased" style="background-color: var(--bg-base); color: var(--text-primary);">
+    {/* 页面加载动画 - dlog.com.cn 紫色风格 */}
     <div id="page-loader" class="fixed inset-0 z-[9999] bg-white flex items-center justify-center transition-all duration-500">
       <div class="text-center">
         {/* Logo */}
-        <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-500 to-green-500 flex items-center justify-center shadow-lg animate-pulse">
+        <div class="w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center shadow-lg animate-pulse"
+             style="background: linear-gradient(135deg, #8163bd, #0f9d58);">
           <span class="text-white font-bold text-2xl">Y</span>
         </div>
         {/* 进度条 */}
         <div class="w-48 h-1.5 bg-stone-200 rounded-full overflow-hidden mb-4">
-          <div id="loader-progress" class="h-full bg-gradient-to-r from-purple-500 to-green-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+          <div id="loader-progress" class="h-full rounded-full transition-all duration-300" style="width: 0%; background: linear-gradient(to right, #8163bd, #0f9d58);"></div>
         </div>
         {/* 提示文字 */}
         <p class="text-sm text-stone-500">正在加载精彩内容...</p>
       </div>
     </div>
 
-    {/* 背景装饰 */}
-    <div class="fixed inset-0 -z-10">
-      <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-white to-amber-50/30"></div>
-      <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-b from-emerald-100/20 to-transparent rounded-full blur-3xl"></div>
-      <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-t from-amber-100/20 to-transparent rounded-full blur-3xl"></div>
+    {/* 背景装饰 - dlog.com.cn 风格 */}
+    <div class="fixed inset-0 -z-10" style="background-color: var(--bg-base);">
+      <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(129, 99, 189, 0.05) 0%, transparent 50%, rgba(15, 157, 88, 0.05) 100%);"></div>
     </div>
 
     {/* 鼠标点击特效画布 */}
@@ -197,7 +196,7 @@ const jsonLD = generateJSONLD({
       if (canvas) {
         var ctx = canvas.getContext('2d');
         var particles = [];
-        var colors = ['#bf30ac', '#0f9d58', '#42b983', '#FF5E3A', '#FF2A68', '#f59e0b', '#8b5cf6'];
+        var colors = ['#8163bd', '#0f9d58', '#42b983', '#79589f', '#bb60d5', '#f59e0b', '#6b4fa8'];
 
         function resizeCanvas() {
           canvas.width = window.innerWidth;
@@ -375,33 +374,33 @@ const jsonLD = generateJSONLD({
       }
 
       // ============ 7. 控制台彩蛋 ============
-      console.log('%c╔════════════════════════════════════════╗', 'color: #0f9d58; font-weight: bold;');
-      console.log('%c║  🎉 欢迎来到 YMLL Blog 源代码！       ║', 'color: #0f9d58; font-weight: bold;');
-      console.log('%c║                                        ║', 'color: #0f9d58; font-weight: bold;');
-      console.log('%c║  👨‍💻 开发者: YMLL                       ║', 'color: #0f9d58; font-weight: bold;');
-      console.log('%c║  🌐 博客: https://yanmengli123.github.io/ymllblog  ║', 'color: #0f9d58; font-weight: bold;');
-      console.log('%c║  💬 交流: 欢迎留言~                    ║', 'color: #0f9d58; font-weight: bold;');
-      console.log('%c║                                        ║', 'color: #0f9d58; font-weight: bold;');
-      console.log('%c║  ✨ 试试输入: blog.help()              ║', 'color: #bf30ac; font-weight: bold;');
-      console.log('%c╚════════════════════════════════════════╝', 'color: #0f9d58; font-weight: bold;');
+      console.log('%c╔════════════════════════════════════════╗', 'color: #8163bd; font-weight: bold;');
+      console.log('%c║  🎉 欢迎来到 YMLL Blog 源代码！       ║', 'color: #8163bd; font-weight: bold;');
+      console.log('%c║                                        ║', 'color: #8163bd; font-weight: bold;');
+      console.log('%c║  👨‍💻 开发者: YMLL                       ║', 'color: #8163bd; font-weight: bold;');
+      console.log('%c║  🌐 博客: https://yanmengli123.github.io/ymllblog  ║', 'color: #8163bd; font-weight: bold;');
+      console.log('%c║  💬 交流: 欢迎留言~                    ║', 'color: #8163bd; font-weight: bold;');
+      console.log('%c║                                        ║', 'color: #8163bd; font-weight: bold;');
+      console.log('%c║  ✨ 试试输入: blog.help()              ║', 'color: #0f9d58; font-weight: bold;');
+      console.log('%c╚════════════════════════════════════════╝', 'color: #8163bd; font-weight: bold;');
 
       window.blog = {
         help: function() {
-          console.log('%c📖 可用命令:', 'color: #0f9d58; font-weight: bold; font-size: 14px;');
+          console.log('%c📖 可用命令:', 'color: #8163bd; font-weight: bold; font-size: 14px;');
           console.log('%c  blog.stats()    - 查看博客统计', 'color: #42b983;');
           console.log('%c  blog.achievements() - 查看成就', 'color: #42b983;');
           console.log('%c  blog.theme()    - 切换主题', 'color: #42b983;');
-          console.log('%c  blog.secret()   - 隐藏彩蛋', 'color: #bf30ac;');
+          console.log('%c  blog.secret()   - 隐藏彩蛋', 'color: #0f9d58;');
         },
         stats: function() {
-          console.log('%c📊 博客统计:', 'color: #0f9d58; font-weight: bold; font-size: 14px;');
+          console.log('%c📊 博客统计:', 'color: #8163bd; font-weight: bold; font-size: 14px;');
           console.log('%c  📄 文章: 9 篇', 'color: #42b983;');
           console.log('%c  🏷️  标签: 22 个', 'color: #42b983;');
           console.log('%c  ⏱️  加载时间: ' + performance.now().toFixed(2) + 'ms', 'color: #42b983;');
         },
         achievements: function() {
           var all = JSON.parse(localStorage.getItem('ymll_achievements') || '[]');
-          console.log('%c🏆 已解锁成就 (' + all.length + '):', 'color: #bf30ac; font-weight: bold; font-size: 14px;');
+          console.log('%c🏆 已解锁成就 (' + all.length + '):', 'color: #0f9d58; font-weight: bold; font-size: 14px;');
           all.forEach(function(a) {
             console.log('%c  ' + a.title + ' - ' + a.desc, 'color: #42b983;');
           });
@@ -409,10 +408,10 @@ const jsonLD = generateJSONLD({
         },
         theme: function() {
           document.documentElement.classList.toggle('dark');
-          console.log('%c🎨 主题已切换！', 'color: #0f9d58; font-weight: bold;');
+          console.log('%c🎨 主题已切换！', 'color: #8163bd; font-weight: bold;');
         },
         secret: function() {
-          console.log('%c🔓 秘密解锁！', 'color: #bf30ac; font-weight: bold; font-size: 16px;');
+          console.log('%c🔓 秘密解锁！', 'color: #0f9d58; font-weight: bold; font-size: 16px;');
           console.log('%c🎁 源代码: https://github.com/yanmengli123/ymllblog', 'color: #42b983;');
           document.body.style.animation = 'rainbow 2s linear';
           setTimeout(function() { document.body.style.animation = ''; }, 2000);
@@ -423,7 +422,7 @@ const jsonLD = generateJSONLD({
       var backToTop = document.createElement('button');
       backToTop.id = 'back-to-top';
       backToTop.innerHTML = '↑';
-      backToTop.style.cssText = 'position:fixed;bottom:80px;right:20px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#bf30ac,#0f9d58);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);opacity:0;transform:translateY(20px);transition:all 0.3s;z-index:100;';
+      backToTop.style.cssText = 'position:fixed;bottom:80px;right:20px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8163bd,#0f9d58);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);opacity:0;transform:translateY(20px);transition:all 0.3s;z-index:100;';
       document.body.appendChild(backToTop);
 
       window.addEventListener('scroll', function() {
@@ -473,7 +472,7 @@ const jsonLD = generateJSONLD({
       // ============ 10. 鼠标跟随光晕 ============
       var mouseFollower = document.createElement('div');
       mouseFollower.id = 'mouse-follower';
-      mouseFollower.style.cssText = 'position:fixed;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle,rgba(191,48,172,0.3),rgba(15,157,88,0.1));pointer-events:none;z-index:9997;transition:transform 0.15s ease-out;mix-blend-mode:screen;';
+      mouseFollower.style.cssText = 'position:fixed;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle,rgba(129,99,189,0.3),rgba(15,157,88,0.1));pointer-events:none;z-index:9997;transition:transform 0.15s ease-out;mix-blend-mode:screen;';
       document.body.appendChild(mouseFollower);
 
       var mouseX = 0, mouseY = 0;
@@ -539,7 +538,7 @@ const jsonLD = generateJSONLD({
         setTimeout(function() {
           var modal = document.createElement('div');
           modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;';
-          modal.innerHTML = '<div style="background:white;border-radius:16px;padding:2rem;max-width:400px;width:90%;text-align:center;position:relative;"><button onclick="this.closest(\'div[style]\').remove()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;">✕</button><div style="font-size:3rem;margin-bottom:1rem;">📬</div><h3 style="font-size:1.25rem;font-weight:bold;margin-bottom:0.5rem;color:#1a1a1a;">订阅我的周报</h3><p style="color:#666;margin-bottom:1.5rem;font-size:0.875rem;">每周分享技术洞察、设计灵感和个人思考</p><form onsubmit="event.preventDefault();localStorage.setItem(\'ymll_subscribe_shown\',\'true\');this.closest(\'div[style]\').remove();alert(\'感谢订阅！\');" style="display:flex;gap:0.5rem;"><input type="email" placeholder="your@email.com" required style="flex:1;padding:0.75rem;border:2px solid #e5e7eb;border-radius:8px;outline:none;"><button type="submit" style="padding:0.75rem 1.5rem;background:linear-gradient(to right,#bf30ac,#0f9d58);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">订阅</button></form><p style="color:#999;font-size:0.75rem;margin-top:1rem;">🔒 我们尊重您的隐私，随时可取消订阅</p></div>';
+          modal.innerHTML = '<div style="background:white;border-radius:16px;padding:2rem;max-width:400px;width:90%;text-align:center;position:relative;"><button onclick="this.closest(\'div[style]\').remove()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;">✕</button><div style="font-size:3rem;margin-bottom:1rem;">📬</div><h3 style="font-size:1.25rem;font-weight:bold;margin-bottom:0.5rem;color:#1a1a1a;">订阅我的周报</h3><p style="color:#666;margin-bottom:1.5rem;font-size:0.875rem;">每周分享技术洞察、设计灵感和个人思考</p><form onsubmit="event.preventDefault();localStorage.setItem(\'ymll_subscribe_shown\',\'true\');this.closest(\'div[style]\').remove();alert(\'感谢订阅！\');" style="display:flex;gap:0.5rem;"><input type="email" placeholder="your@email.com" required style="flex:1;padding:0.75rem;border:2px solid #e5e7eb;border-radius:8px;outline:none;"><button type="submit" style="padding:0.75rem 1.5rem;background:linear-gradient(to right,#8163bd,#0f9d58);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">订阅</button></form><p style="color:#999;font-size:0.75rem;margin-top:1rem;">🔒 我们尊重您的隐私，随时可取消订阅</p></div>';
 
           // 30秒后或滚动50%后显示
           var shown = false;
@@ -591,7 +590,7 @@ const jsonLD = generateJSONLD({
     }
 
     ::selection {
-      background-color: #10b981;
+      background-color: #8163bd;
       color: white;
     }
   }
@@ -606,7 +605,7 @@ const jsonLD = generateJSONLD({
     }
 
     .gradient-text {
-      @apply bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent;
+      @apply bg-gradient-to-r from-purple-600 to-emerald-600 bg-clip-text text-transparent;
     }
 
     .hover-lift {
@@ -661,13 +660,13 @@ const jsonLD = generateJSONLD({
 
     /* 行内代码 */
     code:not(pre code) {
-      background: #f0fdf4;
-      color: #166534;
+      background: rgba(99, 99, 172, 0.05);
+      color: #79589f;
       padding: 0.125rem 0.375rem;
       border-radius: 6px;
       font-size: 0.875em;
       font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
-      border: 1px solid #bbf7d0;
+      border: 1px solid rgba(99, 99, 172, 0.1);
     }
 
     .animate-on-scroll {
@@ -707,11 +706,11 @@ const jsonLD = generateJSONLD({
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #d6d3d1;
+    background: #b8a5d0;
     border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #a8a29e;
+    background: #8163bd;
   }
 </style>

@@ -1,0 +1,208 @@
+---
+// 设置面板组件
+---
+
+<div id="settings-panel" class="fixed right-0 top-1/2 -translate-y-1/2 z-[999] transition-transform duration-300 translate-x-[calc(100%-3rem)] hover:translate-x-0">
+  <div class="relative">
+    <!-- 触发按钮 -->
+    <button id="settings-trigger" class="absolute -left-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-l-2xl shadow-2xl flex items-center justify-center text-white"
+            style="background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    </button>
+
+    <!-- 面板内容 -->
+    <div class="glass-board w-80 rounded-l-2xl shadow-2xl overflow-hidden">
+      <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+        <!-- 标题 -->
+        <div class="flex items-center gap-2 pb-2 border-b border-stone-200/50">
+          <span class="text-xl">⚙️</span>
+          <h3 class="text-lg font-bold text-stone-800 dark:text-stone-100">设置面板</h3>
+        </div>
+
+        <!-- 主题色 -->
+        <div>
+          <label class="block text-sm font-medium text-stone-700 dark:text-stone-200 mb-3">
+            🎨 主题色相
+          </label>
+          <input
+            type="range"
+            id="theme-hue"
+            min="0"
+            max="360"
+            value="150"
+            class="w-full h-2 rounded-full appearance-none cursor-pointer"
+            style="background: linear-gradient(to right, hsl(0,60%,45%), hsl(60,60%,45%), hsl(120,60%,45%), hsl(180,60%,45%), hsl(240,60%,45%), hsl(300,60%,45%), hsl(360,60%,45%));"
+          />
+          <div class="text-center text-sm text-stone-500 mt-1" id="hue-value">150°</div>
+        </div>
+
+        <!-- 壁纸模式 -->
+        <div>
+          <label class="block text-sm font-medium text-stone-700 dark:text-stone-200 mb-3">
+            🖼️ 壁纸模式
+          </label>
+          <div class="space-y-2">
+            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
+              <input type="radio" name="wallpaper" value="gradient" checked class="accent-emerald-500" />
+              <span class="text-sm text-stone-700 dark:text-stone-200">渐变背景</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
+              <input type="radio" name="wallpaper" value="dark" class="accent-emerald-500" />
+              <span class="text-sm text-stone-700 dark:text-stone-200">深色全屏</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
+              <input type="radio" name="wallpaper" value="light" class="accent-emerald-500" />
+              <span class="text-sm text-stone-700 dark:text-stone-200">浅色全屏</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 横幅设置 -->
+        <div>
+          <label class="block text-sm font-medium text-stone-700 dark:text-stone-200 mb-3">
+            📐 横幅设置
+          </label>
+          <div class="space-y-3">
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
+              <span class="text-sm text-stone-700 dark:text-stone-200">显示横幅标题</span>
+              <input type="checkbox" id="show-hero" checked class="w-5 h-5 accent-emerald-500" />
+            </label>
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
+              <span class="text-sm text-stone-700 dark:text-stone-200">水波纹动画</span>
+              <input type="checkbox" id="show-wave" checked class="w-5 h-5 accent-emerald-500" />
+            </label>
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
+              <span class="text-sm text-stone-700 dark:text-stone-200">毛玻璃内容区</span>
+              <input type="checkbox" id="show-glass" checked class="w-5 h-5 accent-emerald-500" />
+            </label>
+          </div>
+        </div>
+
+        <!-- 文章布局 -->
+        <div>
+          <label class="block text-sm font-medium text-stone-700 dark:text-stone-200 mb-3">
+            📰 文章布局
+          </label>
+          <div class="flex gap-2">
+            <button class="layout-btn flex-1 py-2 px-3 rounded-lg text-sm transition-colors" data-layout="list">
+              ☰ 列表
+            </button>
+            <button class="layout-btn flex-1 py-2 px-3 rounded-lg text-sm transition-colors" data-layout="grid">
+              ▦ 网格
+            </button>
+          </div>
+        </div>
+
+        <!-- 重置设置 -->
+        <div class="pt-4 border-t border-stone-200/50">
+          <button id="reset-settings" class="w-full py-2 px-4 rounded-lg bg-stone-200/80 dark:bg-stone-700/80 text-stone-700 dark:text-stone-200 hover:bg-stone-300/80 dark:hover:bg-stone-600/80 transition-colors text-sm">
+            🔄 重置默认设置
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 设置面板交互
+  const settingsPanel = document.getElementById('settings-panel');
+  const settingsTrigger = document.getElementById('settings-trigger');
+
+  let isPanelOpen = false;
+
+  // 鼠标悬停展开
+  let hoverTimeout;
+  settingsPanel?.addEventListener('mouseenter', () => {
+    clearTimeout(hoverTimeout);
+    settingsPanel.style.transform = 'translateY(-50%) translateX(0)';
+    isPanelOpen = true;
+  });
+
+  settingsPanel?.addEventListener('mouseleave', () => {
+    hoverTimeout = setTimeout(() => {
+      settingsPanel.style.transform = 'translateY(-50%) translateX(calc(100% - 3rem))';
+      isPanelOpen = false;
+    }, 500);
+  });
+
+  // 主题色调整
+  const themeHue = document.getElementById('theme-hue');
+  const hueValue = document.getElementById('hue-value');
+
+  function setHue(hue) {
+    document.documentElement.style.setProperty('--primary-hue', hue);
+    localStorage.setItem('theme-hue', hue);
+    if (hueValue) hueValue.textContent = hue + '°';
+  }
+
+  themeHue?.addEventListener('input', (e) => {
+    setHue(e.target.value);
+  });
+
+  // 壁纸模式
+  document.querySelectorAll('input[name="wallpaper"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const value = e.target.value;
+      document.body.classList.remove('wallpaper-gradient', 'wallpaper-dark', 'wallpaper-light');
+      document.body.classList.add('wallpaper-' + value);
+      localStorage.setItem('wallpaper', value);
+    });
+  });
+
+  // 横幅设置
+  const showHero = document.getElementById('show-hero');
+  showHero?.addEventListener('change', (e) => {
+    const hero = document.querySelector('section');
+    if (hero) hero.style.display = e.target.checked ? '' : 'none';
+    localStorage.setItem('show-hero', e.target.checked);
+  });
+
+  const showWave = document.getElementById('show-wave');
+  showWave?.addEventListener('change', (e) => {
+    const wave = document.querySelector('.wave-container');
+    if (wave) wave.style.display = e.target.checked ? '' : 'none';
+    localStorage.setItem('show-wave', e.target.checked);
+  });
+
+  // 文章布局
+  document.querySelectorAll('.layout-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const layout = e.currentTarget.getAttribute('data-layout');
+      localStorage.setItem('post-layout', layout);
+      document.querySelectorAll('.layout-btn').forEach(b => {
+        b.classList.remove('bg-emerald-500', 'text-white');
+        b.classList.add('bg-stone-200/80', 'dark:bg-stone-700/80');
+      });
+      e.currentTarget.classList.add('bg-emerald-500', 'text-white');
+      e.currentTarget.classList.remove('bg-stone-200/80', 'dark:bg-stone-700/80');
+    });
+  });
+
+  // 重置设置
+  document.getElementById('reset-settings')?.addEventListener('click', () => {
+    localStorage.removeItem('theme-hue');
+    localStorage.removeItem('wallpaper');
+    localStorage.removeItem('show-hero');
+    localStorage.removeItem('show-wave');
+    localStorage.removeItem('post-layout');
+    location.reload();
+  });
+
+  // 加载保存的设置
+  const savedHue = localStorage.getItem('theme-hue');
+  if (savedHue) {
+    setHue(savedHue);
+    if (themeHue) themeHue.value = savedHue;
+  }
+
+  const savedWallpaper = localStorage.getItem('wallpaper');
+  if (savedWallpaper) {
+    document.body.classList.add('wallpaper-' + savedWallpaper);
+    const radio = document.querySelector(`input[name="wallpaper"][value="${savedWallpaper}"]`);
+    if (radio) radio.checked = true;
+  }
+</script>

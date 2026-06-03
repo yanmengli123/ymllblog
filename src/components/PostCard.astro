@@ -29,10 +29,10 @@ const formattedDate = new Date(date).toLocaleDateString('zh-CN', {
   day: 'numeric',
 });
 
-// Matery 风格标签颜色
+// dlog.com.cn 紫色风格标签颜色
 const tagColors = [
-  '#F9EBEA', '#F5EEF8', '#D5F5E3', '#E8F8F5', '#FEF9E7',
-  '#82E0AA', '#D7BDE2', '#A3E4D7', '#85C1E9', '#F8C471'
+  '#e9e4f0', '#f3f0f9', '#d4c9e2', '#e8f5e9', '#fef9e7',
+  '#c8e6c9', '#d7bde2', '#a3e4d7', '#85c1e9', '#f8c471'
 ];
 ---
 
@@ -40,7 +40,7 @@ const tagColors = [
   'group relative bg-white rounded-card overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-500 hover:-translate-y-2',
   featured ? 'md:col-span-2 md:grid md:grid-cols-2' : '',
 ]}>
-  {/* Image - Matery 风格 */}
+  {/* Image - 紫色渐变风格 */}
   <div class:list={[
     'relative overflow-hidden',
     featured ? 'aspect-[4/3] md:aspect-auto' : 'aspect-[16/10]'
@@ -53,7 +53,7 @@ const tagColors = [
         loading="lazy"
       />
     ) : (
-      <div class="w-full h-full bg-gradient-to-br from-purple-500 to-green-500 flex items-center justify-center">
+      <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, #8163bd, #0f9d58);">
         <span class="text-6xl opacity-30">📝</span>
       </div>
     )}
@@ -66,13 +66,13 @@ const tagColors = [
     'p-6',
     featured ? 'flex flex-col justify-center' : '',
   ]}>
-    {/* Tags - Matery 风格彩色标签 */}
+    {/* Tags - 紫色风格标签 */}
     {tags.length > 0 && (
       <div class="flex flex-wrap gap-2 mb-4">
         {tags.slice(0, 3).map((tag, index) => (
           <span
             class="px-3 py-1 text-xs font-medium rounded-chip transition-all hover:scale-105"
-            style={`background: ${tagColors[index % tagColors.length]}; color: #34495e;`}
+            style={`background: ${tagColors[index % tagColors.length]}; color: #333;`}
           >
             {tag}
           </span>
@@ -82,24 +82,24 @@ const tagColors = [
 
     {/* Title */}
     <h3 class:list={[
-      'font-bold text-stone-900 group-hover:text-emerald-600 transition-colors duration-300 mb-3',
+      'font-bold group-hover:transition-colors duration-300 mb-3',
       featured ? 'text-2xl md:text-3xl' : 'text-lg'
-    ]}>
-      <a href={`${base}/blog/${slug}`} class="after:absolute after:inset-0">
+    ]} style="color: var(--text-primary);">
+      <a href={`${base}/blog/${slug}`} class="after:absolute after:inset-0 hover:text-purple-600">
         {title}
       </a>
     </h3>
 
     {/* Description */}
     <p class:list={[
-      'text-stone-600 mb-4 leading-relaxed',
+      'mb-4 leading-relaxed',
       featured ? 'text-base line-clamp-3' : 'text-sm line-clamp-2'
-    ]}>
+    ]} style="color: var(--text-secondary);">
       {description}
     </p>
 
     {/* Meta */}
-    <div class="flex items-center gap-4 text-sm text-stone-500">
+    <div class="flex items-center gap-4 text-sm" style="color: var(--text-secondary);">
       <time datetime={date} class="flex items-center gap-1.5">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -117,8 +117,8 @@ const tagColors = [
     </div>
   </div>
 
-  {/* Matery 风格边框动画 */}
-  <div class="absolute inset-0 rounded-card border-2 border-transparent group-hover:border-purple-500/30 transition-all duration-500 pointer-events-none"></div>
+  {/* 紫色边框动画 */}
+  <div class="absolute inset-0 rounded-card border-2 border-transparent group-hover:border-purple-400/30 transition-all duration-500 pointer-events-none"></div>
 </article>
 
 <style>
