@@ -364,10 +364,6 @@
     background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%);
   }
 
-  .bg-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary-hue), 60%, 95%), white, hsl(calc(var(--primary-hue) + 30), 60%, 95%));
-  }
-
   .bg-waves {
     background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2e 100%);
     position: relative;

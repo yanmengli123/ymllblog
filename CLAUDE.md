@@ -4,95 +4,120 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-YMLL Blog — a Chinese-language personal tech/design blog built as a fully static site. Deployed to GitHub Pages at `https://yanmengli123.github.io/ymllblog`. Design inspired by Hexo Matery theme with Material Design aesthetics.
+YMLL Blog — a Chinese-language personal tech/design blog built as a fully static site. Deployed to GitHub Pages at `https://yanmengli123.github.io/ymllblog`. Inspired by Hexo Matery theme with dlog.com.cn layout patterns. Features a comprehensive personalization system (8 color themes, 8 background modes, custom CSS, etc.) accessible via a side settings panel.
 
 ## Tech Stack
 
 - **Framework:** Astro 4.x (static output mode)
-- **Styling:** Tailwind CSS 3.4 via `@astrojs/tailwind`
-- **Interactivity:** React 18 + Framer Motion 11 (used only in `AnimatedPostCard.tsx`)
-- **Animations:** AOS (Animate On Scroll) for scroll-triggered animations
+- **Styling:** Tailwind CSS 3.4 via `@astrojs/tailwind` + custom CSS variables (`global.css`)
+- **Interactivity:** React 18 + Framer Motion 11 (only `AnimatedPostCard.tsx`)
+- **Animations:** AOS (Animate On Scroll), CSS keyframes, IntersectionObserver, canvas particles
 - **Math Rendering:** KaTeX via `remark-math` + `rehype-katex`
 - **Language:** TypeScript (strict mode)
-- **Deployment:** GitHub Pages via GitHub Actions
+- **Deployment:** GitHub Pages via GitHub Actions (auto-deploy on push to `main`)
 
 ## Commands
 
 ```bash
-npm run dev      # Start dev server (usually http://localhost:4321/ymllblog)
-npm run build    # Build static site to dist/
+npm run dev      # Dev server at http://localhost:4321/ymllblog
+npm run build    # Static build to dist/
 npm run preview  # Preview built site locally
 ```
+
+No linting, no tests, no pre-commit hooks. CI only runs `npm ci && npm run build`.
 
 ## Architecture
 
 ### Content Collections (Astro 4)
-Blog posts are managed via Astro Content Collections, not hardcoded arrays. Posts are Markdown files in `src/content/blog/` with frontmatter validated by a schema in `src/content/config.ts`.
+Blog posts live in `src/content/blog/` as Markdown files. Schema validated by `src/content.config.ts`:
 
-To add a new post:
-1. Create a `.md` file in `src/content/blog/`
-2. Add required frontmatter (title, description, pubDate, tags)
-3. Push to GitHub — the site rebuilds automatically
+```typescript
+schema: z.object({
+  title, description, pubDate, updatedDate?,
+  author (default 'YMLL'), tags (string[]),
+  category?, cover?, draft (default false),
+  featured (default false), lang (default 'zh-CN')
+})
+```
 
-### Islands Pattern
-The site uses Astro's islands architecture. All components are static `.astro` files except `AnimatedPostCard.tsx`, which is a React component hydrated on the client via `client:load`. This is the only component that ships JavaScript to the browser.
+To add a post: create `.md` in `src/content/blog/`, add frontmatter, push to main.
 
 ### Base Path
-The site is deployed under `/ymllblog` subpath. All internal links must use:
-```javascript
+Deployed at `/ymllblog` subpath. **Always** use:
+```typescript
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // Then: `${base}/blog`, `${base}/tags`, etc.
 ```
-Never hardcode `/blog` — it will 404 on GitHub Pages.
+Never hardcode `/blog` — 404s on GitHub Pages.
 
-### Dynamic Routes
-- `src/pages/blog/[slug].astro` — individual blog posts (generated from content collection)
-- `src/pages/tags/[tag].astro` — tag filtering pages (generated from post tags)
+### Islands Architecture
+Only `AnimatedPostCard.tsx` ships JS via `client:load`. Everything else is static `.astro`. The site intentionally has minimal client-side hydration.
 
-### Math Formula Support
-LaTeX math formulas are supported via KaTeX:
-- Display math: `$$ ... $$`
-- Inline math: `$ ... $`
-- CSS styling in `PostLayout.astro` with emerald green accent
+### Personalization System (custom, recently added)
+User preferences persist in `localStorage` under key `ymll_user_settings` via `src/lib/theme.ts`. Exposed APIs:
 
-### Helper Functions
-Located in `src/lib/`:
-- `posts.ts` — Content collection queries (getPublishedPosts, getPostsByTag, etc.)
+- **`applyAllSettings(settings)`** — single entry point
+- **`COLOR_THEMES`** — 8 presets (purple, green, blue, pink, orange, cyan, red, yellow)
+- **`BACKGROUND_MODES`** — 8 modes (gradient, aurora, particles, waves, mesh, stars, image, solid)
+- **`BANNER_MODES`** — 5 modes (parallax, fullscreen, minimal, wave, particles)
+- **`POST_LAYOUTS`** — 4 layouts (list, grid, card, masonry)
+- `applyColorTheme`, `applyThemeMode`, `applyFont`, `applyBackground`, `applyBanner` — granular
+
+To add a new theme/background: extend the corresponding constant in `lib/theme.ts` and add a matching class in `global.css` (e.g. `.bg-myname { ... }`). The body class drives the visual.
+
+### Default Visual Identity
+- **Background:** Blue-purple gradient (`#6366f1 → #8b5cf6 → #a78bfa`)
+- **Color theme:** Blue (hue 240, saturation 60%, lightness 55%)
+- **Layout:** Glass-morphism content board overlapping full-screen parallax hero
+- **Hero:** Background image with strong indigo/purple gradient overlay for text contrast
+- **Wave fill:** `#f5f3ff` (light lavender, matches gradient theme)
+
+### Floating Widgets (positioned to avoid overlap)
+| Widget | Position | z-index | Default visibility |
+|--------|----------|---------|-------------------|
+| `SettingsPanel.astro` | Right side, slide-out | 999 | Hidden, hover/click to open |
+| `MusicPlayer.astro` | Bottom-right | 998 | Visible (after first paint) |
+| `Announcement.astro` | Bottom-left | 997 | Hidden, auto-shown 5s after load |
+| `FloatingAvatar.astro` | Bottom-right (compact) | 996 | Hidden by default |
+| `ParticlesBg.astro` | Full-screen canvas | -1 | Off by default |
+
+### Helper Functions (`src/lib/`)
+- `posts.ts` — Content collection queries
 - `reading-time.ts` — Reading time calculation
-- `seo.ts` — SEO utilities (JSON-LD, canonical URLs)
+- `seo.ts` — JSON-LD, canonical URLs, OG tags
+- `theme.ts` — Personalization system (above)
 
-## Key Files
-
+### Key Files
 | File | Purpose |
 |------|---------|
-| `astro.config.mjs` | Site URL (`yanmengli123.github.io`), base path (`/ymllblog`), integrations, KaTeX config |
-| `tailwind.config.mjs` | Design system: Matery-inspired purple-to-green gradient theme |
-| `src/content/config.ts` | Content collection schema (blog posts) |
-| `src/lib/posts.ts` | Post query functions |
-| `src/layouts/Layout.astro` | Base HTML, SEO meta, OG tags, JSON-LD, AOS init, KaTeX CSS |
-| `src/layouts/PostLayout.astro` | Blog post layout with TOC, reading progress, author info, related posts |
-| `src/components/Header.astro` | Navigation with scroll effects, mobile menu |
-| `src/components/HeroSection.astro` | Homepage hero with gradient background |
-| `src/components/StatsChart.astro` | Dynamic statistics dashboard with real data from content collections |
-| `.github/workflows/deploy.yml` | GitHub Pages deployment pipeline |
+| `astro.config.mjs` | Site URL, base path, KaTeX, Shiki theme (github-dark) |
+| `tailwind.config.mjs` | Design tokens, custom colors (primary, accent, matery) |
+| `src/content.config.ts` | Blog collection schema |
+| `src/styles/global.css` | CSS variables, glass-morphism, animations, bg modes, wave, note-box |
+| `src/layouts/Layout.astro` | Base HTML, SEO, AOS init, page loader, click effects, console easter egg, scroll progress, mouse follower, auto dark mode, reading time |
+| `src/layouts/PostLayout.astro` | Post page with TOC, reading progress, related posts |
+| `src/components/HeroSection.astro` | Full-screen parallax hero with dark indigo/purple overlay |
+| `src/components/Header.astro` | Fixed navbar, transparent→solid on scroll, color changes on scroll |
+| `src/components/SettingsPanel.astro` | Side panel with all personalization controls (8 themes, 8 backgrounds, 5 banners, 4 layouts, 4 fonts, custom CSS/avatar/greeting) |
+| `.github/workflows/deploy.yml` | GitHub Pages deploy on push to main |
 
-## Design System (Matery-Inspired)
+## Design System
 
-- **Primary gradient:** Purple (#bf30ac) to Green (#0f9d58) — used on nav, footer, accents
-- **Accent color:** Vue.js green (#42b983)
+- **Primary gradient:** Indigo/purple → blue-purple (`#4f46e5 → #06b6d4` for accents)
+- **Matery gradient:** Purple `#bf30ac` → Green `#0f9d58` (legacy, used in some places)
+- **Hero overlay:** `rgba(67, 56, 202, 0.85) → rgba(124, 58, 237, 0.85) → rgba(91, 33, 182, 0.85)`
 - **Card shadows:** `0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07)`
-- **Tag colors:** 13 soft pastel colors for tag chips
-- **Category gradients:** 7 distinct gradient combinations
-- **Buttons:** Pill-shaped with `border-radius: 30px`
-- **Animations:** AOS library for scroll-triggered animations
-- **Fonts:** Inter (sans), Playfair Display (serif) — loaded via Google Fonts
-- **Utility classes:** `.glass`, `.gradient-text`, `.hover-lift`, `.shadow-card`
+- **Glass-morphism:** `backdrop-filter: blur(20px) saturate(180%)` via `.glass-board`
+- **Buttons:** Pill-shaped, `border-radius: 30px`
+- **Fonts:** Inter (sans), Playfair Display (serif), Fira Code (mono), Comfortaa (rounded)
+- **macOS code blocks:** Three colored dots (red/yellow/green) at top
 
-## Deployment
+## Known Issues / Gotchas
 
-Automatic on every push to `main`. The GitHub Actions workflow runs `npm ci && npm run build`, then deploys `dist/` to GitHub Pages. Manual trigger also supported via `workflow_dispatch`.
-
-## Known Issues
-
-1. **Dark mode incomplete** — Tailwind `darkMode: 'class'` is configured but most components lack `dark:` variants
-2. **No tests, linting, or pre-commit hooks** — CI only handles build/deploy
+1. **No tests, linting, or pre-commit hooks** — CI only builds
+2. **Dark mode toggle** in code but mostly unused; personalization uses light/dark/auto via `<html class="dark">`
+3. **`doublesevenshop.github.io-master/`** in repo is a reference copy of dlog.com.cn source — do not modify, used as design inspiration
+4. **localStorage settings** apply client-side only — first paint always shows defaults until JS hydrates
+5. **Hero background image** is `/image/006.jpg` — must exist in `public/image/`
+6. **Wave fill color** (`#f5f3ff` in `global.css`) must contrast with whatever `bg-XXX` mode is active
+7. **Setting panel buttons** use inline `style="border-color: ..."` for active state — overrides Tailwind classes; reset with `borderColor = 'transparent'` in `updateActiveButton()`

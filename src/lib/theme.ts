@@ -110,12 +110,26 @@ export const POST_LAYOUTS: Record<PostLayout, { name: string; label: string; ico
 };
 
 const STORAGE_KEY = 'ymll_user_settings';
+const VERSION = '2.0.0';
+const VERSION_KEY = 'ymll_settings_version';
 
 /**
  * 加载用户设置
  */
 export function loadSettings(): UserSettings {
   if (typeof window === 'undefined') return DEFAULT_SETTINGS;
+
+  // 版本检查：如果版本不匹配，清除旧设置
+  try {
+    const savedVersion = localStorage.getItem(VERSION_KEY);
+    if (savedVersion !== VERSION) {
+      // 升级到新版本，清除旧设置
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(VERSION_KEY, VERSION);
+      return DEFAULT_SETTINGS;
+    }
+  } catch {}
+
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return DEFAULT_SETTINGS;
