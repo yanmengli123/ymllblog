@@ -1,49 +1,67 @@
 ---
+import { getCollection } from 'astro:content';
+
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const posts = await getCollection('blog');
 
 const navItems = [
-  { label: '首页', href: `${base}/`, icon: 'home' },
-  { label: '归档', href: `${base}/archive`, icon: 'archive' },
-  { label: '标签', href: `${base}/tags`, icon: 'tag' },
-  { label: '关于', href: `${base}/about`, icon: 'user' },
+  { key: 'home', label: '首页', href: `${base}/` },
+  { key: 'archive', label: '归档', href: `${base}/archive` },
+  { key: 'tags', label: '标签', href: `${base}/tags` },
+  { key: 'about', label: '关于', href: `${base}/about` },
 ];
 
-const currentPath = Astro.url.pathname;
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => {
+  const normalizedHref = href.replace(/\/$/, '') || '/';
+  if (normalizedHref === base || normalizedHref === `${base}`) {
+    return currentPath === base || currentPath === `${base}/` || currentPath === `${base}`;
+  }
+  return currentPath === normalizedHref || currentPath.startsWith(`${normalizedHref}/`);
+};
+
+const searchIndex = posts
+  .filter((post) => !post.data.draft)
+  .map((post) => ({
+    title: post.data.title,
+    description: post.data.description ?? '',
+    tags: post.data.tags ?? [],
+    url: `${base}/blog/${post.slug}`,
+  }));
 ---
 
-<header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
+<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-transparent transition-all duration-300">
   <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
-      <!-- Logo -->
       <a href={`${base}/`} class="flex items-center gap-3 group shrink-0">
-        <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-all"
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform"
              style="background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));">
           <span class="text-white font-bold text-lg">Y</span>
         </div>
-        <span id="header-title" class="hidden sm:block text-lg font-semibold text-white group-hover:text-white/80 transition-colors">
+        <span id="header-title" class="hidden sm:block text-lg font-semibold text-white transition-colors">
           YMLL<span style="color: var(--primary)">.</span>blog
         </span>
       </a>
 
-      <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center gap-1">
-        {navItems.map(item => (
-          <a
-            href={item.href}
-            class:list={[
-              'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
-              (currentPath === item.href || (item.href !== `${base}/` && currentPath.startsWith(item.href)))
-                ? 'text-white bg-white/20'
-                : 'text-white/80 hover:text-white hover:bg-white/10'
-            ]}
-            id={`nav-${item.label}`}
-          >
-            {item.label}
-          </a>
-        ))}
+        {navItems.map((item) => {
+          const active = isActive(item.href);
+          return (
+            <a
+              href={item.href}
+              data-nav-link={item.key}
+              data-active={active ? 'true' : 'false'}
+              class:list={[
+                'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
+                active ? 'text-white bg-white/20' : 'text-white/80 hover:text-white hover:bg-white/10'
+              ]}
+            >
+              {item.label}
+            </a>
+          );
+        })}
       </div>
 
-      <!-- 工具栏 -->
       <div class="flex items-center gap-1">
         <button id="search-btn" class="p-2.5 rounded-lg text-white/80 hover:bg-white/10 transition-all" aria-label="搜索">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,7 +69,7 @@ const currentPath = Astro.url.pathname;
           </svg>
         </button>
 
-        <button id="theme-toggle" class="p-2.5 rounded-lg text-white/80 hover:bg-white/10 transition-all" aria-label="主题">
+        <button id="theme-toggle" class="p-2.5 rounded-lg text-white/80 hover:bg-white/10 transition-all" aria-label="切换主题">
           <svg class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
@@ -60,7 +78,7 @@ const currentPath = Astro.url.pathname;
           </svg>
         </button>
 
-        <button id="mobile-menu-toggle" class="md:hidden p-2.5 rounded-lg text-white/80 hover:bg-white/10 transition-all" aria-label="菜单">
+        <button id="mobile-menu-toggle" class="md:hidden p-2.5 rounded-lg text-white/80 hover:bg-white/10 transition-all" aria-label="菜单" aria-expanded="false">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
@@ -68,12 +86,12 @@ const currentPath = Astro.url.pathname;
       </div>
     </div>
 
-    <!-- Mobile menu -->
     <div id="mobile-menu" class="hidden md:hidden pb-4">
       <div class="glass-card p-3 space-y-1">
-        {navItems.map(item => (
+        {navItems.map((item) => (
           <a
             href={item.href}
+            data-mobile-nav-link={item.key}
             class="block px-4 py-3 rounded-lg text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-stone-100/80 dark:hover:bg-stone-800/80 transition-colors"
           >
             {item.label}
@@ -84,53 +102,141 @@ const currentPath = Astro.url.pathname;
   </nav>
 </header>
 
-<script>
-  // Header scroll effect - dlog.com.cn style (transparent -> solid)
+<div id="search-modal" class="fixed inset-0 z-[1200] hidden items-start justify-center bg-black/45 px-4 pt-24 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="search-modal-title">
+  <div class="w-full max-w-2xl rounded-2xl bg-white p-4 shadow-2xl dark:bg-stone-900">
+    <div class="flex items-center gap-3">
+      <h2 id="search-modal-title" class="sr-only">站内搜索</h2>
+      <input
+        id="site-search-input"
+        type="search"
+        autocomplete="off"
+        placeholder="搜索文章、标签、摘要"
+        class="min-w-0 flex-1 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-800 outline-none focus:border-indigo-400 focus:bg-white dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100"
+      />
+      <button id="search-close" class="shrink-0 rounded-xl px-3 py-2 text-sm text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800" aria-label="关闭搜索">关闭</button>
+    </div>
+    <div id="search-results" class="mt-4 max-h-[60vh] overflow-y-auto space-y-2"></div>
+  </div>
+</div>
+
+<script define:vars={{ searchIndex }}>
   const header = document.getElementById('header');
   const headerTitle = document.getElementById('header-title');
+  const navLinks = Array.from(document.querySelectorAll('[data-nav-link]'));
+  const activeNavSelector = '[data-active="true"]';
+  const headerButtons = Array.from(document.querySelectorAll('#search-btn, #theme-toggle, #mobile-menu-toggle'));
 
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      // 滚动后：白色背景 + 深色文字
-      header?.classList.add('bg-white/95', 'backdrop-blur-md', 'shadow-lg');
-      header?.classList.remove('bg-transparent');
-      if (headerTitle) {
-        headerTitle.classList.remove('text-white');
-        headerTitle.classList.add('text-stone-800');
-      }
-      // 更新导航链接颜色
-      document.querySelectorAll('[id^="nav-"]').forEach(el => {
-        el.classList.remove('text-white/80', 'hover:text-white', 'hover:bg-white/10', 'text-white', 'bg-white/20');
-        el.classList.add('text-stone-600', 'hover:text-stone-900', 'hover:bg-stone-100/80');
-      });
-      // 更新工具栏按钮颜色
-      document.querySelectorAll('#search-btn, #theme-toggle, #mobile-menu-toggle').forEach(btn => {
-        btn.classList.remove('text-white/80', 'hover:bg-white/10');
-        btn.classList.add('text-stone-600', 'hover:bg-stone-100/80');
-      });
-    } else {
-      // 顶部：透明背景 + 白色文字
-      header?.classList.remove('bg-white/95', 'backdrop-blur-md', 'shadow-lg');
-      header?.classList.add('bg-transparent');
-      if (headerTitle) {
-        headerTitle.classList.add('text-white');
-        headerTitle.classList.remove('text-stone-800');
-      }
-      // 恢复导航链接颜色
-      document.querySelectorAll('[id^="nav-"]').forEach(el => {
-        el.classList.add('text-white/80', 'hover:text-white', 'hover:bg-white/10');
-        el.classList.remove('text-stone-600', 'hover:text-stone-900', 'hover:bg-stone-100/80');
-      });
-      // 恢复工具栏按钮颜色
-      document.querySelectorAll('#search-btn, #theme-toggle, #mobile-menu-toggle').forEach(btn => {
-        btn.classList.add('text-white/80', 'hover:bg-white/10');
-        btn.classList.remove('text-stone-600', 'hover:bg-stone-100/80');
-      });
-    }
-  });
+  function setHeaderScrolled(scrolled) {
+    header?.classList.toggle('bg-white/95', scrolled);
+    header?.classList.toggle('backdrop-blur-md', scrolled);
+    header?.classList.toggle('shadow-lg', scrolled);
+    header?.classList.toggle('bg-transparent', !scrolled);
 
-  // Mobile menu
+    headerTitle?.classList.toggle('text-white', !scrolled);
+    headerTitle?.classList.toggle('text-stone-800', scrolled);
+
+    navLinks.forEach((link) => {
+      const active = link.matches(activeNavSelector);
+      link.className = [
+        'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
+        scrolled
+          ? (active ? 'text-indigo-700 bg-indigo-50' : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/80')
+          : (active ? 'text-white bg-white/20' : 'text-white/80 hover:text-white hover:bg-white/10')
+      ].join(' ');
+    });
+
+    headerButtons.forEach((button) => {
+      button.classList.toggle('text-white/80', !scrolled);
+      button.classList.toggle('hover:bg-white/10', !scrolled);
+      button.classList.toggle('text-stone-600', scrolled);
+      button.classList.toggle('hover:bg-stone-100/80', scrolled);
+    });
+  }
+
+  setHeaderScrolled(window.scrollY > 50);
+  window.addEventListener('scroll', () => setHeaderScrolled(window.scrollY > 50), { passive: true });
+
   const mobileBtn = document.getElementById('mobile-menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
-  mobileBtn?.addEventListener('click', () => mobileMenu?.classList.toggle('hidden'));
+  mobileBtn?.addEventListener('click', () => {
+    const willOpen = mobileMenu?.classList.contains('hidden');
+    mobileMenu?.classList.toggle('hidden');
+    mobileBtn.setAttribute('aria-expanded', String(Boolean(willOpen)));
+  });
+  document.querySelectorAll('[data-mobile-nav-link]').forEach((link) => {
+    link.addEventListener('click', () => {
+      mobileMenu?.classList.add('hidden');
+      mobileBtn?.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  const themeBtn = document.getElementById('theme-toggle');
+  themeBtn?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const nextTheme = root.classList.contains('dark') ? 'light' : 'dark';
+    root.classList.toggle('dark', nextTheme === 'dark');
+    localStorage.setItem('theme', nextTheme);
+
+    try {
+      const saved = JSON.parse(localStorage.getItem('ymll_user_settings') || '{}');
+      saved.themeMode = nextTheme;
+      localStorage.setItem('ymll_user_settings', JSON.stringify(saved));
+    } catch {}
+  });
+
+  const searchBtn = document.getElementById('search-btn');
+  const searchModal = document.getElementById('search-modal');
+  const searchClose = document.getElementById('search-close');
+  const searchInput = document.getElementById('site-search-input');
+  const searchResults = document.getElementById('search-results');
+
+  function openSearch() {
+    searchModal?.classList.remove('hidden');
+    searchModal?.classList.add('flex');
+    requestAnimationFrame(() => searchInput?.focus());
+    renderSearchResults('');
+  }
+
+  function closeSearch() {
+    searchModal?.classList.add('hidden');
+    searchModal?.classList.remove('flex');
+  }
+
+  function renderSearchResults(query) {
+    if (!searchResults) return;
+    const normalized = query.trim().toLowerCase();
+    const results = normalized
+      ? searchIndex.filter((post) => {
+          const text = [post.title, post.description, ...(post.tags || [])].join(' ').toLowerCase();
+          return text.includes(normalized);
+        })
+      : searchIndex.slice(0, 6);
+
+    searchResults.innerHTML = results.length
+      ? results.slice(0, 8).map((post) => `
+          <a href="${post.url}" class="block rounded-xl border border-stone-100 p-3 transition-colors hover:bg-stone-50 dark:border-stone-800 dark:hover:bg-stone-800">
+            <span class="block text-sm font-semibold text-stone-800 dark:text-stone-100">${post.title}</span>
+            <span class="mt-1 block line-clamp-2 text-xs text-stone-500">${post.description || '暂无摘要'}</span>
+          </a>
+        `).join('')
+      : '<div class="rounded-xl bg-stone-50 p-4 text-sm text-stone-500 dark:bg-stone-800">没有找到匹配内容</div>';
+  }
+
+  searchBtn?.addEventListener('click', openSearch);
+  searchClose?.addEventListener('click', closeSearch);
+  searchModal?.addEventListener('click', (event) => {
+    if (event.target === searchModal) closeSearch();
+  });
+  if (searchInput) {
+    searchInput.addEventListener('input', (event) => {
+      renderSearchResults(event.target.value);
+    });
+  }
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeSearch();
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      openSearch();
+    }
+  });
 </script>

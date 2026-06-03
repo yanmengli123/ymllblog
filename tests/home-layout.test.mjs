@@ -49,6 +49,9 @@ for (const pattern of [
 const music = read('src/components/MusicPlayer.astro');
 assert.match(music, /interface Props[\s\S]*variant\?: 'floating' \| 'sidebar'/, 'music player should support floating and sidebar variants');
 assert.match(music, /const isSidebar = variant === 'sidebar'/, 'music player should branch on sidebar variant');
+assert.match(music, /music\.163\.com\/outchain\/player/, 'music player should use NetEase official iframe player');
+assert.match(music, /id="netease-player-frame"/, 'music player should render a NetEase iframe');
+assert.doesNotMatch(music, /new Audio\(/, 'music player should not rely on unstable NetEase mp3 direct links');
 
 const announcement = read('src/components/Announcement.astro');
 assert.match(announcement, /interface Props[\s\S]*variant\?: 'floating' \| 'sidebar'/, 'announcement should support floating and sidebar variants');
@@ -56,5 +59,22 @@ assert.match(announcement, /interface Props[\s\S]*variant\?: 'floating' \| 'side
 const settings = read('src/components/SettingsPanel.astro');
 assert.match(settings, /interface Props[\s\S]*variant\?: 'floating' \| 'sidebar'/, 'settings panel should support floating and sidebar variants');
 assert.match(settings, /const isSidebar = variant === 'sidebar'/, 'settings panel should branch on sidebar variant');
+
+const header = read('src/components/Header.astro');
+assert.match(header, /id="search-modal"/, 'header should include a real search modal');
+assert.match(header, /data-nav-link/, 'header nav links should use stable nav selectors');
+assert.match(header, /data-active="true"/, 'header should preserve active nav state');
+assert.match(header, /localStorage\.setItem\('theme'/, 'theme button should persist theme');
+assert.match(header, /searchInput\.addEventListener\('input'/, 'search input should filter posts');
+
+const theme = read('src/lib/theme.ts');
+assert.match(theme, /setGlassMode/, 'settings should toggle glass styling instead of hiding the board');
+assert.doesNotMatch(theme, /toggleElement\('#board', settings\.showGlass\)/, 'showGlass must not hide the entire home board');
+assert.match(theme, /particlesBg/, 'settings should control particle background API');
+
+const featuredPosts = read('src/components/FeaturedPosts.astro');
+assert.match(featuredPosts, /id="featured-posts"/, 'featured posts should expose a layout target');
+assert.match(featuredPosts, /layout-change/, 'featured posts should respond to layout-change events');
+assert.match(featuredPosts, /data-post-layout/, 'featured posts should keep the current post layout in DOM');
 
 console.log('home layout structure tests passed');

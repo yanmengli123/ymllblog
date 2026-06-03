@@ -81,6 +81,13 @@
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
   }
 
+  .plain-board {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 1rem;
+    box-shadow: none;
+  }
+
   .glass-card {
     background: var(--bg-card);
     backdrop-filter: blur(12px);

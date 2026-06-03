@@ -270,12 +270,13 @@ export function applyAllSettings(settings: UserSettings) {
 
   // 切换各组件显隐
   toggleElement('.wave-container', settings.showWave);
-  toggleElement('#board', settings.showGlass);
+  setGlassMode(settings.showGlass);
   toggleElement('#hero-banner', settings.showHero);
   toggleElement('#music-player', settings.showMusicPlayer);
   toggleElement('#announcement', settings.showAnnouncement);
   toggleElement('#profile-card', settings.showAvatar);
   toggleElement('#floating-avatar', settings.showAvatar);
+  setParticles(settings.showParticles || settings.backgroundMode === 'particles' || settings.backgroundMode === 'aurora');
 
   // 动画
   if (!settings.animationsEnabled) {
@@ -298,5 +299,22 @@ function toggleElement(selector: string, show: boolean) {
   const el = document.querySelector(selector) as HTMLElement | null;
   if (el) {
     el.style.display = show ? '' : 'none';
+  }
+}
+
+function setGlassMode(enabled: boolean) {
+  const board = document.getElementById('board');
+  if (!board) return;
+  board.classList.toggle('glass-board', enabled);
+  board.classList.toggle('plain-board', !enabled);
+}
+
+function setParticles(enabled: boolean) {
+  const particlesBg = (window as any).particlesBg;
+  if (!particlesBg) return;
+  if (enabled) {
+    particlesBg.start?.();
+  } else {
+    particlesBg.stop?.();
   }
 }

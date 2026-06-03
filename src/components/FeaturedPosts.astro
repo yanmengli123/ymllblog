@@ -21,7 +21,7 @@ interface Props {
 const { posts, title = '最新文章' } = Astro.props;
 ---
 
-<section class="py-10">
+<section id="featured-posts" class="py-10" data-post-layout="grid">
   {/* Section header */}
   <div class="flex items-center justify-between mb-8">
     <div>
@@ -42,15 +42,15 @@ const { posts, title = '最新文章' } = Astro.props;
 
   {/* Featured post */}
   {posts.length > 0 && (
-    <div class="mb-6 post-card-animate">
+    <div class="featured-post-primary mb-6 post-card-animate">
       <PostCard {...posts[0]} featured={true} />
     </div>
   )}
 
   {/* Post grid */}
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div id="featured-post-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {posts.slice(1).map(post => (
-      <div class="post-card-animate">
+      <div class="post-card-animate featured-post-item">
         <PostCard {...post} />
       </div>
     ))}
@@ -70,3 +70,47 @@ const { posts, title = '最新文章' } = Astro.props;
     </a>
   </div>
 </section>
+
+<script>
+  (function() {
+    const section = document.getElementById('featured-posts');
+    const list = document.getElementById('featured-post-list');
+    const items = Array.from(document.querySelectorAll('.featured-post-item'));
+    const primary = document.querySelector('.featured-post-primary');
+
+    const layoutClasses = {
+      grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6',
+      list: 'grid grid-cols-1 gap-4',
+      card: 'grid grid-cols-1 md:grid-cols-2 gap-6',
+      masonry: 'columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6',
+    };
+
+    function readSavedLayout() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('ymll_user_settings') || '{}');
+        return saved.postLayout || 'grid';
+      } catch {
+        return 'grid';
+      }
+    }
+
+    function applyPostLayout(layout) {
+      if (!section || !list) return;
+      const nextLayout = layoutClasses[layout] ? layout : 'grid';
+      section.dataset.postLayout = nextLayout;
+      list.className = layoutClasses[nextLayout];
+
+      items.forEach((item) => {
+        item.classList.toggle('break-inside-avoid', nextLayout === 'masonry');
+        item.classList.toggle('mb-6', nextLayout === 'masonry');
+      });
+      primary?.classList.toggle('hidden', nextLayout === 'list');
+    }
+
+    applyPostLayout(readSavedLayout());
+
+    window.addEventListener('layout-change', (event) => {
+      applyPostLayout(event.detail?.layout || readSavedLayout());
+    });
+  })();
+</script>
