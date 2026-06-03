@@ -1,0 +1,810 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="杜子源">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1. PRIME: A Novel Processing-in-memory Architecture for Neural Network Computation in ReRAM-based Main Memory 2016年郭昕婕（知存科技首席科学家）在美国加州大学圣塔芭芭拉分校（UCSB）的谢源教授团队，研发出了全球第一个3层神经网络的浮栅存内计算深度学习芯片（PRIME架构），首次验证了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="存算一体经典文章精读">
+<meta property="og:url" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/index.html">
+<meta property="og:site_name" content="旺仔杂货铺">
+<meta property="og:description" content="1. PRIME: A Novel Processing-in-memory Architecture for Neural Network Computation in ReRAM-based Main Memory 2016年郭昕婕（知存科技首席科学家）在美国加州大学圣塔芭芭拉分校（UCSB）的谢源教授团队，研发出了全球第一个3层神经网络的浮栅存内计算深度学习芯片（PRIME架构），首次验证了">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/ReRAM%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/%E5%8F%8C%E6%9E%81ReRAM%E7%94%B5%E6%B1%A0.png">
+<meta property="og:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/PRIME%E6%9E%B6%E6%9E%84%E5%AF%B9%E6%AF%94%E5%9B%BE.png">
+<meta property="og:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/%E5%AE%8C%E6%95%B4%E7%9A%84%E7%94%B5%E8%B7%AF%E5%9B%BE.png">
+<meta property="og:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/FF%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B.jpeg">
+<meta property="og:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/PRIME%E7%BC%96%E7%A8%8B%E6%B5%81%E7%A8%8B.jpeg">
+<meta property="og:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/benchmarks.jpeg">
+<meta property="og:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/configurations.jpeg">
+<meta property="og:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/comparatives.jpeg">
+<meta property="og:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95%E6%AF%94%E8%BE%83%E7%BB%93%E6%9E%9C.jpeg">
+<meta property="article:published_time" content="2024-08-25T16:04:06.000Z">
+<meta property="article:modified_time" content="2024-08-28T09:56:28.867Z">
+<meta property="article:author" content="杜子源">
+<meta property="article:tag" content="存算一体 精读">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/ReRAM%E7%BB%93%E6%9E%84.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>存算一体经典文章精读 - 旺仔杂货铺</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/scrollAnimation.css">
+<link rel="stylesheet" href="/css/mk.css">
+<link rel="stylesheet" href="/css/selection.css">
+<link rel="stylesheet" href="/css/round.css">
+<link rel="stylesheet" href="/css/cloudeGlass.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":true,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>旺仔杂货铺</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/004.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="存算一体经典文章精读"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-26 00:04" pubdate>
+          2024年8月26日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          31 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">存算一体经典文章精读</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="1-PRIME-A-Novel-Processing-in-memory-Architecture-for-Neural-Network-Computation-in-ReRAM-based-Main-Memory"><a href="#1-PRIME-A-Novel-Processing-in-memory-Architecture-for-Neural-Network-Computation-in-ReRAM-based-Main-Memory" class="headerlink" title="1. PRIME: A Novel Processing-in-memory Architecture for Neural Network Computation in ReRAM-based Main Memory"></a>1. PRIME: A Novel Processing-in-memory Architecture for Neural Network Computation in ReRAM-based Main Memory</h1><blockquote>
+<p>2016年郭昕婕（知存科技首席科学家）在美国加州大学圣塔芭芭拉分校（UCSB）的谢源教授团队，研发出了全球第一个3层神经网络的浮栅存内计算深度学习芯片（PRIME架构），首次验证了浮栅晶体管的存内计算在深度学习应用中的效用。功耗降低约20倍，速度提升大约50倍。</p>
+</blockquote>
+<h2 id="1-1-摘要"><a href="#1-1-摘要" class="headerlink" title="1.1. 摘要"></a>1.1. 摘要</h2><p>PIM能够很好地解决<strong>内存墙</strong>的问题，ReRAM作为元器件，ReRAM凭借其<code>crossbar array structure</code>，在存算一体方面拥有很强的前景。本文提出了一种架构级别的创新：使得Memory具有计算功能。文章提出的新型存算融合架构叫做<strong>PRIME</strong>，不仅提供了微架构和电路设计，并且提供了软硬件接口来实现各种NN。性能提升有2000多倍，能耗比提升有800多倍(本人对于测量方法存疑)</p>
+<h2 id="1-2-Intro"><a href="#1-2-Intro" class="headerlink" title="1.2. Intro"></a>1.2. Intro</h2><p>传统的电脑采用计算和存储分离架构，CPU和GPU作为计算单元，Memory、Flash、Disks作为存储介质。随着AI的发展，内存墙的问题越来越严重。例如CPU和内存之间的IO的耗能比执行浮点操作高两个数量级。</p>
+<p>有很多新型的元器件可以做到非易失性Memory，例如ReRAM、STT-RAM、PCM等等，可以在存储数据之外进行算术运算。其中ReRAM由于有很高效的<code>crossbar architecture</code>，被广泛用作突触研究。</p>
+<p>PRIME并不是作为一个专用加速器，它需要的开销面积非常小，并且并不需要很复杂的集成和3D堆叠工艺。</p>
+<p>Memory arrays可以根据eNVM单元的功能被分为三个子阵列：</p>
+<ol>
+<li>FF array：每个单元都可以作为神经网络的加速器，在不需要的时候作为普通存储单元，其转换由特别设计的外围电路实现。</li>
+<li>Mem array</li>
+<li>Buffer array</li>
+</ol>
+<p>这篇文章的主要内容如下：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span> 提出新的内存架构<br><span class="hljs-bullet">2.</span> 设计一套电路和微架构<br><span class="hljs-bullet">3.</span> 提出输入和突触组合方案，克服精度问题。<br><span class="hljs-bullet">4.</span> 开发一套软硬件接口，允许软件开发人员配置完整的子阵列实现各种神经网络。<br></code></pre></td></tr></table></figure>
+
+<h2 id="1-3-Background-and-Related-Work"><a href="#1-3-Background-and-Related-Work" class="headerlink" title="1.3. Background and Related Work"></a>1.3. Background and Related Work</h2><p>这一块主要回顾一下ReRAM、NN计算、PIM的基础知识。</p>
+<h3 id="ReRAM"><a href="#ReRAM" class="headerlink" title="ReRAM"></a>ReRAM</h3><p>ReRAM(Rsistive random access memory)电阻随机存取存储器，是一种非易失性的内存，其结构大致如下：</p>
+<p><img src="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/ReRAM%E7%BB%93%E6%9E%84.png" srcset="/img/loading.gif" lazyload alt="ReRAM结构"><br>图1(a)展示了ReRAM电池的金属-绝缘体-金属（MIM）结构：顶部电极，底部电极和夹在它们之间的金属氧化物层。通过在上面施加外部电压，ReRAM电池可以在高电阻（HRS）和低电阻（LRS）之间切换，分别用于表示逻辑“0”和“1”。</p>
+<p><img src="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/%E5%8F%8C%E6%9E%81ReRAM%E7%94%B5%E6%B1%A0.png" srcset="/img/loading.gif" lazyload alt="双极ReRAM电池"><br>图1(b)显示了一个典型的双极ReRAM细胞的I-V特征。将一个单元格从HRS（逻辑“0”）切换到LRS（逻辑“1”）是一个SET操作，而相反的过程是一个重置操作。要设置电池，需要一个能够产生足够的写电流的正电压。要重置电池，需要一个适当大小的负电压。据报道，ReRAM的耐久性高达10的12次方，因此它的寿命关注较少。</p>
+<p>有两种提升密度减少开销的主要方法：</p>
+<ol>
+<li>Multi-layer crossbar architecture</li>
+<li>Multi-Level Cell(MLC、与TLC、QLC类似)</li>
+</ol>
+<p>ReRAM的读延迟和DRAM差不多，但是写延迟明显要高很多(大概是DRAM的5倍)。但是有许多技术来提升这种写延迟，差距逐渐被缩小到10%以内。</p>
+<h3 id="Neural-Network"><a href="#Neural-Network" class="headerlink" title="Neural Network"></a>Neural Network</h3><p>Artifical Neural Networks是机器学习ML的一个子集。</p>
+<p>一个博客带大家了解<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43654363/article/details/134697353">神经网络？</a></p>
+<p>神经网络在分类和预测任务中效果出色，常见的CNN、VGG、Transformer等现在都在AI领域大放异彩。很多科学家常识去构建一套基于CMOS的神经元和突触，但是由于其巨大的面积，因此很难做到大规模。</p>
+<p>而ReRAM可以很好的做到<br><strong>SA(Sense Amplifier)</strong>:<br>这一点，有很多独：SA精度可以在1bit-会提供更高的精度。采用了一种精度可重构设计。P0(P0&lt;9)bit之间调制。<br>并且允许低精度的ReRAM单元以高精度的权重执行神经网络计算。</p>
+<p><strong>ReLU</strong>：加速器、协处理器、多核或者NoC架构都在使用ReRAM。例如ISAAC是一种基于ReRAM的充分训练过的神经网络加速器。</p>
+<h3 id="PIM"><a href="#PIM" class="headerlink" title="PIM"></a>PIM</h3><p>PIM参考上一篇博客。</p>
+<h2 id="1-4-PRIME-Architecture"><a href="#1-4-PRIME-Architecture" class="headerlink" title="1.4. PRIME Architecture"></a>1.4. PRIME Architecture</h2><p><img src="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/PRIME%E6%9E%B6%E6%9E%84%E5%AF%B9%E6%AF%94%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="PRIME架构对比图"></p>
+<p>如下图，a&#x2F;b方案是传统加速器方案，构造多个处理单元与CPU协同工作，类似于近存计算，存储部分和process unit是分离的，通过数据总线进行数据address。而PRIME架构的存储单元和乘加计算单元是一体的，只需要CPU传来控制信号和地址信号，即可在memory array上完成权重存取和对输入的乘加运算。PRIME的bank划分为三个region：</p>
+<ul>
+<li><strong>Memory subarrays</strong>：只有数据存储的能力，和传统内存一样</li>
+<li><strong>Full Function subarrays</strong>：具有存储和计算能力两种模式，有一个控制器来控制计算和重配置。</li>
+<li><strong>Buffer subarrays</strong>：为FF做数据服务，通过私有的数据端口来进行连接，因此数据传输不再消耗带宽。</li>
+</ul>
+<p>FF子阵列的设计目标是用最小的面积来支持存储和计算，为了实现这个目标，论文中最大限度地利用了存储和计算的外围电路。</p>
+<p><img src="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/%E5%AE%8C%E6%95%B4%E7%9A%84%E7%94%B5%E8%B7%AF%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="完整的电路图"></p>
+<p><strong>首先是Decoder和Driver</strong>：对输入电压信号进行多级拆分，以提供精准的字线电压，用mux进行switch控制。<br>为保证输入信号的同步，加了很多latch进行锁存。<br>在每根字线上设置了电流放大器以提高模拟信号的驱动能力。</p>
+<p><strong>Column Multiplexer</strong>：为了支持NN计算，加入了这个模块，包含两个部分：减法单元（为什么是减法单元？）和非线性单元（sigmoid）</p>
+<p>**SA(Sense Amplifier)**：SA会提供更高的精度。采用了一种精度可重构设计。精度可以在1bit-P0(P0&lt;9)bit之间调制。并且允许低精度的ReRAM单元以高精度的权重执行神经网络计算。</p>
+<p>还支持了ReLU和Max-Pool，ReLU其实就是信号0和输入信号之间的切换，有个比较器和mux就可以。4-1Maxpooling也是比较器+mux就可以，这两个电路设计都比较基础。</p>
+<p><strong>Buffer Connection</strong>：计算和控制功能区的array和buffer array之间的数据传输。允许FF子阵列访问缓冲区中的任何物理位置，来保证NN计算的随机内存访问模式。并且允许数据传输绕过Buffer子阵列。</p>
+<p><img src="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/FF%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B.jpeg" srcset="/img/loading.gif" lazyload alt="FF配置实例"></p>
+<p>这个微架构具有非常显著的两个优势：</p>
+<ol>
+<li><strong>Memory和Computation功能是公用的，节省面积；SA和ADC类似，写Driver和DAC类似，在电路中稍微修改SA和写Driver功能就完成了数模转换的功能。</strong></li>
+<li><strong>功能array区可以在Memory和Computation中灵活切换。</strong></li>
+</ol>
+<p>上图是FF子阵列切换模式的配置实例，左边(a)是计算模式，右边(b)是存储模式。</p>
+<ol>
+<li><p><strong>计算模式</strong>：FF子阵列将NN的输入数据从Buffer中取出来，放到写驱动中，在存储正负权重的阵列计算过后，将输出信号输入到Sub和Sigmoid计算单元中，模拟输出通过SA转换为数字信号被写入到缓冲子阵列。</p>
+</li>
+<li><p><strong>存储模式</strong>：在内存模式下，输入来自读写的电压选择，输出绕过计算单元。</p>
+</li>
+</ol>
+<p>内存和计算模式的切换步骤：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span> 在切换到计算模式之前，先把存储在FF阵列的数据迁移到内存子阵列特定的分配空间中，然后将需要计算的权重放到FF子阵列中。<br><span class="hljs-bullet">2.</span> 数据准备就绪后，PRIME控制器重新配置外围电路，FF子阵列开始执行映射的NN。<br><span class="hljs-bullet">3.</span> 完成计算后，FF子阵列通过重新配置外围电路切换回内存模式。<br><br></code></pre></td></tr></table></figure>
+
+
+<p>Buffer有两个功能，首先他们用于缓存FF子数组的IO数据；此外由于数据的IO是串行的，因此非常有必要缓存这些数据。FF和Buffer的通信不需要CPU，因此CPU和FF可以并行工作。在选择Buffer位置的时候，将FF旁边的内存作为缓存区，使得延迟最小化。</p>
+<blockquote>
+<p>问：但是在这个地方，<code>Global Row buffer</code>的作用是什么？</p>
+</blockquote>
+<p>除了控制器之外，还有精度问题在文中也有被提到：输入精度、权重精度、计算输出精度以及他们对神经网络应用结果的影响。</p>
+<p>神经网络算法对于输入数据和权重的精度具有很强的鲁棒性。</p>
+<blockquote>
+<p>问：dynamic fiexed point又是什么？</p>
+</blockquote>
+<p>对于它如何优化精度的，里边有一堆公式，我还没有看懂，之后再详细看下这个精度优化过程。</p>
+<h2 id="1-5-System-Level-Design"><a href="#1-5-System-Level-Design" class="headerlink" title="1.5. System-Level Design"></a>1.5. System-Level Design</h2><p>从软件编程到硬件执行，PRIME有三个阶段：编程(编码)、编译(代码优化)、代码执行。</p>
+<p><img src="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/PRIME%E7%BC%96%E7%A8%8B%E6%B5%81%E7%A8%8B.jpeg" srcset="/img/loading.gif" lazyload alt="PRIME编程流程"><br>在软件层面的PRIME中，它首先把NN参数划分为五个部分，每个部分都提供对应的API；之后在编译层面，根据外围电路配置来选择模式，并且把NN加载到对应的模块中，并且将计算数据也加载到对应模块中。最终进行计算。<strong>（后边加载的过程还没看太懂，之后再细读一下！）</strong></p>
+<p>在编译优化层面，NN映射会针对不同大小的模型来进行优化。</p>
+<ol>
+<li><p><strong>Small Scale NN</strong>：直接Replication，如果NN能被单个的FF mat装载，说明这是一个小网络。但是小网络的话会存在一些问题，例如利用率不高、加速效果不明显(外围电路延迟超过矩阵运算的延迟)，他们把一个小的NN放到不同的mat上。例如：为了实现一个128 * 1的NN，会复制成为一个256 * 2的NN映射到mat上，同样这种优化可以用在卷积层上。</p>
+</li>
+<li><p><strong>Medium Scale NN</strong>：优化方案是拆分合并。当一个NN不能映射到单个的FF的mat，但是可以放在一个bank中，这便是一个中等规模的NN。在编译映射过程中，一个中等规模的NN必须被切分成小的NN，然后再合并他们的结果。例如：在一块256 * 256的mat上计算512 * 512的NN，需要切分成四个部分M11， M12，M21，M22，将他们分别映射到4个mat上，之后再将运算结果合并起来。</p>
+</li>
+<li><p><strong>Large Scale NN</strong>：大的NN不能再映射到一个bank中，和Medium类似，把NN切成几个trunks，并且对每个trunk分多阶段串行映射到同一个bank。（但这个写延迟很高，很有可能抵消加速）另一种方式是，类似于体系结构，用多个bank来实现大规模NN。这些bank可以相互传输数据，并且通过流水线方式运行来提高吞吐量。最终用<code>PRIME controller</code>来管理bank之间的通信。这种会产生一个非常大的NN(2.7*10^8个权重)</p>
+</li>
+</ol>
+<blockquote>
+<p>问：mat和bank的区别是什么？这些概念在哪里？需要查找一下</p>
+</blockquote>
+<p>在Bank级别的并行优化，因为FF子阵列在每一个bank中，因此对于中小规模的NN，完全可以放在同一个bank中加速运行。<strong>（由于Bank这个概念不是很清楚，关于它的并行还不是很了解）</strong></p>
+<p>在运行时优化层面：当内存不够用时，由于缺页置换，有可能会将之前固定保留的内存地址作为正常的内存释放。在本论文的设计中，mat作为计算和内存配置的最小粒度。当array配置为计算时，存储多位权重；当数组用作正常内存时，它将正常存储数据。同时OS和MMU一起工作来保留FF子阵列的所有映射信息，根据LRU和FF子阵列的计算利用率，决定何时以及释放多少保留的内存空间。</p>
+<h2 id="1-6-Evaluation"><a href="#1-6-Evaluation" class="headerlink" title="1.6. Evaluation"></a>1.6. Evaluation</h2><p>在性能评估的时候，用到了CNN和VGG等NN模型，配置如下。<br><img src="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/benchmarks.jpeg" srcset="/img/loading.gif" lazyload alt="benchmarks"><br>ReRAM内存大小为16GB，有两个FF子阵列，每个bank都有一个Buffer，在FF子阵列中，对于每个mat，都有256 * 256的ReRAM单元，还有8个6-bit的SA。<br><img src="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/configurations.jpeg" srcset="/img/loading.gif" lazyload alt="configurations"></p>
+<p>对比方式如下图：<br><img src="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/comparatives.jpeg" srcset="/img/loading.gif" lazyload alt="comparatives"><br>PRIME与CPU-only、NPU co-processor、NPU PIM-processor这些架构，执行CNN、MLP、VGG、gmean等算法，都进行了性能对比。</p>
+<p>测试结果如下：<br><img src="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95%E6%AF%94%E8%BE%83%E7%BB%93%E6%9E%9C.jpeg" srcset="/img/loading.gif" lazyload alt="性能测试比较结果"></p>
+<p>可以看出PRIME的性能是碾压的！<br>例如图8：由于MiBench需要大型的NN，因此需要高带宽的内存，因此和PIM相关的都有大幅度的提升。为了进一步验证PIM的性能，他们做了pim-x1和pim-x64的实验，发现随着带宽增大，性能有陡然提升。</p>
+<p>性能评估这一部分推荐看原文，讲的十分十分详细。</p>
+<blockquote>
+<p>个人思考：<br>PRIME很好地结合了模拟计算和ANN计算的优势，功能设计十分简单高效。<br>不仅仅提出了设计，还提出了完整的存算方案设计思路<br>文章不仅讲到了存算架构，还讲到了外围电路的设计<br>具体是怎么仿真的？需要查询更多资料？<br>下一篇看看ISAAC<br>看一下2017年的Mrico，各个大厂和高校都提出了著名的存内系统计算原型</p>
+</blockquote>
+<p><strong>ReLU</strong>：</p>
+<h1 id="2-A-Survey-of-ReRAM-Based-Architectures-for-Processing-In-Memory-and-Neural-Networks"><a href="#2-A-Survey-of-ReRAM-Based-Architectures-for-Processing-In-Memory-and-Neural-Networks" class="headerlink" title="2. A Survey of ReRAM-Based Architectures for Processing-In-Memory and Neural Networks"></a>2. A Survey of ReRAM-Based Architectures for Processing-In-Memory and Neural Networks</h1><ol>
+<li>A Survey of ReRAM-Based Architectures for Processing-In-Memory and Neural Networks</li>
+</ol>
+<blockquote>
+<p>词条1：<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%8F%AF%E8%AE%8A%E9%9B%BB%E9%98%BB%E5%BC%8F%E8%A8%98%E6%86%B6%E9%AB%94">ReRAM</a>,它的优势是：高密度低能量存储以及存内计算&#x2F;搜索引擎。</p>
+</blockquote>
+<p>在这篇文章中主要介绍基于ReRAM的PIM和NN架构。</p>
+<p>ReRAM可以支持模拟矩阵向量乘法，并且可以在内存中进行位操作和查询。在CNN上加速极快，在MLP、transformer、自注意力等都在探索。</p>
+<p>ReRAM有写入限制、对工艺要求高、会发生电阻漂移，同时模拟操作会导致有面积开销，写入能量和延迟都很高，频繁更新权重和大量数据会很难。</p>
+<p>机器学习有两个模块：train和test。<br>神经网络分为ANN和SNN，实际上SNN更能模仿大脑的操作。</p>
+<p>过程变异是指参数与其标称值的偏差。<br>A hard default指的是电阻由于到达写入极限，卡在0或者1.<br>电阻漂移指的是电阻会随着时间产生误差。</p>
+<p>Sneak-paths指的是不是预定期望的电阻路径。</p>
+<p>忆阻器是模拟计算，精度会有问题<br>期间本身精度问题</p>
+<p>吴华强团队，唐建石</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%BA%E6%96%87%E7%B3%BB%E5%88%97/" class="category-chain-item">论文系列</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93-%E7%B2%BE%E8%AF%BB/" class="print-no-link">#存算一体 精读</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>存算一体经典文章精读</div>
+      <div>http://example.com/2024/08/26/1-5-存算一体经典文章精读/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>杜子源</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/29/1-7-%E5%A6%82%E4%BD%95%E7%BB%84%E4%BC%9A%E5%92%8C%E7%A7%91%E7%A0%94/" title="3-4-如何组会和科研">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">3-4-如何组会和科研</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="3_3-Beamer学习记录">
+                        <span class="hidden-mobile">3_3-Beamer学习记录</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量
+        <span id="busuanzi_value_site_pv"></span>
+        次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访问量
+        <span id="busuanzi_value_site_uv"></span>
+        人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    
+      <script  src="/js/img-lazyload.js" ></script>
+    
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/scrollAnimation.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>

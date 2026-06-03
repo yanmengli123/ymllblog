@@ -1,0 +1,827 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="杜子源">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Latex和Beamer介绍Latex在学术界被广泛使用，常被用作期刊和论文的排版引擎。它的排版能力非常强，并且并不需要很强大的编程基础。 同样，我们在做学术汇报的时候，很多时候PPT都需要花费大量的时间排版，Beamer可以很好的帮我们解决这个烦恼。在overleaf中有很多现成的beamer-template，大家可以在overleaf搜索，或者直接在github中搜索也可以。 Overlea">
+<meta property="og:type" content="article">
+<meta property="og:title" content="3_3-Beamer学习记录">
+<meta property="og:url" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:site_name" content="旺仔杂货铺">
+<meta property="og:description" content="Latex和Beamer介绍Latex在学术界被广泛使用，常被用作期刊和论文的排版引擎。它的排版能力非常强，并且并不需要很强大的编程基础。 同样，我们在做学术汇报的时候，很多时候PPT都需要花费大量的时间排版，Beamer可以很好的帮我们解决这个烦恼。在overleaf中有很多现成的beamer-template，大家可以在overleaf搜索，或者直接在github中搜索也可以。 Overlea">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E5%85%AC%E5%BC%8F%E6%98%BE%E7%A4%BA%E6%95%88%E6%9E%9C%E5%9B%BE.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E4%B8%AD%E6%96%87%E4%BD%BF%E7%94%A8%E9%A1%B5%E9%9D%A2%E5%B1%95%E7%A4%BA.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E5%AD%97%E4%BD%93%E5%9B%BE.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E5%AD%97%E4%BD%93%E5%BD%A2%E7%8A%B6.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/Latex%E6%96%87%E6%A1%A3%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E6%AE%B5%E8%90%BD%E6%8D%A2%E8%A1%8C%E6%B5%8B%E8%AF%95.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E7%9B%AE%E5%BD%95%E5%B1%95%E7%A4%BA.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E8%A1%A8%E6%A0%BC%E7%A4%BA%E4%BE%8B.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E6%B5%AE%E5%8A%A8%E4%BD%93.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E9%A6%96%E9%A1%B5.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E4%BC%98%E9%9B%85%E7%9A%84%E6%A0%87%E7%AD%BE%E9%A1%B5.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E6%94%B9%E5%8F%98%E9%A2%9C%E8%89%B2%E7%9A%84%E6%A0%87%E7%AD%BE%E9%A1%B5.png">
+<meta property="og:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E5%BC%BA%E8%B0%83%E6%A1%86.png">
+<meta property="article:published_time" content="2024-08-24T02:43:13.000Z">
+<meta property="article:modified_time" content="2024-08-25T13:51:46.434Z">
+<meta property="article:author" content="杜子源">
+<meta property="article:tag" content="Beamer Latex Slides">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E5%85%AC%E5%BC%8F%E6%98%BE%E7%A4%BA%E6%95%88%E6%9E%9C%E5%9B%BE.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>3_3-Beamer学习记录 - 旺仔杂货铺</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/scrollAnimation.css">
+<link rel="stylesheet" href="/css/mk.css">
+<link rel="stylesheet" href="/css/selection.css">
+<link rel="stylesheet" href="/css/round.css">
+<link rel="stylesheet" href="/css/cloudeGlass.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":true,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>旺仔杂货铺</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/004.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="3_3-Beamer学习记录"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-24 10:43" pubdate>
+          2024年8月24日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          36 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">3_3-Beamer学习记录</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Latex和Beamer介绍"><a href="#Latex和Beamer介绍" class="headerlink" title="Latex和Beamer介绍"></a>Latex和Beamer介绍</h1><p>Latex在学术界被广泛使用，常被用作期刊和论文的排版引擎。它的排版能力非常强，并且并不需要很强大的编程基础。</p>
+<p>同样，我们在做学术汇报的时候，很多时候PPT都需要花费大量的时间排版，Beamer可以很好的帮我们解决这个烦恼。在overleaf中有很多现成的beamer-template，大家可以在overleaf搜索，或者直接在github中搜索也可以。</p>
+<p>Overleaf可以帮助我们很好地解决配置latex环境的问题，本文我们就学习一下如何使用beamer来制作Slides。</p>
+<h2 id="1-Latex基础语法"><a href="#1-Latex基础语法" class="headerlink" title="1. Latex基础语法"></a>1. Latex基础语法</h2><h3 id="1-1-Latex源文件基本结构"><a href="#1-1-Latex源文件基本结构" class="headerlink" title="1.1. Latex源文件基本结构"></a>1.1. Latex源文件基本结构</h3><p>Latex主要由两个板块组成：<code>导言区</code>+<code>正文区</code></p>
+<p>一个完整的.tex文件一般长这样：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-comment">%% 导言区</span><br><span class="hljs-keyword">\documentclass</span>&#123;beamer&#125;<br>...<br><span class="hljs-keyword">\usepackage</span>&#123;graphicx&#125;<br><span class="hljs-keyword">\author</span>[]()<br><span class="hljs-keyword">\title</span>&#123;&#125;<br>...<br><br><span class="hljs-comment">%% 正文区</span><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br>...<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>导言区用于全局设置，包括导入的包、标题、作者等等，正文区用于正式的论文书写。在一般的学术会议latex模板中，都会提供对应的论文格式，我们直接使用即可。</p>
+<h3 id="1-2-Latex公式排版"><a href="#1-2-Latex公式排版" class="headerlink" title="1.2. Latex公式排版"></a>1.2. Latex公式排版</h3><p>在正文区中，<code>$xxx$</code>来输出数学公式，单个$表示行内公式，两个$$会另起一行显示。</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs tex"><br><span class="hljs-comment">% test</span><br><span class="hljs-keyword">\documentclass</span>&#123;article&#125;<br><span class="hljs-keyword">\title</span>&#123;This is a test&#125;<br><span class="hljs-keyword">\author</span>&#123;xyw&#125;<br><span class="hljs-keyword">\date</span>&#123;<span class="hljs-keyword">\today</span>&#125;<br><br><span class="hljs-comment">% main</span><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br>    <span class="hljs-keyword">\maketitle</span><br>    Hello world!<br><br>    Lef <span class="hljs-built_in">$</span>f(x<span class="hljs-built_in">$</span> be defined by formula:<br>    <span class="hljs-comment">%here is my big formula</span><br>    <span class="hljs-built_in">$</span><span class="hljs-built_in">$</span>f(x)=3x<span class="hljs-built_in">^</span>2+x-1<span class="hljs-built_in">$</span><span class="hljs-built_in">$</span> which is a polynomial of degree 2.<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br></code></pre></td></tr></table></figure>
+
+<p>显示效果如下：<br><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E5%85%AC%E5%BC%8F%E6%98%BE%E7%A4%BA%E6%95%88%E6%9E%9C%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="公式显示效果图"></p>
+<h3 id="1-2-Latex中的中文处理方法"><a href="#1-2-Latex中的中文处理方法" class="headerlink" title="1.2. Latex中的中文处理方法"></a>1.2. Latex中的中文处理方法</h3><p>可以导入一个中文宏的包</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\usepackage</span>&#123;ctex&#125;  <span class="hljs-comment">% 中文宏包</span><br></code></pre></td></tr></table></figure>
+
+<p>一个完整的示例如下：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;article&#125;<br><span class="hljs-keyword">\usepackage</span>&#123;ctex&#125;<br><br><span class="hljs-keyword">\title</span>&#123;<span class="hljs-keyword">\heiti</span> 杂谈勾股定理&#125;<br><span class="hljs-keyword">\author</span>&#123;<span class="hljs-keyword">\kaishu</span> 张三&#125;<br><span class="hljs-keyword">\date</span>&#123;<span class="hljs-keyword">\today</span>&#125;<br><br><span class="hljs-comment">% 正文区</span><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br>    <span class="hljs-keyword">\maketitle</span><br>    勾股定理可以用现代语言描述如下：<br>    <br>    直角三角形斜边的平方等于两条直角边的平方和。<br><br>    可以用符号语言表述为：设直角三角形<span class="hljs-built_in">$</span>ABC<span class="hljs-built_in">$</span>,其中<br>    <span class="hljs-built_in">$</span><span class="hljs-keyword">\angle</span> C = 90<span class="hljs-built_in">^</span><span class="hljs-keyword">\circ</span><span class="hljs-built_in">$</span><br>    则有：<br>    <span class="hljs-comment">%equation命令用于产生带编号的行间公式：</span><br>    <span class="hljs-keyword">\begin</span>&#123;equation&#125;<br>        AB<span class="hljs-built_in">^</span>2 = BC<span class="hljs-built_in">^</span>2 + AB<span class="hljs-built_in">^</span>2<br>    <span class="hljs-keyword">\end</span>&#123;equation&#125;<span class="hljs-keyword">\label</span>&#123;key&#125;<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br></code></pre></td></tr></table></figure>
+<p><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E4%B8%AD%E6%96%87%E4%BD%BF%E7%94%A8%E9%A1%B5%E9%9D%A2%E5%B1%95%E7%A4%BA.png" srcset="/img/loading.gif" lazyload alt="中文使用页面展示"></p>
+<p>设置字体可以使用类似于：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\rmfamily</span>&#123;罗马字体族&#125;<br><span class="hljs-keyword">\ttfamily</span>&#123;打字机字体族&#125;<br><span class="hljs-keyword">\heiti</span>&#123;黑体&#125;<br></code></pre></td></tr></table></figure>
+
+<p>等等来设置字体，包括可以设置字体的粗细</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\textmd</span>&#123;Medium Series&#125;<br><span class="hljs-keyword">\textbf</span>&#123;Boldface Series&#125;<br>&#123;<span class="hljs-keyword">\mdseries</span> Medium Series&#125;<br>&#123;<span class="hljs-keyword">\bfsearisc</span> Boldface Series&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E5%AD%97%E4%BD%93%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="字体图"></p>
+<p>设置字体的形状:</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs tex">&#123;<span class="hljs-keyword">\upshape</span> Upright shape&#125;<br>&#123;<span class="hljs-keyword">\itshape</span> Italic Shape&#125;<br>&#123;<span class="hljs-keyword">\slshape</span> Slanted Shape&#125;<br>&#123;<span class="hljs-keyword">\scshape</span> Small Caps Shape&#125;<br>&#123;<span class="hljs-keyword">\songti</span> 宋体&#125;<br>&#123;<span class="hljs-keyword">\heiti</span> 黑体&#125;<br>&#123;<span class="hljs-keyword">\fangsong</span> 仿宋&#125;<br>&#123;<span class="hljs-keyword">\kaishu</span> 楷书&#125;<br><span class="hljs-keyword">\textbf</span>&#123;abd&#125;    <span class="hljs-comment">% 粗体    </span><br><span class="hljs-keyword">\textit</span>&#123;abc&#125;    <span class="hljs-comment">% 斜体</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E5%AD%97%E4%BD%93%E5%BD%A2%E7%8A%B6.png" srcset="/img/loading.gif" lazyload alt="字体形状"></p>
+<p>Latex的思想是格式和内容分离，因此不建议在文档中使用大量的命令，而是用<code>newcommand</code>定义新的命令来执行相关的操作。</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\newcommand</span>&#123;<span class="hljs-keyword">\myfont</span>&#125;&#123;<span class="hljs-keyword">\textit</span>&#123;<span class="hljs-keyword">\textbf</span>&#123;<span class="hljs-keyword">\textsf</span>&#123;Fancy Text&#125;&#125;&#125;&#125;<br><span class="hljs-keyword">\myfont</span><br></code></pre></td></tr></table></figure>
+<p>当需要修改字体时，只需要修改已经定义的命令即可。</p>
+<p>更多和字体有关的资料大家可以<a target="_blank" rel="noopener" href="https://cn.overleaf.com/learn/latex/Font_typefaces">RTFM</a></p>
+<h3 id="1-3-Latex文档结构"><a href="#1-3-Latex文档结构" class="headerlink" title="1.3. Latex文档结构"></a>1.3. Latex文档结构</h3><p>latex主要有<code>section</code>, <code>subsection</code>, <code>subsubsection</code>来构建提纲。</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\section</span>&#123;引言&#125;<br>    This is a Introduction. <br><span class="hljs-keyword">\section</span>&#123;实验方法&#125;<br><span class="hljs-keyword">\section</span>&#123;实验结果&#125;<br><span class="hljs-keyword">\subsection</span>&#123;结果1&#125;<br><span class="hljs-keyword">\subsection</span>&#123;结果2&#125;<br><span class="hljs-keyword">\subsection</span>&#123;结果3&#125;<br><span class="hljs-keyword">\subsubsection</span>&#123;分析1&#125;<br><span class="hljs-keyword">\subsubsection</span>&#123;分析2&#125;<br><span class="hljs-keyword">\section</span>&#123;附录&#125;<br></code></pre></td></tr></table></figure>
+<p><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/Latex%E6%96%87%E6%A1%A3%E7%BB%93%E6%9E%84.png" srcset="/img/loading.gif" lazyload alt="Latex文档结构"></p>
+<p>在文章段落中，使用<code>\\</code>换行，不会产生新的段落，即没有首行缩进；使用<code>\par</code>，则会产生新的段落。</p>
+<p><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E6%AE%B5%E8%90%BD%E6%8D%A2%E8%A1%8C%E6%B5%8B%E8%AF%95.png" srcset="/img/loading.gif" lazyload alt="段落换行测试"></p>
+<p>使用<code>\tableofcontents</code>会产生文档目录<br><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E7%9B%AE%E5%BD%95%E5%B1%95%E7%A4%BA.png" srcset="/img/loading.gif" lazyload alt="目录展示"></p>
+<h3 id="1-4-插图"><a href="#1-4-插图" class="headerlink" title="1.4. 插图"></a>1.4. 插图</h3><p>主要格式如下：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-comment">% 导言区：\usepackage&#123;graphicx&#125;</span><br><br><span class="hljs-comment">% 语法：\includegraphics[&lt;选项&gt;]&#123;&lt;文件名&gt;&#125;</span><br><span class="hljs-comment">% 格式：EPS PDF PNG JPEG BMP</span><br><span class="hljs-comment">% &lt;选项&gt;：scale(缩放因子)、height(固定值的图像高度)、width(固定值的图像宽度)、height=0.1\textheight(版型0.1倍的图像高度、width=0.2\textwidth(版型0.2倍的图像宽度)、angle=-45(旋转角度)， 可以同时指定多个可选参数，不同参数之间用逗号间隔)</span><br></code></pre></td></tr></table></figure>
+
+<p>一个具体的实例如下：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;article&#125;<br><span class="hljs-keyword">\usepackage</span>&#123;ctex&#125;<br><br><span class="hljs-keyword">\usepackage</span>&#123;graphicx&#125;<br><span class="hljs-keyword">\graphicspath</span>&#123;&#123;figures/&#125;,&#123;pics/&#125;&#125; <span class="hljs-comment">%图片在当前目录下的figures目录</span><br><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br>	<span class="hljs-keyword">\LaTeX</span>&#123;&#125;中的插图<br>	<span class="hljs-keyword">\includegraphics</span>[scale=0.3]&#123;figures/image.png&#125;<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="1-5-表格"><a href="#1-5-表格" class="headerlink" title="1.5. 表格"></a>1.5. 表格</h3><p><strong>概要</strong>：使用<code>tabular</code>生成表格，该环境需要指定一个排版格式的必选参数：<code>l, c, r, p</code></p>
+<ul>
+<li>l：左对齐</li>
+<li>c：居中</li>
+<li>r：右对齐</li>
+<li>p：内容超过宽度时自动换行</li>
+</ul>
+<p>语法如下：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\begin</span>&#123;tabular&#125;[&lt;垂直对齐方式&gt;]&#123;&lt;列格式说明&gt;&#125;<br>&lt;表项&gt; <span class="hljs-built_in">&amp;</span> &lt;表项&gt; <span class="hljs-built_in">&amp;</span> &lt;表项&gt; <span class="hljs-keyword">\\</span><br><span class="hljs-keyword">\end</span>&#123;tabular&#125;<br><br><span class="hljs-comment">% \\ 表示换行</span><br><br></code></pre></td></tr></table></figure>
+
+<p>完整的示例如下：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;ctexart&#125;<br><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br>	<span class="hljs-keyword">\begin</span>&#123;tabular&#125;&#123;| l || c | c | c | r&#125; <span class="hljs-comment">% 用 | 产生竖线，两个|可以产生双竖线，列格式说明中空格不起作用</span><br>		<span class="hljs-keyword">\hline</span> <span class="hljs-comment">%产生表格横线</span><br>		A组 <span class="hljs-built_in">&amp;</span> 队名 <span class="hljs-built_in">&amp;</span> 比分 <span class="hljs-built_in">&amp;</span> 备注<span class="hljs-keyword">\\</span><br>		<span class="hljs-keyword">\hline</span><span class="hljs-keyword">\hline</span> <span class="hljs-comment">%产生双横线</span><br>		1st <span class="hljs-built_in">&amp;</span> RNG <span class="hljs-built_in">&amp;</span> 6-0 <span class="hljs-built_in">&amp;</span> 出线<span class="hljs-keyword">\\</span><br>		<span class="hljs-keyword">\hline</span><br>		2nd <span class="hljs-built_in">&amp;</span> DK <span class="hljs-built_in">&amp;</span> 3-3 <span class="hljs-built_in">&amp;</span> 出线<span class="hljs-keyword">\\</span><br>		<span class="hljs-keyword">\hline</span><br>		3rd <span class="hljs-built_in">&amp;</span> T1 <span class="hljs-built_in">&amp;</span> 2-4 <span class="hljs-built_in">&amp;</span> 淘汰<span class="hljs-keyword">\\</span><br>		<span class="hljs-keyword">\hline</span><br>		4th <span class="hljs-built_in">&amp;</span> G2 <span class="hljs-built_in">&amp;</span> 1-5 <span class="hljs-built_in">&amp;</span> 淘汰<span class="hljs-keyword">\\</span>	<br>		<span class="hljs-keyword">\hline</span>	<br>	<span class="hljs-keyword">\end</span>&#123;tabular&#125;<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E8%A1%A8%E6%A0%BC%E7%A4%BA%E4%BE%8B.png" srcset="/img/loading.gif" lazyload alt="表格示例"></p>
+<h3 id="1-6-浮动体"><a href="#1-6-浮动体" class="headerlink" title="1.6. 浮动体"></a>1.6. 浮动体</h3><p>功能：</p>
+<blockquote>
+<ol>
+<li><strong>实现灵活分页</strong>，防止因为无法分割的内容产生页面留白</li>
+<li><strong>给图标添加标题</strong></li>
+<li><strong>交叉引用</strong></li>
+</ol>
+</blockquote>
+<p>以下是figure&#x2F;table的环境</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\begin</span>&#123;figure&#125;[&lt;允许位置&gt;]<br>    &lt;任意内容&gt;<br><span class="hljs-keyword">\end</span>&#123;figure&#125;<br></code></pre></td></tr></table></figure>
+<ul>
+<li>h: here, 代码所在的上下文位置</li>
+<li>t：top，代码所在的页面，或者之后页面的顶部</li>
+<li>b：bottom，代码所在的页面，或者之后页面的底部</li>
+<li>p：page，浮动页面</li>
+</ul>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;ctexart&#125;<br><span class="hljs-keyword">\usepackage</span>&#123;graphicx&#125;<br><span class="hljs-keyword">\graphicspath</span>&#123;&#123;figures/&#125;&#125;<br><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br>	<span class="hljs-comment">%figure浮动体环境</span><br>	<span class="hljs-keyword">\LaTeX</span>&#123;&#125;中的插图：<span class="hljs-keyword">\ref</span>&#123;fig-p1&#125; <span class="hljs-comment">%ref引用标签</span><br> <br>	<span class="hljs-keyword">\begin</span>&#123;figure&#125;[htbp] <span class="hljs-comment">%通过可选参数指定浮动体的排版位置</span><br>		<span class="hljs-keyword">\centering</span> <span class="hljs-comment">%让环境中的内容居中</span><br>		<span class="hljs-keyword">\includegraphics</span>[scale=0.3]&#123;figures/image.png&#125;<br>		<span class="hljs-keyword">\caption</span>&#123;<span class="hljs-keyword">\TeX</span> 浮动体学习&#125;<span class="hljs-keyword">\label</span>&#123;fig-p1&#125; <span class="hljs-comment">%caption设置标题,lable为浮动体设置标签</span><br>	<span class="hljs-keyword">\end</span>&#123;figure&#125;	<br>	<br>	<span class="hljs-comment">%table浮动体环境</span><br>	<span class="hljs-keyword">\LaTeX</span>&#123;&#125;中的表格<span class="hljs-keyword">\ref</span>&#123;table-score&#125;<br>	<span class="hljs-keyword">\begin</span>&#123;table&#125;[h]<br>		<span class="hljs-keyword">\centering</span><br>		<span class="hljs-keyword">\caption</span>&#123;积分情况&#125;<span class="hljs-keyword">\label</span>&#123;table-score&#125;<br>		<span class="hljs-keyword">\begin</span>&#123;tabular&#125;&#123;| l || c | c | c | r&#125; <span class="hljs-comment">% 用 | 产生竖线，两个|可以产生双竖线，列格式说明中空格不起作用</span><br>			<span class="hljs-keyword">\hline</span> <span class="hljs-comment">%产生表格横线</span><br>			A组 <span class="hljs-built_in">&amp;</span> 队名 <span class="hljs-built_in">&amp;</span> 比分 <span class="hljs-built_in">&amp;</span> 备注<span class="hljs-keyword">\\</span><br>			<span class="hljs-keyword">\hline</span><span class="hljs-keyword">\hline</span> <span class="hljs-comment">%产生双横线</span><br>			1st <span class="hljs-built_in">&amp;</span> RNG <span class="hljs-built_in">&amp;</span> 6-0 <span class="hljs-built_in">&amp;</span> 出线<span class="hljs-keyword">\\</span><br>			<span class="hljs-keyword">\hline</span><br>			2nd <span class="hljs-built_in">&amp;</span> DK <span class="hljs-built_in">&amp;</span> 3-3 <span class="hljs-built_in">&amp;</span> 出线<span class="hljs-keyword">\\</span><br>			<span class="hljs-keyword">\hline</span><br>			3rd <span class="hljs-built_in">&amp;</span> T1 <span class="hljs-built_in">&amp;</span> 2-4 <span class="hljs-built_in">&amp;</span> 淘汰<span class="hljs-keyword">\\</span><br>			<span class="hljs-keyword">\hline</span><br>			4th <span class="hljs-built_in">&amp;</span> G2 <span class="hljs-built_in">&amp;</span> 1-5 <span class="hljs-built_in">&amp;</span> 淘汰<span class="hljs-keyword">\\</span>	<br>			<span class="hljs-keyword">\hline</span>	<br>		<span class="hljs-keyword">\end</span>&#123;tabular&#125;<br>	<span class="hljs-keyword">\end</span>&#123;table&#125;<br>	<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br></code></pre></td></tr></table></figure>
+<p>最终的效果如下：<br><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E6%B5%AE%E5%8A%A8%E4%BD%93.png" srcset="/img/loading.gif" lazyload alt="浮动体"></p>
+<h3 id="1-7-数学公式"><a href="#1-7-数学公式" class="headerlink" title="1.7. 数学公式"></a>1.7. 数学公式</h3><figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;ctexart&#125;<br><span class="hljs-keyword">\usepackage</span>&#123;amsmath&#125;<br><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br>	<span class="hljs-keyword">\section</span>&#123;简介&#125;<br>	<span class="hljs-keyword">\LaTeX</span>&#123;&#125;将排版内容分为文本模式和数学模式。文本模式用于普通文本排版，数学模式用于数学公式排版。<br>	<br>	<span class="hljs-keyword">\section</span>&#123;行内公式&#125;<br>		<span class="hljs-keyword">\subsection</span>&#123;美元符号&#125;<br>	交换律：<span class="hljs-built_in">$</span><span class="hljs-built_in">$</span>a+b=b+a<span class="hljs-built_in">$</span><span class="hljs-built_in">$</span><br>		<span class="hljs-keyword">\subsection</span>&#123;小括号&#125;<br>	交换律：<span class="hljs-keyword">\(</span>a+b=b+a<span class="hljs-keyword">\)</span><br>	 	<span class="hljs-keyword">\subsection</span>&#123;math环境&#125;<br>	交换律：<span class="hljs-keyword">\begin</span>&#123;math&#125;a+b=b+a<span class="hljs-keyword">\end</span>&#123;math&#125;<br>	<br>	<span class="hljs-keyword">\section</span>&#123;上下标&#125;<br>	上：<span class="hljs-built_in">$</span>x<span class="hljs-built_in">^</span>&#123;2x<span class="hljs-built_in">^</span>&#123;6&#125;+1&#125;+y=0<span class="hljs-built_in">$</span> <span class="hljs-keyword">\\</span><br>	下：<span class="hljs-built_in">$</span>a<span class="hljs-built_in">_</span>1,a<span class="hljs-built_in">_</span>2,a<span class="hljs-built_in">_</span>3...a<span class="hljs-built_in">_</span>&#123;100&#125;<span class="hljs-built_in">$</span> <br>	<br>	<span class="hljs-keyword">\section</span>&#123;希腊字母&#125;<br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\alpha</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\beta</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\gamma</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\epsilon</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\omega</span><span class="hljs-built_in">$</span><br>	<br>	大写希腊字母：<br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\Gamma</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\Delta</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\Theta</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\Pi</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\Omega</span><span class="hljs-built_in">$</span><br>	<br>	<span class="hljs-keyword">\section</span>&#123;数学函数&#125;<br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\log</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\sin</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\cos</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\arcsin</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\arccos</span><span class="hljs-built_in">$</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\ln</span><span class="hljs-built_in">$</span> <span class="hljs-keyword">\\</span><br>	<span class="hljs-built_in">$</span>y=<span class="hljs-keyword">\sin</span><span class="hljs-built_in">^</span>&#123;-1&#125;x<span class="hljs-built_in">$</span> <span class="hljs-keyword">\\</span><br>	<span class="hljs-built_in">$</span>y=log<span class="hljs-built_in">_</span>2x<span class="hljs-built_in">$</span> <span class="hljs-keyword">\\</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\sqrt</span>[4]&#123;x<span class="hljs-built_in">^</span>2+y<span class="hljs-built_in">^</span>2&#125;<span class="hljs-built_in">$</span> <span class="hljs-comment">%[]可选参数，开方次数</span><br>	<br>	<span class="hljs-keyword">\section</span>&#123;分式&#125;<br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\frac</span>&#123;x&#125;&#123;x<span class="hljs-built_in">^</span>2+x+1&#125;<span class="hljs-built_in">$</span> <span class="hljs-keyword">\\</span> <span class="hljs-comment">%第一个可选参数是分子，第二个是分母</span><br>	<span class="hljs-built_in">$</span><span class="hljs-keyword">\sqrt</span>&#123;<span class="hljs-keyword">\frac</span>&#123;x&#125;&#123;x<span class="hljs-built_in">^</span>2+x&#125;&#125;<span class="hljs-built_in">$</span><br>	<br>	<span class="hljs-keyword">\section</span>&#123;行间公式&#125;<br>		<span class="hljs-keyword">\subsection</span>&#123;美元符号&#125;<br>	<span class="hljs-built_in">$</span><span class="hljs-built_in">$</span>x+y=2<span class="hljs-built_in">$</span><span class="hljs-built_in">$</span> <span class="hljs-comment">%使用双$</span><br>		<span class="hljs-keyword">\subsection</span>&#123;中括号&#125;<br>	 <span class="hljs-keyword">\[</span>x+y=2<span class="hljs-keyword">\]</span> <span class="hljs-comment">%同样效果</span><br>	 	<span class="hljs-keyword">\subsection</span>&#123;displaymath环境&#125;<br>	 	<span class="hljs-keyword">\begin</span>&#123;displaymath&#125;<br>	 		x+y=2<br>	 	<span class="hljs-keyword">\end</span>&#123;displaymath&#125;<br> 	<br>	<span class="hljs-keyword">\section</span>&#123;自动编号公式equation环境&#125;<br>	交换律见式<span class="hljs-keyword">\ref</span>&#123;eq:commutative&#125; <span class="hljs-comment">%交叉引用</span><br>		<span class="hljs-keyword">\begin</span>&#123;equation&#125;<br>			a+b=b+a <span class="hljs-keyword">\label</span>&#123;eq:commutative&#125;<br>		<span class="hljs-keyword">\end</span>&#123;equation&#125;<br><br>	<span class="hljs-keyword">\section</span>&#123;不编号equation*环境&#125;<br>	交换律见式：<span class="hljs-keyword">\ref</span>&#123;eq:commutative2&#125;:<br>		<span class="hljs-keyword">\begin</span>&#123;equation*&#125;<br>			a+b=b+a  <span class="hljs-keyword">\label</span>&#123;eq:commutative2&#125;<br>		<span class="hljs-keyword">\end</span>&#123;equation*&#125;<br>	<span class="hljs-comment">%在公式末尾加\nonumber也可以去编号</span><br>	<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br></code></pre></td></tr></table></figure>
+
+<p>公式编号和交叉引用都是自动实现的，在排版中，要习惯采用自动化的方式处理注入图、表、公式的编号与交叉引用。</p>
+<p>矩阵处理如下：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;ctexart&#125;<br><span class="hljs-keyword">\usepackage</span>&#123;amsmath&#125;<br><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br>	<span class="hljs-comment">%矩阵环境，用&amp;分割列，用\\分割行 每个矩阵前后需要加 \[ \]</span><br>	<span class="hljs-comment">%注意\[ \] 里面无需空行</span><br>	<span class="hljs-keyword">\[</span><br>	<span class="hljs-keyword">\begin</span>&#123;matrix&#125; <span class="hljs-comment">%无定界符</span><br>		0<span class="hljs-built_in">&amp;</span>1<span class="hljs-keyword">\\</span><br>		1<span class="hljs-built_in">&amp;</span>0<br>	<span class="hljs-keyword">\end</span>&#123;matrix&#125;<br>	<span class="hljs-keyword">\]</span><br>	<span class="hljs-keyword">\[</span><br>	A=<span class="hljs-keyword">\begin</span>&#123;pmatrix&#125;<span class="hljs-comment">%小括号</span><br>		a<span class="hljs-built_in">_</span>&#123;11&#125;<span class="hljs-built_in">^</span>2<span class="hljs-built_in">&amp;</span>a<span class="hljs-built_in">_</span>&#123;12&#125;<span class="hljs-built_in">^</span>2<span class="hljs-built_in">&amp;</span>a<span class="hljs-built_in">_</span>&#123;13&#125;<span class="hljs-built_in">^</span>2<span class="hljs-keyword">\\</span><br>		0<span class="hljs-built_in">&amp;</span>a<span class="hljs-built_in">_</span>&#123;22&#125;<span class="hljs-built_in">&amp;</span>a<span class="hljs-built_in">_</span>&#123;23&#125; <span class="hljs-keyword">\\</span><br>		0<span class="hljs-built_in">&amp;</span>0<span class="hljs-built_in">&amp;</span>a<span class="hljs-built_in">_</span>&#123;33&#125;<br>	<span class="hljs-keyword">\end</span>&#123;pmatrix&#125; <br>	<span class="hljs-keyword">\]</span><br>	<span class="hljs-keyword">\[</span><br>	<span class="hljs-keyword">\\</span><br>	<span class="hljs-keyword">\begin</span>&#123;bmatrix&#125;<span class="hljs-comment">%中括号</span><br>		0<span class="hljs-built_in">&amp;</span>-1<span class="hljs-keyword">\\</span><br>		3<span class="hljs-built_in">&amp;</span>1<br>	<span class="hljs-keyword">\end</span>&#123;bmatrix&#125;<span class="hljs-keyword">\\</span><br>	<span class="hljs-keyword">\begin</span>&#123;Bmatrix&#125;<span class="hljs-comment">%大括号</span><br>		0<span class="hljs-built_in">&amp;</span>-1<span class="hljs-keyword">\\</span><br>		3<span class="hljs-built_in">&amp;</span>1<br>		17<br>	<span class="hljs-keyword">\end</span>&#123;Bmatrix&#125;<br>	<span class="hljs-keyword">\begin</span>&#123;vmatrix&#125;<span class="hljs-comment">%单竖线</span><br>		0<span class="hljs-built_in">&amp;</span>-1<span class="hljs-keyword">\\</span><br>		3<span class="hljs-built_in">&amp;</span>1<br>	<span class="hljs-keyword">\end</span>&#123;vmatrix&#125;<br>	<span class="hljs-keyword">\begin</span>&#123;Vmatrix&#125;<span class="hljs-comment">%双竖线</span><br>		0<span class="hljs-built_in">&amp;</span>-1<span class="hljs-keyword">\\</span><br>		3<span class="hljs-built_in">&amp;</span>1<br>	<span class="hljs-keyword">\end</span>&#123;Vmatrix&#125;<br>	<span class="hljs-keyword">\]</span><br>	<span class="hljs-comment">%常用省略号： \dots 横向 \ddots 对角线 \vdots 竖线</span><br>	<span class="hljs-keyword">\[</span><br>	B=<span class="hljs-keyword">\begin</span>&#123;bmatrix&#125;<br>		b<span class="hljs-built_in">_</span>&#123;11&#125; <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\dots</span> <span class="hljs-built_in">&amp;</span> b<span class="hljs-built_in">_</span>&#123;1n&#125;<span class="hljs-keyword">\\</span><br>		<span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\ddots</span> <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\vdots</span> <span class="hljs-keyword">\\</span><br>		0 <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\dots</span> <span class="hljs-built_in">&amp;</span> b<span class="hljs-built_in">_</span>&#123;nn&#125;<br>	<span class="hljs-keyword">\end</span>&#123;bmatrix&#125;<span class="hljs-built_in">_</span>&#123;n<span class="hljs-keyword">\times</span> n&#125; <span class="hljs-comment">%\times 是乘号 (X)</span><br>	<span class="hljs-keyword">\]</span><br>	<span class="hljs-comment">%分块矩阵（矩阵镶套）</span><br>	<span class="hljs-keyword">\[</span><br>	C=<span class="hljs-keyword">\begin</span>&#123;pmatrix&#125;<br>		<span class="hljs-keyword">\begin</span>&#123;matrix&#125; 0<span class="hljs-built_in">&amp;</span>1<span class="hljs-keyword">\\</span>1<span class="hljs-built_in">&amp;</span>-1 <span class="hljs-keyword">\end</span>&#123;matrix&#125;<br>		<span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>&#123;<span class="hljs-keyword">\Large</span> 0&#125; <span class="hljs-keyword">\\</span> <span class="hljs-comment">%text用于在数学模式中临时切换为文本模式</span><br>		<span class="hljs-keyword">\text</span>&#123;<span class="hljs-keyword">\Large</span> 0&#125; <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\begin</span>&#123;matrix&#125; 1<span class="hljs-built_in">&amp;</span>0 <span class="hljs-keyword">\\</span> 0<span class="hljs-built_in">&amp;</span> -2 <span class="hljs-keyword">\end</span>&#123;matrix&#125;<br>	<span class="hljs-keyword">\end</span>&#123;pmatrix&#125;<br>	<span class="hljs-keyword">\]</span><br>	<span class="hljs-comment">% 括号包裹的矩阵</span><br>	<span class="hljs-keyword">\[</span><span class="hljs-keyword">\begin</span>&#123;pmatrix&#125;<br>		a<span class="hljs-built_in">_</span>&#123;11&#125;<span class="hljs-built_in">&amp;</span>a<span class="hljs-built_in">_</span>&#123;12&#125;<span class="hljs-built_in">&amp;</span><span class="hljs-keyword">\cdots</span><span class="hljs-built_in">&amp;</span>a<span class="hljs-built_in">_</span>&#123;ln&#125;<span class="hljs-keyword">\\</span><br>		<span class="hljs-built_in">&amp;</span>a<span class="hljs-built_in">_</span>&#123;22&#125;<span class="hljs-built_in">&amp;</span><span class="hljs-keyword">\cdots</span><span class="hljs-built_in">&amp;</span>a<span class="hljs-built_in">_</span>&#123;2n&#125;<span class="hljs-keyword">\\</span><br>		<span class="hljs-built_in">&amp;</span>		<span class="hljs-built_in">&amp;</span><span class="hljs-keyword">\dots</span> <span class="hljs-built_in">&amp;</span><span class="hljs-keyword">\vdots</span> <span class="hljs-keyword">\\</span><br>		<span class="hljs-keyword">\multicolumn</span>&#123;2&#125;&#123;c&#125;&#123;<span class="hljs-keyword">\raisebox</span>&#123;1.3ex&#125;[0pt]&#123;<span class="hljs-keyword">\Huge</span> 0&#125;&#125; <span class="hljs-comment">%muticolumn合并多列 raisebox调整高度</span><br>		<span class="hljs-built_in">&amp;</span>		<span class="hljs-built_in">&amp;</span>a<span class="hljs-built_in">_</span>&#123;nn&#125;<br>	<span class="hljs-keyword">\end</span>&#123;pmatrix&#125;<br>	<span class="hljs-keyword">\]</span><br>	<span class="hljs-comment">% 跨列的省略号：\hdotsfor&#123;&lt;列数&gt;&#125;</span><br>	<span class="hljs-keyword">\[</span><span class="hljs-keyword">\begin</span>&#123;pmatrix&#125;<br>		1<span class="hljs-built_in">&amp;</span><span class="hljs-keyword">\frac</span> 12 <span class="hljs-built_in">&amp;</span><span class="hljs-keyword">\dots</span> <span class="hljs-built_in">&amp;</span><span class="hljs-keyword">\frac</span> 1n <span class="hljs-keyword">\\</span><br>		<span class="hljs-keyword">\hdotsfor</span>&#123;4&#125;<span class="hljs-keyword">\\</span><br>		m<span class="hljs-built_in">&amp;</span><span class="hljs-keyword">\frac</span> m2<span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\dots</span> <span class="hljs-built_in">&amp;</span><span class="hljs-keyword">\frac</span> mn<br>	<span class="hljs-keyword">\end</span>&#123;pmatrix&#125;<br>	<span class="hljs-keyword">\]</span><br>	<span class="hljs-comment">% 行内小矩阵(smallmatrix)环境</span><br>	复数<span class="hljs-built_in">$</span>z=(x,y)<span class="hljs-built_in">$</span>也可以用矩阵<br>	<span class="hljs-keyword">\begin</span>&#123;math&#125;<br>		<span class="hljs-keyword">\left</span>(<span class="hljs-comment">% 需手动加上左括号</span><br>		<span class="hljs-keyword">\begin</span>&#123;smallmatrix&#125;<br>			x <span class="hljs-built_in">&amp;</span>-y<span class="hljs-keyword">\\</span>y <span class="hljs-built_in">&amp;</span>x<br>		<span class="hljs-keyword">\end</span>&#123;smallmatrix&#125;<br>		<span class="hljs-keyword">\right</span>)<span class="hljs-comment">% 需手动加上右括号</span><br>	<span class="hljs-keyword">\end</span>&#123;math&#125;来表示<br>	<br>	<span class="hljs-comment">% array环境(类似表格环境tabular)</span><br>	<span class="hljs-keyword">\[</span><br>	<span class="hljs-keyword">\begin</span>&#123;array&#125;&#123;r|r&#125;<br>		<span class="hljs-keyword">\frac</span> 12<span class="hljs-built_in">&amp;</span>0<span class="hljs-keyword">\\</span><br>		<span class="hljs-keyword">\hline</span><br>		0<span class="hljs-built_in">&amp;</span> -<span class="hljs-keyword">\frac</span> a&#123;bc&#125;<span class="hljs-keyword">\\</span><br>	<span class="hljs-keyword">\end</span>&#123;array&#125;<br>	<span class="hljs-keyword">\]</span><br>	<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br></code></pre></td></tr></table></figure>
+
+<p>多行公式处理如下：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;article&#125;<br><span class="hljs-keyword">\usepackage</span>&#123;ctex&#125;<br><span class="hljs-keyword">\usepackage</span>&#123;amsmath&#125;<br><span class="hljs-keyword">\usepackage</span>&#123;amssymb&#125;<br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br>	<span class="hljs-comment">% gather和gather*环境实现多行公式的排版(可以使用\\换行)</span><br>	<span class="hljs-comment">% 带编号</span><br>	<span class="hljs-keyword">\begin</span>&#123;gather&#125;<br>		a + b = b + a<span class="hljs-keyword">\\</span><br>		ab  ba<br>	<span class="hljs-keyword">\end</span>&#123;gather&#125;<br>	<br>	<span class="hljs-comment">% 不带编号</span><br>	<span class="hljs-keyword">\begin</span>&#123;gather*&#125;<br>		3+5 = 5+3 = 8<span class="hljs-keyword">\\</span><br>		3 <span class="hljs-keyword">\times</span> 5=5 <span class="hljs-keyword">\times</span> 3<br>	<span class="hljs-keyword">\end</span>&#123;gather*&#125;<br>	<br>	<span class="hljs-comment">% 在\\前使用\notag阻止编号</span><br>	<span class="hljs-keyword">\begin</span>&#123;gather&#125;<br>		3<span class="hljs-built_in">^</span>2 + 4<span class="hljs-built_in">^</span>2 = 5<span class="hljs-built_in">^</span>2 <span class="hljs-keyword">\notag</span> <span class="hljs-keyword">\\</span><br>		a<span class="hljs-built_in">^</span>2 + b<span class="hljs-built_in">^</span>2 = c<span class="hljs-built_in">^</span>2<br>	<span class="hljs-keyword">\end</span>&#123;gather&#125;<br>	<br>	<span class="hljs-comment">% align和align*环境使公式在指定位置对齐(用&amp;符号指定对齐位置)</span><br>	<span class="hljs-comment">% 带编号</span><br>	<span class="hljs-keyword">\begin</span>&#123;align&#125;<br>		x <span class="hljs-built_in">&amp;</span>=t+<span class="hljs-keyword">\cos</span> t+1<span class="hljs-keyword">\\</span> <span class="hljs-comment">%按等号对齐</span><br>		y <span class="hljs-built_in">&amp;</span>=2 <span class="hljs-keyword">\sin</span> t<br>	<span class="hljs-keyword">\end</span>&#123;align&#125;<br>	<span class="hljs-comment">% 不带编号</span><br>	<span class="hljs-keyword">\begin</span>&#123;align*&#125;<br>		x <span class="hljs-built_in">&amp;</span>= t <span class="hljs-built_in">&amp;</span> x <span class="hljs-built_in">&amp;</span>= <span class="hljs-keyword">\cos</span> t <span class="hljs-built_in">&amp;</span> x <span class="hljs-built_in">&amp;</span>= t <span class="hljs-keyword">\\</span><br>		y <span class="hljs-built_in">&amp;</span>= 2t <span class="hljs-built_in">&amp;</span> y <span class="hljs-built_in">&amp;</span>= <span class="hljs-keyword">\sin</span>(t+1) <span class="hljs-built_in">&amp;</span> y <span class="hljs-built_in">&amp;</span>= <span class="hljs-keyword">\sin</span> t<br>	<span class="hljs-keyword">\end</span>&#123;align*&#125;<br>	<br>	<span class="hljs-comment">% split环境(对齐采用align环境的方式，编号在中间)</span><br>	<span class="hljs-keyword">\begin</span>&#123;equation&#125;<br>		<span class="hljs-keyword">\begin</span>&#123;split&#125; <span class="hljs-comment">%实现一个公式的多行排版</span><br>			<span class="hljs-keyword">\cos</span> 2x <span class="hljs-built_in">&amp;</span>=<span class="hljs-keyword">\cos</span><span class="hljs-built_in">^</span>2 x- <span class="hljs-keyword">\sin</span><span class="hljs-built_in">^</span>2 x<span class="hljs-keyword">\\</span><br>			<span class="hljs-built_in">&amp;</span>=2<span class="hljs-keyword">\cos</span><span class="hljs-built_in">^</span>2 x-1<br>		<span class="hljs-keyword">\end</span>&#123;split&#125;<br>	<span class="hljs-keyword">\end</span>&#123;equation&#125;<br>	<br>	<span class="hljs-comment">% case环境（实现分段函数的排版）</span><br>	<span class="hljs-comment">% 每行公式中使用&amp;分隔为两部分</span><br>	<span class="hljs-comment">% 通常表示值和后面的条件</span><br>	<span class="hljs-comment">% \text&#123;&#125;在数学模式中处理中文或者临时切换为文本模式</span><br>	<span class="hljs-keyword">\begin</span>&#123;equation&#125;<br>		D(x)=<span class="hljs-keyword">\begin</span>&#123;cases&#125;<br>			1,<span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>&#123;如果&#125; x <span class="hljs-keyword">\in</span> <span class="hljs-keyword">\mathbb</span>&#123;Q&#125;;<span class="hljs-keyword">\\</span><br>			0,<span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>&#123;如果&#125; x <span class="hljs-keyword">\in</span> <span class="hljs-keyword">\mathbb</span>&#123;R&#125;<span class="hljs-keyword">\setminus</span><span class="hljs-keyword">\mathbb</span>&#123;Q&#125;<br>		<span class="hljs-keyword">\end</span>&#123;cases&#125;<br>	<span class="hljs-keyword">\end</span>&#123;equation&#125;<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br><br></code></pre></td></tr></table></figure>
+
+
+<h3 id="1-8-Latex中的参考文献"><a href="#1-8-Latex中的参考文献" class="headerlink" title="1.8. Latex中的参考文献"></a>1.8. Latex中的参考文献</h3><figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;article&#125;<br><span class="hljs-keyword">\usepackage</span>&#123;ctex&#125;<br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br>	<span class="hljs-comment">% 一次管理,一次使用</span><br>	<span class="hljs-comment">% 参考文献格式:</span><br>	<span class="hljs-comment">% \begin&#123;thebibliography&#125;&#123;编号样本&#125;</span><br>	<span class="hljs-comment">% 	\bibitem[记号]&#123;引用标志&#125;文献条目1</span><br>	<span class="hljs-comment">% 	\bibitem[记号]&#123;引用标志&#125;文献条目2</span><br>	<span class="hljs-comment">% 	……</span><br>	<span class="hljs-comment">% \end&#123;thebibliography &#125;</span><br>	<span class="hljs-comment">% 其中文献条目包括:作者，题目，出版社，年代，版本，页码等。</span><br>	<span class="hljs-comment">% 引用时候要可以采用:\cite&#123;引用标志1，引用标志2，...&#125;</span><br>	引用一篇文章<span class="hljs-keyword">\cite</span>&#123;article1&#125;,引用一本书<span class="hljs-keyword">\cite</span>&#123;book1&#125;<br>	<span class="hljs-keyword">\begin</span>&#123;thebibliography&#125;&#123;99&#125;<br>		<span class="hljs-keyword">\bibitem</span>&#123;article1&#125;陈立耀,苏伟,蔡川,陈晓云.<span class="hljs-keyword">\emph</span>&#123;基于LaTex的Web数堂公式提取方法研究&#125;[1]、让算机科学、2014(06)<br>		<span class="hljs-keyword">\bibitem</span>&#123;book1&#125;william H. Press,saul A.Teukolsky, william T. Metterling, Brian P. Elannery,<span class="hljs-keyword">\emph</span>&#123;Numerical Recipes 3rd Edition:The Art of Scientific Computing&#125;Cambridge University Press,New York,2007.<br>		<span class="hljs-keyword">\bibitem</span>&#123;latexGuide&#125; Kopka Helmut，w. Daly Patrick,<span class="hljs-keyword">\emph</span>&#123;Guide to <span class="hljs-keyword">\LaTeX</span>&#125;，<span class="hljs-built_in">$</span>4<span class="hljs-built_in">^</span>&#123;th&#125;<span class="hljs-built_in">$</span> Edition.Available at <span class="hljs-keyword">\texttt</span>&#123;http://www.amazon.com&#125;.<br>		<span class="hljs-keyword">\bibitem</span>&#123;latexMath&#125; Graetzer George，lemph&#123;Math Into <span class="hljs-keyword">\LaTeX</span>&#125;,BirkhAuser Boston; 3 edition (une 22，2000).<br>	<span class="hljs-keyword">\end</span>&#123;thebibliography&#125;<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="2-Beamer基础用法"><a href="#2-Beamer基础用法" class="headerlink" title="2. Beamer基础用法"></a>2. Beamer基础用法</h2><h3 id="2-1-如何用Beamer创建标签页"><a href="#2-1-如何用Beamer创建标签页" class="headerlink" title="2.1. 如何用Beamer创建标签页"></a>2.1. 如何用Beamer创建标签页</h3><p>Beamer是一个非常强大的Slides制作工具，那么我们该如何利用它来做出优美的Slides呢？</p>
+<p>首先我们需要声明这是一个Beamer演示文稿：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;beamer&#125;<br></code></pre></td></tr></table></figure>
+
+<p>之后在我们文档下边可以添加title, author, institute, date等信息：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;beamer&#125;<br><span class="hljs-keyword">\title</span>&#123;Example&#125;<br><span class="hljs-keyword">\author</span>&#123;Xyw&#125;<br><span class="hljs-keyword">\institute</span>&#123;BUPT&#125;<br><span class="hljs-keyword">\date</span>&#123;<span class="hljs-keyword">\today</span>&#125;<br><br></code></pre></td></tr></table></figure>
+<p><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E9%A6%96%E9%A1%B5.png" srcset="/img/loading.gif" lazyload alt="首页"></p>
+<p>在<code>\begin&#123;document&#125; ... \end&#123;document&#125;</code>中，可以存放所有的Slides内容。</p>
+<p>那么我们先放一个<code>\frame&#123;\titlepage&#125;</code>，这个命令会帮我们创建标签页。</p>
+<p>那么我们现在想做一个略微复杂一些的标签页：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;beamer&#125;<br><br><span class="hljs-keyword">\title</span>[Advanced] &#123;This is an advanced titlepage&#125;<br><span class="hljs-keyword">\subtitle</span>&#123;A beautiful slide&#125;<br><span class="hljs-keyword">\author</span>[Xyw, John, Tom] <span class="hljs-comment">%(optional, you can add more authors)</span><br>&#123;A.~B.~Xyw<span class="hljs-keyword">\inst</span>&#123;1&#125; <span class="hljs-keyword">\ </span>and J.John<span class="hljs-keyword">\inst</span>&#123;2&#125;&#125;<br><span class="hljs-keyword">\institute</span>[VFU] <span class="hljs-comment">%(optional)</span><br>&#123;<br>    <span class="hljs-keyword">\inst</span>&#123;1&#125; <span class="hljs-comment">%</span><br>    Computer and Technology <span class="hljs-keyword">\\</span><br>    Beijing University of Posts and Telecommunication<br>    <span class="hljs-keyword">\and</span> <br>    <span class="hljs-keyword">\inst</span>&#123;2&#125; <span class="hljs-comment">%</span><br>    Computer and Technology <span class="hljs-keyword">\\</span><br>    Very Famous University<br>&#125;<br><span class="hljs-keyword">\date</span>[VLC 2024] <span class="hljs-comment">% (optional)</span><br>&#123;<br>    Very Large Conference, <span class="hljs-keyword">\today</span><br>&#125;<br><span class="hljs-keyword">\logo</span>&#123;<span class="hljs-keyword">\includegraphics</span>[scale=0.1]&#123;figures/image.png&#125;&#125;<br><span class="hljs-keyword">\usetheme</span>&#123;Madrid&#125;<br><span class="hljs-keyword">\usecolortheme</span>&#123;beaver&#125; <span class="hljs-comment">%一个主题可以与一个颜色主题相结合，以改变不同元素使用的颜色</span><br><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br><span class="hljs-comment">%标题页</span><br><span class="hljs-keyword">\frame</span>&#123;<span class="hljs-keyword">\titlepage</span>&#125;<br><br><span class="hljs-keyword">\end</span>&#123;document&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>一个略微优雅的标签页就被我们设计好啦！<br><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E4%BC%98%E9%9B%85%E7%9A%84%E6%A0%87%E7%AD%BE%E9%A1%B5.png" srcset="/img/loading.gif" lazyload alt="优雅的标签页"></p>
+<h3 id="2-2-如何加入更多元素"><a href="#2-2-如何加入更多元素" class="headerlink" title="2.2. 如何加入更多元素"></a>2.2. 如何加入更多元素</h3><p>在Beamer中，最基础的元素是frame，一个frame可能包含多个页。完整的Beamer创建页如下：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;beamer&#125;<br><span class="hljs-keyword">\title</span>&#123;Example&#125;<br><span class="hljs-keyword">\author</span>&#123;Xyw&#125;<br><span class="hljs-keyword">\institute</span>&#123;BUPT&#125;<br><span class="hljs-keyword">\date</span>&#123;<span class="hljs-keyword">\today</span>&#125;<br><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br><br>    <span class="hljs-keyword">\frame</span>&#123;<span class="hljs-keyword">\titlepage</span>&#125;<br><br>    <span class="hljs-keyword">\begin</span>&#123;frame&#125;<br>    <span class="hljs-keyword">\frametitle</span>&#123;Sample frame title&#125;<br>    This is some text in the first frame. This is some text in the first frame. This is some text in the first frame.<br>    <span class="hljs-keyword">\end</span>&#123;frame&#125;<br><br><span class="hljs-keyword">\end</span>&#123;document&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Beamer类提供了许多工具来帮助我们创建漂亮的Slides。</p>
+<ul>
+<li>单行内容：<code>\frame&#123;xxx&#125;</code></li>
+<li>多行内容：<code>\begin&#123;frame&#125; xxx \end&#123;frame&#125;</code></li>
+</ul>
+<p>通过<code>\usetheme&#123;xxx&#125;</code>去指定所使用的主题，beamer内置了许多种不同的主题。</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;beamer&#125;<br><br><span class="hljs-keyword">\title</span>&#123;Sample title&#125;<br><span class="hljs-keyword">\author</span>&#123;Anonymous&#125;<br><span class="hljs-keyword">\institute</span>&#123;Overleaf&#125;<br><span class="hljs-keyword">\date</span>&#123;2021&#125;<br><br><span class="hljs-keyword">\usetheme</span>&#123;Madrid&#125;<br><span class="hljs-keyword">\usecolortheme</span>&#123;beaver&#125; <span class="hljs-comment">%一个主题可以与一个颜色主题相结合，以改变不同元素使用的颜色</span><br><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br><span class="hljs-comment">%标题页</span><br><span class="hljs-keyword">\frame</span>&#123;<span class="hljs-keyword">\titlepage</span>&#125;<br><br><span class="hljs-comment">%slide页面</span><br><span class="hljs-keyword">\begin</span>&#123;frame&#125;<br><span class="hljs-keyword">\frametitle</span>&#123;Sample frame title&#125;<br>This is some text in the first frame. This is some text in the first frame. This is some text in the first frame.<br><span class="hljs-keyword">\end</span>&#123;frame&#125;<br><br><span class="hljs-keyword">\end</span>&#123;document&#125;<br></code></pre></td></tr></table></figure>
+<p><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E6%94%B9%E5%8F%98%E9%A2%9C%E8%89%B2%E7%9A%84%E6%A0%87%E7%AD%BE%E9%A1%B5.png" srcset="/img/loading.gif" lazyload alt="改变颜色的标签页"></p>
+<h3 id="2-3-创建一个目录"><a href="#2-3-创建一个目录" class="headerlink" title="2.3. 创建一个目录"></a>2.3. 创建一个目录</h3><p>如果Slides有非常多，可以加入一个目录页来展示PPT章节：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\begin</span>&#123;frame&#125;<br><span class="hljs-keyword">\frametitle</span>&#123;Table of Contents&#125;<br><span class="hljs-keyword">\tableofcontents</span><br><span class="hljs-keyword">\end</span>&#123;frame&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们也可以在每一章前面加入一个目录，然后高亮当前的目录。具体来说，在文档的导言区加入以下命令：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\AtBeginSection</span>[]<br>&#123;<br>    <span class="hljs-keyword">\begin</span>&#123;frame&#125;<br>        <span class="hljs-keyword">\frametitle</span>&#123;Table of Contents&#125;<br>        <span class="hljs-keyword">\tableofcontents</span>[currentsection]<br>    <span class="hljs-keyword">\end</span>&#123;frame&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>上边的如果是<code>\AtBeginSubsection[]</code>，那么目录会出现在每一个子章节之前。</p>
+<h3 id="2-4-Beamer强调"><a href="#2-4-Beamer强调" class="headerlink" title="2.4. Beamer强调"></a>2.4. Beamer强调</h3><p>在PPT中我们可能会对某些内容进行强调，可以用一些框框来对它进行标注：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\documentclass</span>&#123;beamer&#125;<br><br><span class="hljs-keyword">\title</span>&#123;Sample title&#125;<br><span class="hljs-keyword">\author</span>&#123;Anonymous&#125;<br><span class="hljs-keyword">\institute</span>&#123;Overleaf&#125;<br><span class="hljs-keyword">\date</span>&#123;2021&#125;<br><br><span class="hljs-keyword">\usetheme</span>&#123;Madrid&#125;<br><span class="hljs-keyword">\usecolortheme</span>&#123;beaver&#125;<br><br><span class="hljs-keyword">\begin</span>&#123;document&#125;<br><span class="hljs-comment">%标题页</span><br><span class="hljs-keyword">\frame</span>&#123;<span class="hljs-keyword">\titlepage</span>&#125;<br><br><span class="hljs-comment">%slide页面</span><br><span class="hljs-keyword">\begin</span>&#123;frame&#125;<br><span class="hljs-keyword">\frametitle</span>&#123;Sample frame title&#125;<br>This is some text in the first frame. This is some text in the first frame. This is some text in the first frame.<br><span class="hljs-keyword">\end</span>&#123;frame&#125;<br><br><span class="hljs-comment">%slide页面2</span><br><span class="hljs-keyword">\begin</span>&#123;frame&#125;<br><span class="hljs-keyword">\frametitle</span>&#123;Sample frame title&#125;<br><br>In this slide, some important text will be<br><span class="hljs-keyword">\alert</span>&#123;highlighted&#125; because it&#x27;s important.<br>Please, don&#x27;t abuse it.<br><br><span class="hljs-keyword">\begin</span>&#123;block&#125;&#123;Remark&#125;<br>Sample text<br><span class="hljs-keyword">\end</span>&#123;block&#125;<br><br><span class="hljs-keyword">\begin</span>&#123;alertblock&#125;&#123;Important theorem&#125;<br>Sample text in red box<br><span class="hljs-keyword">\end</span>&#123;alertblock&#125;<br><br><span class="hljs-keyword">\begin</span>&#123;examples&#125;<br>Sample text in green box. The title of the block is ``Examples&quot;.<br><span class="hljs-keyword">\end</span>&#123;examples&#125;<br><span class="hljs-keyword">\end</span>&#123;frame&#125;<br><span class="hljs-keyword">\end</span>&#123;document&#125;<br></code></pre></td></tr></table></figure>
+<p><img src="/2024/08/24/1-6-Beamer%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/%E5%BC%BA%E8%B0%83%E6%A1%86.png" srcset="/img/loading.gif" lazyload alt="强调框"></p>
+<p>如果要强调一整段文字，例如概念、定义、定理等等，最好的方法是把他们放在一个文本框中。我们可以定义三种文本框：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs tex"><span class="hljs-keyword">\begin</span>&#123;block&#125;&#123;Remark&#125; <span class="hljs-keyword">\end</span>&#123;block&#125;<br><span class="hljs-keyword">\begin</span>&#123;alertblock&#125;&#123;Important theorem&#125; <span class="hljs-keyword">\end</span>&#123;alertblock&#125;<br><span class="hljs-keyword">\begin</span>&#123;examples&#125; <span class="hljs-keyword">\end</span>&#123;examples&#125;<br></code></pre></td></tr></table></figure>
+<p>感谢你能看到这里，在未来的学习中，我们会用一套模板来设计PPT，并将会放在下方。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%BE%8E%E5%8C%96%E7%B3%BB%E5%88%97/" class="category-chain-item">美化系列</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Beamer-Latex-Slides/" class="print-no-link">#Beamer Latex Slides</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>3_3-Beamer学习记录</div>
+      <div>http://example.com/2024/08/24/1-6-Beamer学习记录/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>杜子源</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/26/1-5-%E5%AD%98%E7%AE%97%E4%B8%80%E4%BD%93%E7%BB%8F%E5%85%B8%E6%96%87%E7%AB%A0%E7%B2%BE%E8%AF%BB/" title="存算一体经典文章精读">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">存算一体经典文章精读</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/21/1-4-RISC-V%E6%9D%AD%E5%B7%9E%E5%B3%B0%E4%BC%9A%E8%AE%B0%E5%BD%95/" title="RISC-V杭州峰会记录">
+                        <span class="hidden-mobile">RISC-V杭州峰会记录</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量
+        <span id="busuanzi_value_site_pv"></span>
+        次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访问量
+        <span id="busuanzi_value_site_uv"></span>
+        人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    
+      <script  src="/js/img-lazyload.js" ></script>
+    
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/scrollAnimation.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>

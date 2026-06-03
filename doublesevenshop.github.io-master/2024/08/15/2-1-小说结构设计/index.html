@@ -1,0 +1,742 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="杜子源">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="小说推理架构思路从7月份开始构思小说，已经构思了一个月，但是还是没有很好的思路，为了防止自己内耗，我决定把自己平时拆书的心得分享给大家！本篇讲的是小说故事线的推理架构以及拆书，如何从各大榜单上找到有用的信息点。 1. 开篇通用模板网文的开篇小说的通用模板如下：   切入事件（一下子能抓住读者眼球） 解释事件因果，目的是解释主角身份背景（拉仇恨、博同情、制造氛围），接下来即将面临什么危机 主角怎么想">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1-小说组织架构">
+<meta property="og:url" content="http://example.com/2024/08/15/2-1-%E5%B0%8F%E8%AF%B4%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="旺仔杂货铺">
+<meta property="og:description" content="小说推理架构思路从7月份开始构思小说，已经构思了一个月，但是还是没有很好的思路，为了防止自己内耗，我决定把自己平时拆书的心得分享给大家！本篇讲的是小说故事线的推理架构以及拆书，如何从各大榜单上找到有用的信息点。 1. 开篇通用模板网文的开篇小说的通用模板如下：   切入事件（一下子能抓住读者眼球） 解释事件因果，目的是解释主角身份背景（拉仇恨、博同情、制造氛围），接下来即将面临什么危机 主角怎么想">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/08/15/2-1-%E5%B0%8F%E8%AF%B4%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1/%E6%8B%89%E6%89%AF%E6%9C%9F%E5%BE%85%E6%84%9F.png">
+<meta property="article:published_time" content="2024-08-15T12:42:55.000Z">
+<meta property="article:modified_time" content="2024-08-17T14:19:03.266Z">
+<meta property="article:author" content="杜子源">
+<meta property="article:tag" content="小说推理思路">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/08/15/2-1-%E5%B0%8F%E8%AF%B4%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1/%E6%8B%89%E6%89%AF%E6%9C%9F%E5%BE%85%E6%84%9F.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>1-小说组织架构 - 旺仔杂货铺</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/scrollAnimation.css">
+<link rel="stylesheet" href="/css/mk.css">
+<link rel="stylesheet" href="/css/selection.css">
+<link rel="stylesheet" href="/css/round.css">
+<link rel="stylesheet" href="/css/cloudeGlass.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":true,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>旺仔杂货铺</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/004.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="1-小说组织架构"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-15 20:42" pubdate>
+          2024年8月15日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">1-小说组织架构</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="小说推理架构思路"><a href="#小说推理架构思路" class="headerlink" title="小说推理架构思路"></a>小说推理架构思路</h1><p>从7月份开始构思小说，已经构思了一个月，但是还是没有很好的思路，为了防止自己内耗，我决定把自己平时拆书的心得分享给大家！本篇讲的是小说故事线的推理架构以及拆书，如何从各大榜单上找到有用的信息点。</p>
+<h2 id="1-开篇通用模板"><a href="#1-开篇通用模板" class="headerlink" title="1. 开篇通用模板"></a>1. 开篇通用模板</h2><p>网文的开篇小说的通用模板如下：</p>
+<blockquote>
+<ol>
+<li>切入事件（一下子能抓住读者眼球）</li>
+<li>解释事件因果，目的是解释主角身份背景（拉仇恨、博同情、制造氛围），接下来即将面临什么危机</li>
+<li>主角怎么想的，有什么策略（暗示主角与众不同，从而为主角获得金手指理所当然）</li>
+<li>主角不得不去做某一件事情，但是主角一筹莫展或者面临巨大的挑战</li>
+<li>主角获得金手指，问题变得可以解决（向读者暗示主角接下来可以实现脱困或者装逼打脸）</li>
+<li>反派登场施压，主角被打脸或者陷入危机，暗示金手指即将发挥作用</li>
+</ol>
+</blockquote>
+<p>需要注意的是，在开头切入事件的过程中，不要过多的铺设定，而是用配角或者环境来描述出来，而不是用上帝视角直接写出来。</p>
+<p>在断章的过程中，一般来说把故事的高潮刚展开就结束，这样就会有一个很好的钩子的效果。</p>
+<h2 id="2-如何把平淡的日常写的很有趣味性？"><a href="#2-如何把平淡的日常写的很有趣味性？" class="headerlink" title="2. 如何把平淡的日常写的很有趣味性？"></a>2. 如何把平淡的日常写的很有趣味性？</h2><p>在小说中，总是会遇到一些工具章节作为铺垫，那我们该怎么办呢？</p>
+<p>其实就是把故事尽量不要和盘托出，而是慢慢的来展开，给读者一点猜疑，但是又不是完全猜得到，让读者有一种优越感，或者是在文章中加一些小小的冲突（一句话就好）。</p>
+<p>如果说信息差是拉起期待感最简单的方法，那么设计误会就是拉起读者期待感最惯用的套路。</p>
+<p>如何实现让误会解除呢？——情绪价值</p>
+<p>给读者提供极大的情绪价值，明显让读者得到误会解除的满足感，吃瓜感。甚至在产生误会之前就要有一种产生不确定的情绪，之后再铺垫被误会，最终最终解除误会。</p>
+<p>例如：一方付出了代价，但是被另一方误会，并且做出了伤害或者忽视对方的行为。</p>
+<ol>
+<li>升级矛盾。</li>
+<li>情感共鸣</li>
+<li>给于希望（工具人给出解决问题的办法）</li>
+<li>希望受阻（由于主观&#x2F;客观原因无法达成希望）</li>
+</ol>
+<p>以上是如何让读者产生强烈的期待感，那么如何把这份情绪再最终落地呢？</p>
+<p>可以告诉读者某一件事情很难完成，但是又提供一种暗示，那么当未来这个事情发生的时候，读者就会有一种预料之感，但是又会觉得理所当然。</p>
+<p>例如：</p>
+<blockquote>
+<p>小红是一个高冷校花，张三是一个舔狗。（矛盾）<br>张三付出了很多，校花都没有理会。（升级矛盾）<br>张三好不容易修好了校花的自行车，但是校花却以为张三偷偷摸摸给她自行车搞破坏（情感共鸣）<br>张三没来得及开口解释，被李四拉走办别的事情，校花回家路上听到闺蜜说是张三修好的（给于希望）<br>校花太傲娇，还是不想对张三说一声谢谢（希望受阻，人设原因）<br>张三受伤，校花恰巧看到，关心张三（误会解除，但是又没完全解除）</p>
+</blockquote>
+<p>以上是我临时想出来的一个故事，虽然写的不是很好，但是基本能够写出了对于情绪的拉扯。</p>
+<p>我们可以套用这种<code>误会</code>的方式，来让读者产生一种期待感。</p>
+<p><img src="/2024/08/15/2-1-%E5%B0%8F%E8%AF%B4%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1/%E6%8B%89%E6%89%AF%E6%9C%9F%E5%BE%85%E6%84%9F.png" srcset="/img/loading.gif" lazyload alt="拉扯期待感"></p>
+<p>这个图是B站一个很有名的UP主拆解的一篇小说，我们可以看到作者对于情绪的拉扯甚至不只有一次，而是交错复杂，这样子很能够让读者的心一蹦一蹦的。</p>
+<h2 id="3-如何设计出一个故事"><a href="#3-如何设计出一个故事" class="headerlink" title="3. 如何设计出一个故事"></a>3. 如何设计出一个故事</h2><p>当我们扫完榜之后，我们自然的会想到构建出一个属于我们自己的故事，但我们要不就是写的和之前看的极为雷同，要不就是写出来的故事平平无奇，那如何创建一个属于我们自己的故事呢？</p>
+<p>今天我们主要分享两个思路，来解决新人构建大纲的难题。（后续我也会在网站上持续更新，当然，我也是新人，一本书都没写出来的那种）</p>
+<h3 id="1-没经验，怎么写？"><a href="#1-没经验，怎么写？" class="headerlink" title="1. 没经验，怎么写？"></a>1. 没经验，怎么写？</h3><p>很多视频上来就说，本视频针对有第一本完本经验的作者，那些技巧对他们来说当然好，但是我们这种一本书都没写过的该怎么办？</p>
+<p>对于大部分新人来说，连1万字都写不出来才是常态。</p>
+<p>那我们如何从零构建一个大纲呢？</p>
+<ol>
+<li><p>【计划-意外】主角实施计划，遭遇意外。</p>
+<blockquote>
+<p>主角有一个目标A，开始实施计划1，并且取得了一定的成果，但是意外1计划失败，主角有了新的目标B，实施计划2：先去B，人物开始成长(小高潮)，此时意外2发生，主角找到最终路径，计划3，大结局。</p>
+</blockquote>
+</li>
+<li><p>【大高潮逆推法】先把最高潮的部分想出来，最爽的一幕，所有的人物都会参与进去。</p>
+<blockquote>
+<p>开始解构矛盾与冲突，其中的逻辑关系。开始逆推情节到小高潮，小高潮没办法解决核心冲突，并且最好是引出下一幕的矛盾，在当前是次要矛盾，下一幕就变成主要矛盾。一直逆推到最初主角和敌人的冲突场景。（需要存稿3-6万字）</p>
+</blockquote>
+</li>
+<li><p>上边两个方法，先用2再用1，一般来说效果会更好一些。</p>
+</li>
+</ol>
+<p>要有心理预期，一开始写的和我最终写的差距很大。</p>
+<h2 id="附录I-参考文献"><a href="#附录I-参考文献" class="headerlink" title="附录I 参考文献"></a>附录I 参考文献</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1kK4y1e7fM/?spm_id_from=333.999.0.0&vd_source=98101c1de7471be746ee7086e136f38f">B站UP主宝剑侍从视频：网文新人构建剧情难？给你两条思路和诀窍</a></li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%B0%8F%E8%AF%B4%E6%8A%80%E5%B7%A7/" class="category-chain-item">小说技巧</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%B0%8F%E8%AF%B4%E6%8E%A8%E7%90%86%E6%80%9D%E8%B7%AF/" class="print-no-link">#小说推理思路</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>1-小说组织架构</div>
+      <div>http://example.com/2024/08/15/2-1-小说结构设计/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>杜子源</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月15日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/15/1-1-%E7%94%A8Chisel%E8%AE%BE%E8%AE%A1CPU%E5%90%84%E6%A8%A1%E5%9D%97/" title="1-用Chisel设计CPU各模块">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">1-用Chisel设计CPU各模块</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量
+        <span id="busuanzi_value_site_pv"></span>
+        次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访问量
+        <span id="busuanzi_value_site_uv"></span>
+        人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    
+      <script  src="/js/img-lazyload.js" ></script>
+    
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/scrollAnimation.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
