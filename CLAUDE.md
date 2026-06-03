@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-YMLL Blog — a Chinese-language personal tech/design blog built as a fully static site. Deployed to GitHub Pages at `https://yanmengli123.github.io/ymllblog`. Inspired by Hexo Matery theme with dlog.com.cn layout patterns. Features a comprehensive personalization system (8 color themes, 8 background modes, custom CSS, etc.) accessible via a side settings panel.
+YMLL Blog — a Chinese-language personal tech/design blog built as a fully static site. Deployed to GitHub Pages at `https://yanmengli123.github.io/ymllblog`. Inspired by Hexo Matery theme and dlog.com.cn layout patterns. Features a comprehensive personalization system (8 color themes, 8 background modes, 5 banner modes, custom CSS, etc.) accessible via a right-side settings panel.
 
 ## Tech Stack
 
 - **Framework:** Astro 4.x (static output mode)
-- **Styling:** Tailwind CSS 3.4 via `@astrojs/tailwind` + custom CSS variables (`global.css`)
+- **Styling:** Tailwind CSS 3.4 via `@astrojs/tailwind` + custom CSS variables in `src/styles/global.css`
 - **Interactivity:** React 18 + Framer Motion 11 (only `AnimatedPostCard.tsx`)
 - **Animations:** AOS (Animate On Scroll), CSS keyframes, IntersectionObserver, canvas particles
 - **Math Rendering:** KaTeX via `remark-math` + `rehype-katex`
@@ -53,33 +53,47 @@ Never hardcode `/blog` — 404s on GitHub Pages.
 ### Islands Architecture
 Only `AnimatedPostCard.tsx` ships JS via `client:load`. Everything else is static `.astro`. The site intentionally has minimal client-side hydration.
 
-### Personalization System (custom, recently added)
-User preferences persist in `localStorage` under key `ymll_user_settings` via `src/lib/theme.ts`. Exposed APIs:
+### CSS Architecture (CRITICAL — read before touching styles)
+- `src/styles/global.css` **MUST be imported** in `src/layouts/Layout.astro` at the top of the frontmatter: `import '../styles/global.css';`. Without this, the file is never bundled.
+- The Layout.astro body class uses `theme-bg-gradient` (default) — see `applyBackground()` in `theme.ts`.
+- **Custom background/utility classes use the `theme-` prefix** to avoid conflict with Tailwind utilities (e.g. `theme-bg-gradient` not `bg-gradient`). Tailwind purges any class that matches its own utility naming convention.
+- All background mode classes (`.theme-bg-gradient`, `.theme-bg-aurora`, etc.) live **outside** `@layer` in `global.css` to prevent Tailwind purge.
+- Inline `<style is:global>` blocks in `.astro` files get component-scoped IDs and Tailwind still purges them. Prefer `global.css` for app-wide styles.
 
-- **`applyAllSettings(settings)`** — single entry point
-- **`COLOR_THEMES`** — 8 presets (purple, green, blue, pink, orange, cyan, red, yellow)
-- **`BACKGROUND_MODES`** — 8 modes (gradient, aurora, particles, waves, mesh, stars, image, solid)
-- **`BANNER_MODES`** — 5 modes (parallax, fullscreen, minimal, wave, particles)
-- **`POST_LAYOUTS`** — 4 layouts (list, grid, card, masonry)
-- `applyColorTheme`, `applyThemeMode`, `applyFont`, `applyBackground`, `applyBanner` — granular
+### Personalization System (in `src/lib/theme.ts`)
+User preferences persist in `localStorage`:
+- `ymll_user_settings` — main settings object (JSON)
+- `ymll_settings_version` — version string; mismatch wipes settings (currently `2.0.0`)
 
-To add a new theme/background: extend the corresponding constant in `lib/theme.ts` and add a matching class in `global.css` (e.g. `.bg-myname { ... }`). The body class drives the visual.
+**Constants exported from `theme.ts`:**
+- `COLOR_THEMES` — 8 presets (purple, green, blue, pink, orange, cyan, red, yellow)
+- `BACKGROUND_MODES` — 8 modes (gradient, aurora, particles, waves, mesh, stars, image, solid)
+- `BANNER_MODES` — 5 modes (parallax, fullscreen, minimal, wave, particles)
+- `POST_LAYOUTS` — 4 layouts (list, grid, card, masonry)
+- `DEFAULT_SETTINGS` — sane defaults used when localStorage is empty
+
+**API functions:** `loadSettings`, `saveSettings`, `resetSettings`, `applyAllSettings`, `applyColorTheme`, `applyThemeMode`, `applyFont`, `applyBackground`, `applyBanner`. All work client-side; `loadSettings` includes a version-check that clears stale settings on upgrade.
+
+To add a new background mode: extend `BACKGROUND_MODES` in `theme.ts` AND add a matching `.theme-bg-myname` class in `global.css` (outside `@layer`). The body class drives the visual via `applyBackground()`.
 
 ### Default Visual Identity
-- **Background:** Blue-purple gradient (`#6366f1 → #8b5cf6 → #a78bfa`)
+- **Body class:** `theme-bg-gradient` (linear-gradient `#6366f1 → #8b5cf6 → #a78bfa`)
 - **Color theme:** Blue (hue 240, saturation 60%, lightness 55%)
 - **Layout:** Glass-morphism content board overlapping full-screen parallax hero
 - **Hero:** Background image with strong indigo/purple gradient overlay for text contrast
 - **Wave fill:** `#f5f3ff` (light lavender, matches gradient theme)
+- **Body min-height:** `100vh` so gradient always fills viewport
 
 ### Floating Widgets (positioned to avoid overlap)
 | Widget | Position | z-index | Default visibility |
 |--------|----------|---------|-------------------|
 | `SettingsPanel.astro` | Right side, slide-out | 999 | Hidden, hover/click to open |
 | `MusicPlayer.astro` | Bottom-right | 998 | Visible (after first paint) |
-| `Announcement.astro` | Bottom-left | 997 | Hidden, auto-shown 5s after load |
-| `FloatingAvatar.astro` | Bottom-right (compact) | 996 | Hidden by default |
-| `ParticlesBg.astro` | Full-screen canvas | -1 | Off by default |
+| `Announcement.astro` | Bottom-left (floating variant) | 997 | Hidden, auto-shown 5s after load |
+| `FloatingAvatar.astro` | Bottom-right (compact) | 996 | Visible by default |
+| `ParticlesBg.astro` | Full-screen canvas | -1 | Off unless `theme-bg-particles` or `theme-bg-aurora` active |
+
+`Announcement.astro` accepts a `variant` prop: `'floating'` (default, fixed position) or `'sidebar'` (used inside a parent container).
 
 ### Helper Functions (`src/lib/`)
 - `posts.ts` — Content collection queries
@@ -93,12 +107,13 @@ To add a new theme/background: extend the corresponding constant in `lib/theme.t
 | `astro.config.mjs` | Site URL, base path, KaTeX, Shiki theme (github-dark) |
 | `tailwind.config.mjs` | Design tokens, custom colors (primary, accent, matery) |
 | `src/content.config.ts` | Blog collection schema |
-| `src/styles/global.css` | CSS variables, glass-morphism, animations, bg modes, wave, note-box |
-| `src/layouts/Layout.astro` | Base HTML, SEO, AOS init, page loader, click effects, console easter egg, scroll progress, mouse follower, auto dark mode, reading time |
+| `src/styles/global.css` | CSS variables, glass-morphism, animations, **theme-bg-*** modes, wave, note-box |
+| `src/layouts/Layout.astro` | Base HTML, imports `global.css`, SEO, AOS init, page loader, click effects, console easter egg, scroll progress, mouse follower, auto dark mode, reading time |
 | `src/layouts/PostLayout.astro` | Post page with TOC, reading progress, related posts |
 | `src/components/HeroSection.astro` | Full-screen parallax hero with dark indigo/purple overlay |
 | `src/components/Header.astro` | Fixed navbar, transparent→solid on scroll, color changes on scroll |
-| `src/components/SettingsPanel.astro` | Side panel with all personalization controls (8 themes, 8 backgrounds, 5 banners, 4 layouts, 4 fonts, custom CSS/avatar/greeting) |
+| `src/components/SettingsPanel.astro` | Side panel with all personalization controls |
+| `src/components/ParticlesBg.astro` | Dynamic particle canvas (auto-starts/stops based on body class) |
 | `.github/workflows/deploy.yml` | GitHub Pages deploy on push to main |
 
 ## Design System
@@ -119,5 +134,7 @@ To add a new theme/background: extend the corresponding constant in `lib/theme.t
 3. **`doublesevenshop.github.io-master/`** in repo is a reference copy of dlog.com.cn source — do not modify, used as design inspiration
 4. **localStorage settings** apply client-side only — first paint always shows defaults until JS hydrates
 5. **Hero background image** is `/image/006.jpg` — must exist in `public/image/`
-6. **Wave fill color** (`#f5f3ff` in `global.css`) must contrast with whatever `bg-XXX` mode is active
+6. **Settings version migration:** Changing `VERSION` in `theme.ts` wipes all user settings on next load. Use this to force a defaults refresh after breaking changes.
 7. **Setting panel buttons** use inline `style="border-color: ..."` for active state — overrides Tailwind classes; reset with `borderColor = 'transparent'` in `updateActiveButton()`
+8. **CSS class naming:** Never use `bg-X`, `text-X`, `font-X` for custom utility classes — they collide with Tailwind. Prefix with `theme-` or another unique namespace.
+9. **`global.css` must be imported** in `Layout.astro` frontmatter or none of its rules ship to the build
