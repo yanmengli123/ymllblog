@@ -4,7 +4,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 <section class="hero-banner" parallax="true" id="hero-banner">
   <!-- 背景图片 -->
-  <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('/image/006.jpg');"></div>
+  <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style={`background-image: url('${base}/image/006.jpg');`}></div>
 
   <!-- 渐变遮罩 - 蓝紫色调，深色确保文字可读 -->
   <div class="mask" style="background: linear-gradient(135deg, rgba(67, 56, 202, 0.85) 0%, rgba(124, 58, 237, 0.85) 50%, rgba(91, 33, 182, 0.85) 100%);"></div>

@@ -25,6 +25,7 @@ export interface UserSettings {
   showParticles: boolean;
   showMusicPlayer: boolean;
   showAnnouncement: boolean;
+  showAvatar: boolean;
   postLayout: PostLayout;
   fontFamily: FontFamily;
   fontSize: 'sm' | 'base' | 'lg';
@@ -50,6 +51,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   showParticles: false,
   showMusicPlayer: true,
   showAnnouncement: true,
+  showAvatar: true,
   postLayout: 'grid',
   fontFamily: 'sans',
   fontSize: 'base',
@@ -272,6 +274,8 @@ export function applyAllSettings(settings: UserSettings) {
   toggleElement('#hero-banner', settings.showHero);
   toggleElement('#music-player', settings.showMusicPlayer);
   toggleElement('#announcement', settings.showAnnouncement);
+  toggleElement('#profile-card', settings.showAvatar);
+  toggleElement('#floating-avatar', settings.showAvatar);
 
   // 动画
   if (!settings.animationsEnabled) {

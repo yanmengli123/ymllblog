@@ -228,6 +228,86 @@
     padding: 1.5rem;
   }
 
+  .home-sidebar-layout {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 1rem;
+  }
+
+  .home-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .sidebar-widget {
+    border-radius: 0.875rem;
+    box-shadow: 0 12px 26px rgba(50, 50, 93, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .sidebar-widget-title {
+    color: var(--title-color);
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .sidebar-widget-title::before {
+    background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
+    border-radius: 999px;
+    content: '';
+    display: inline-block;
+    height: 1.1rem;
+    width: 0.25rem;
+  }
+
+  @media (min-width: 1024px) {
+    .home-sidebar-layout {
+      grid-template-columns: 270px minmax(0, 1fr);
+      padding: 1.25rem;
+    }
+
+    .home-sidebar-right {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .home-sidebar-layout {
+      grid-template-columns: 280px minmax(0, 1fr) 300px;
+      padding: 1.5rem;
+    }
+
+    .home-sidebar-left,
+    .home-sidebar-right {
+      position: sticky;
+      top: 5.5rem;
+      align-self: start;
+      max-height: calc(100vh - 6.5rem);
+      overflow-y: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .home-sidebar-right {
+      grid-column: auto;
+      display: flex;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .home-sidebar-layout {
+      grid-template-columns: 300px minmax(0, 1fr) 320px;
+      gap: 1.75rem;
+    }
+  }
+
   /* ========== macOS 代码块 (dlog.com.cn 紫色主题) ========== */
   pre {
     position: relative;

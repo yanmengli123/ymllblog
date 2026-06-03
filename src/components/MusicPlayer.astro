@@ -1,5 +1,11 @@
 ---
 // 音乐播放器组件
+interface Props {
+  variant?: 'floating' | 'sidebar';
+}
+
+const { variant = 'floating' } = Astro.props;
+const isSidebar = variant === 'sidebar';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 // 默认歌单
@@ -25,7 +31,18 @@ const playlist = [
 ];
 ---
 
-<div id="music-player" class="fixed bottom-20 right-4 z-[998] w-80 max-w-[calc(100vw-2rem)] rounded-2xl shadow-2xl overflow-hidden" style="display: none; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(0, 0, 0, 0.1);">
+<div
+  id="music-player"
+  data-widget-variant={variant}
+  class:list={[
+    'overflow-hidden',
+    isSidebar
+      ? 'sidebar-glass sidebar-widget w-full'
+      : 'fixed bottom-20 right-4 z-[998] w-80 max-w-[calc(100vw-2rem)] rounded-2xl shadow-2xl'
+  ]}
+  style={`${isSidebar ? '' : 'display: none;'} background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(0, 0, 0, 0.1);`}
+>
+  {isSidebar && <div class="sidebar-widget-title px-3 pt-3">音乐</div>}
   <div class="p-3">
     <!-- 顶部：歌曲信息 -->
     <div class="flex items-center gap-2 mb-2">

@@ -7,12 +7,29 @@ import {
   DEFAULT_SETTINGS,
   type UserSettings,
 } from '../lib/theme';
+
+interface Props {
+  variant?: 'floating' | 'sidebar';
+}
+
+const { variant = 'floating' } = Astro.props;
+const isSidebar = variant === 'sidebar';
 ---
 
-<div id="settings-panel" class="fixed right-0 top-1/2 -translate-y-1/2 z-[999] transition-transform duration-300 translate-x-[calc(100%-3rem)] hover:translate-x-0">
+<div
+  id="settings-panel"
+  data-widget-variant={variant}
+  class:list={[
+    isSidebar
+      ? 'sidebar-glass sidebar-widget relative z-10 overflow-hidden'
+      : 'fixed right-0 top-1/2 -translate-y-1/2 z-[999] transition-transform duration-300 translate-x-[calc(100%-3rem)] hover:translate-x-0'
+  ]}
+>
   <div class="relative">
     <!-- 触发按钮 -->
-    <button id="settings-trigger" class="absolute -left-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-l-2xl shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform"
+    <button id="settings-trigger" class:list={[
+              isSidebar ? 'hidden' : 'absolute -left-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-l-2xl shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform'
+            ]}
             style="background: linear-gradient(135deg, #4f46e5, #06b6d4);">
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -21,8 +38,15 @@ import {
     </button>
 
     <!-- 面板内容 -->
-    <div class="w-80 max-w-[calc(100vw-2rem)] rounded-l-2xl shadow-2xl overflow-hidden" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); max-height: 90vh; border: 1px solid rgba(0, 0, 0, 0.1); border-right: 0;">
-      <div class="p-6 space-y-5 overflow-y-auto" style="max-height: 90vh; color: #333;">
+    <div
+      class:list={[
+        isSidebar
+          ? 'w-full overflow-hidden'
+          : 'w-80 max-w-[calc(100vw-2rem)] rounded-l-2xl shadow-2xl overflow-hidden'
+      ]}
+      style={`background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); ${isSidebar ? 'border: 0;' : 'max-height: 90vh; border: 1px solid rgba(0, 0, 0, 0.1); border-right: 0;'}`}
+    >
+      <div class="space-y-5 overflow-y-auto" style={`${isSidebar ? 'max-height: 74vh; padding: 0.25rem;' : 'max-height: 90vh; padding: 1.5rem;'} color: #333;`}>
 
         <!-- 标题 -->
         <div class="flex items-center gap-2 pb-2 border-b border-stone-200">
@@ -452,8 +476,10 @@ import {
     avatarEl?.addEventListener('change', (e) => {
       const checked = (e.target as HTMLInputElement).checked;
       settings = saveSettings({ showAvatar: checked });
-      const avatar = document.getElementById('floating-avatar');
-      if (avatar) avatar.style.display = checked ? '' : 'none';
+      ['floating-avatar', 'profile-card'].forEach(id => {
+        const avatar = document.getElementById(id);
+        if (avatar) avatar.style.display = checked ? '' : 'none';
+      });
     });
 
     // 布局

@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const totalPosts = posts.length;
+const totalWords = posts.reduce((sum, post) => sum + (post.body?.length || 0), 0);
+const totalReadingMinutes = Math.ceil(totalWords / 400);
+const categories = new Set(posts.map(post => post.data.category || '未分类'));
+const tags = new Set(posts.flatMap(post => post.data.tags));
+const latestPost = [...posts].sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())[0];
+const latestDays = latestPost
+  ? Math.max(0, Math.floor((Date.now() - latestPost.data.pubDate.getTime()) / (1000 * 60 * 60 * 24)))
+  : 0;
+const launchDate = new Date('2024-01-01T00:00:00+08:00');
+const runningDays = Math.max(0, Math.floor((Date.now() - launchDate.getTime()) / (1000 * 60 * 60 * 24)));
+
+const stats = [
+  { label: '文章', value: totalPosts },
+  { label: '分类', value: categories.size },
+  { label: '标签', value: tags.size },
+  { label: '总字数', value: totalWords.toLocaleString('zh-CN') },
+  { label: '阅读', value: `${totalReadingMinutes} 分` },
+  { label: '运行', value: `${runningDays} 天` },
+];
+---
+
+<section id="site-stats-card" class="sidebar-glass sidebar-widget">
+  <div class="sidebar-widget-title">站点统计</div>
+  <div class="grid grid-cols-2 gap-3">
+    {stats.map(stat => (
+      <div class="rounded-xl bg-white/70 p-3 text-center shadow-sm">
+        <div class="text-lg font-bold text-stone-900">{stat.value}</div>
+        <div class="mt-1 text-xs text-stone-500">{stat.label}</div>
+      </div>
+    ))}
+  </div>
+  <div class="mt-4 rounded-xl bg-gradient-to-r from-indigo-50 to-cyan-50 px-3 py-2 text-xs text-stone-600">
+    最后活动：{latestDays === 0 ? '今天' : `${latestDays} 天前`}
+  </div>
+  <div class="mt-3 hidden text-xs text-stone-500" id="busuanzi-stats">
+    总访问量 <span id="busuanzi_value_site_pv">--</span> · 访客 <span id="busuanzi_value_site_uv">--</span>
+  </div>
+</section>

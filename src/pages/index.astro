@@ -6,11 +6,12 @@ import Footer from '../components/Footer.astro';
 import HeroSection from '../components/HeroSection.astro';
 import FeaturedPosts from '../components/FeaturedPosts.astro';
 import TagsSection from '../components/TagsSection.astro';
-import StatsChart from '../components/StatsChart.astro';
 import SettingsPanel from '../components/SettingsPanel.astro';
 import MusicPlayer from '../components/MusicPlayer.astro';
 import Announcement from '../components/Announcement.astro';
-import FloatingAvatar from '../components/FloatingAvatar.astro';
+import ProfileCard from '../components/ProfileCard.astro';
+import SiteStatsCard from '../components/SiteStatsCard.astro';
+import PostCalendarCard from '../components/PostCalendarCard.astro';
 import ParticlesBg from '../components/ParticlesBg.astro';
 
 // 获取精选文章
@@ -42,6 +43,8 @@ const tags = Array.from(tagMap.entries())
   .map(([name, count]) => ({ name, count }))
   .sort((a, b) => b.count - a.count)
   .slice(0, 8);
+
+const HomeSidebarLayout = 'home-sidebar-layout';
 ---
 
 <Layout title="YMLL Blog - 首页" description="探索技术与设计的交汇点，记录成长与思考">
@@ -56,29 +59,30 @@ const tags = Array.from(tagMap.entries())
 
     {/* 毛玻璃内容面板 - dlog.com.cn 风格 */}
     <div class="relative z-10" style="margin-top: -2rem;">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div id="board" class="glass-board p-6 sm:p-8 lg:p-10">
-          <FeaturedPosts posts={formattedPosts} title="精选文章" />
-          <TagsSection tags={tags} />
-          <StatsChart />
+      <div class="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+        <div id="board" class={`glass-board ${HomeSidebarLayout}`}>
+          <aside id="home-left-sidebar" class="home-sidebar home-sidebar-left" aria-label="左侧信息栏">
+            <ProfileCard />
+            <Announcement variant="sidebar" />
+            <MusicPlayer variant="sidebar" />
+          </aside>
+
+          <main id="home-feed" class="min-w-0">
+            <FeaturedPosts posts={formattedPosts} title="精选文章" />
+            <TagsSection tags={tags} />
+          </main>
+
+          <aside id="home-right-sidebar" class="home-sidebar home-sidebar-right" aria-label="右侧工具栏">
+            <SettingsPanel variant="sidebar" />
+            <SiteStatsCard />
+            <PostCalendarCard />
+          </aside>
         </div>
       </div>
     </div>
   </main>
 
   <Footer />
-
-  {/* 个性化设置面板 */}
-  <SettingsPanel />
-
-  {/* 浮动头像 */}
-  <FloatingAvatar />
-
-  {/* 音乐播放器 */}
-  <MusicPlayer />
-
-  {/* 公告 */}
-  <Announcement />
 
   {/* 滚动动画脚本 */}
   <script>
