@@ -25,13 +25,13 @@ const { posts, title = '最新文章' } = Astro.props;
   {/* Section header */}
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h2 class="text-2xl md:text-3xl font-bold mb-2" style="color: var(--title-color);">{title}</h2>
-      <p style="color: var(--text-secondary);">探索技术与设计的最新见解</p>
+      <h2 class="text-2xl md:text-3xl font-bold mb-2" style="color: #4338ca;">{title}</h2>
+      <p class="text-stone-500">探索技术与设计的最新见解</p>
     </div>
     <a
       href={`${base}/blog`}
       class="hidden sm:flex items-center gap-2 font-medium transition-colors group"
-      style="color: var(--primary);"
+      style="color: #4f46e5;"
     >
       查看全部
       <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

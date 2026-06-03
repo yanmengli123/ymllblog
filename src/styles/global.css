@@ -201,7 +201,7 @@
   }
 
   .wave-fill {
-    fill: var(--bg-base);
+    fill: #f5f3ff;
   }
 
   /* ========== 设置面板 ========== */
@@ -325,6 +325,22 @@
   .note-primary { border-color: var(--primary); background: var(--purple-light-1); }
 
   /* ========== 动态背景模式 ========== */
+  /* 蓝紫渐变 - 默认背景 */
+  .bg-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+    background-attachment: fixed;
+    position: relative;
+  }
+  .bg-gradient::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.4), transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.4), transparent 50%);
+  }
+
   .bg-aurora {
     background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 30%, #16213e 70%, #0f3460 100%);
     position: relative;

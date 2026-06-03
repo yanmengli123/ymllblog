@@ -138,20 +138,21 @@ const tags = Array.from(tagMap.entries())
     (function() {
       try {
         const settings = JSON.parse(localStorage.getItem('ymll_user_settings') || 'null');
-        if (settings) {
-          // 应用背景模式
-          const body = document.body;
-          body.classList.remove('bg-aurora', 'bg-gradient', 'bg-waves', 'bg-mesh', 'bg-stars', 'bg-image', 'bg-solid', 'bg-particles');
-          if (settings.backgroundMode) {
-            body.classList.add('bg-' + settings.backgroundMode);
-          }
+        const body = document.body;
+        // 始终先清除所有背景类
+        body.classList.remove('bg-aurora', 'bg-gradient', 'bg-waves', 'bg-mesh', 'bg-stars', 'bg-image', 'bg-solid', 'bg-particles');
+        if (settings && settings.backgroundMode) {
+          body.classList.add('bg-' + settings.backgroundMode);
           if (settings.backgroundMode === 'image' && settings.customBackground) {
             body.style.setProperty('--custom-bg-image', `url('${settings.customBackground}')`);
           }
+        } else {
+          // 默认使用蓝紫渐变
+          body.classList.add('bg-gradient');
         }
       } catch (e) {
-        // 默认使用极光
-        document.body.classList.add('bg-aurora');
+        // 默认使用蓝紫渐变
+        document.body.classList.add('bg-gradient');
       }
     })();
   </script>

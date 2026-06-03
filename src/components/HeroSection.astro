@@ -6,30 +6,30 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   <!-- 背景图片 -->
   <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('/image/006.jpg');"></div>
 
-  <!-- 半透明遮罩 -->
-  <div class="mask"></div>
+  <!-- 渐变遮罩 - 蓝紫色调，深色确保文字可读 -->
+  <div class="mask" style="background: linear-gradient(135deg, rgba(67, 56, 202, 0.85) 0%, rgba(124, 58, 237, 0.85) 50%, rgba(91, 33, 182, 0.85) 100%);"></div>
 
   <!-- Hero 内容 -->
   <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
     <!-- 主标题 -->
-    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4" style="text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4" style="text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">
       都是风景，幸会！
     </h1>
 
     <!-- 副标题 - 打字效果 -->
     <div class="h2">
-      <span id="subtitle" class="text-xl sm:text-2xl md:text-3xl text-white/80" data-typed-text="吾生也有涯，而知也无涯"></span>
+      <span id="subtitle" class="text-xl sm:text-2xl md:text-3xl text-white/90" data-typed-text="吾生也有涯，而知也无涯"></span>
     </div>
 
     <!-- 装饰线 -->
     <div class="flex items-center justify-center gap-4 pt-6">
-      <div class="h-px w-16 bg-gradient-to-r from-transparent to-white/40"></div>
-      <div class="w-2 h-2 rounded-full bg-white/60 animate-float"></div>
-      <div class="h-px w-16 bg-gradient-to-l from-transparent to-white/40"></div>
+      <div class="h-px w-16 bg-gradient-to-r from-transparent to-white/60"></div>
+      <div class="w-2 h-2 rounded-full bg-white/80 animate-float"></div>
+      <div class="h-px w-16 bg-gradient-to-l from-transparent to-white/60"></div>
     </div>
 
     <!-- 简介 -->
-    <p class="text-base sm:text-lg text-white/70 max-w-2xl mx-auto pt-6 leading-relaxed">
+    <p class="text-base sm:text-lg text-white/80 max-w-2xl mx-auto pt-6 leading-relaxed">
       探索技术与设计的交汇点，记录成长与思考
     </p>
 
@@ -37,15 +37,15 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
       <a
         href={`${base}/blog`}
-        class="group relative px-8 py-4 bg-white text-stone-900 font-semibold rounded-full shadow-2xl hover:shadow-3xl transition-all hover:-translate-y-1 overflow-hidden"
+        class="group relative px-8 py-4 bg-white text-indigo-600 font-semibold rounded-full shadow-2xl hover:shadow-3xl transition-all hover:-translate-y-1 overflow-hidden"
       >
         <span class="relative z-10">探索文章</span>
-        <div class="absolute inset-0 bg-gradient-to-r from-purple-500 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
         <span class="absolute inset-0 z-10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity font-semibold">探索文章</span>
       </a>
       <a
         href={`${base}/about`}
-        class="px-8 py-4 bg-white/10 backdrop-blur-md text-white font-semibold rounded-full border-2 border-white/30 hover:bg-white/20 transition-all hover:-translate-y-1"
+        class="px-8 py-4 bg-white/10 backdrop-blur-md text-white font-semibold rounded-full border-2 border-white/40 hover:bg-white/20 transition-all hover:-translate-y-1"
       >
         了解更多
       </a>
@@ -62,7 +62,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
   <!-- 滚动指示器 -->
   <div class="scroll-down-bar">
-    <i class="iconfont icon-arrowdown"></i>
+    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: rgba(255,255,255,0.8);">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+    </svg>
   </div>
 </section>
 

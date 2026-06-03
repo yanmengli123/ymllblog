@@ -25,63 +25,63 @@ const playlist = [
 ];
 ---
 
-<div id="music-player" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[998] w-[420px] max-w-[calc(100vw-2rem)] glass-board rounded-2xl shadow-2xl overflow-hidden" style="display: none;">
-  <div class="p-4">
+<div id="music-player" class="fixed bottom-20 right-4 z-[998] w-80 max-w-[calc(100vw-2rem)] rounded-2xl shadow-2xl overflow-hidden" style="display: none; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(0, 0, 0, 0.1);">
+  <div class="p-3">
     <!-- 顶部：歌曲信息 -->
-    <div class="flex items-center gap-3 mb-3">
+    <div class="flex items-center gap-2 mb-2">
       <div class="relative shrink-0">
-        <img id="music-cover" src={playlist[0].cover} alt="cover" class="w-14 h-14 rounded-lg object-cover shadow-md" />
+        <img id="music-cover" src={playlist[0].cover} alt="cover" class="w-10 h-10 rounded-lg object-cover shadow-md" />
         <div id="music-spinning" class="absolute inset-0 rounded-lg border-2 border-white/30"></div>
       </div>
       <div class="flex-1 min-w-0">
-        <div id="music-title" class="font-semibold text-sm truncate" style="color: var(--text-primary);">{playlist[0].title}</div>
-        <div id="music-artist" class="text-xs truncate" style="color: var(--text-secondary);">{playlist[0].artist}</div>
+        <div id="music-title" class="font-semibold text-xs truncate text-stone-800">{playlist[0].title}</div>
+        <div id="music-artist" class="text-[10px] truncate text-stone-500">{playlist[0].artist}</div>
       </div>
-      <button id="music-toggle-player" class="p-2 rounded-lg hover:bg-stone-200/50 dark:hover:bg-stone-700/50 transition-colors" aria-label="关闭播放器" style="color: var(--text-secondary);">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <button id="music-toggle-player" class="p-1 rounded hover:bg-stone-100 transition-colors text-stone-400 hover:text-stone-600" aria-label="关闭播放器">
+        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
 
     <!-- 进度条 -->
-    <div class="mb-3">
-      <div id="music-progress-bar" class="h-1 bg-stone-200/50 dark:bg-stone-700/50 rounded-full cursor-pointer relative">
-        <div id="music-progress" class="h-full rounded-full transition-all" style="width: 0%; background: linear-gradient(to right, var(--primary), var(--primary-light));"></div>
+    <div class="mb-2">
+      <div id="music-progress-bar" class="h-1 bg-stone-200 rounded-full cursor-pointer relative">
+        <div id="music-progress" class="h-full rounded-full transition-all" style="width: 0%; background: linear-gradient(to right, #4f46e5, #06b6d4);"></div>
       </div>
-      <div class="flex justify-between text-[10px] mt-1" style="color: var(--text-secondary);">
+      <div class="flex justify-between text-[9px] mt-0.5 text-stone-500">
         <span id="music-current-time">0:00</span>
         <span id="music-duration">0:00</span>
       </div>
     </div>
 
     <!-- 控制按钮 -->
-    <div class="flex items-center justify-center gap-4">
-      <button id="music-mode" class="p-2 rounded-lg hover:bg-stone-200/50 dark:hover:bg-stone-700/50 transition-colors" aria-label="播放模式" style="color: var(--text-secondary);" title="循环播放">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="flex items-center justify-center gap-2">
+      <button id="music-mode" class="p-1.5 rounded hover:bg-stone-100 transition-colors text-stone-500" aria-label="播放模式" title="循环播放">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
       </button>
-      <button id="music-prev" class="p-2 rounded-lg hover:bg-stone-200/50 dark:hover:bg-stone-700/50 transition-colors" aria-label="上一首" style="color: var(--text-primary);">
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <button id="music-prev" class="p-1.5 rounded hover:bg-stone-100 transition-colors text-stone-700" aria-label="上一首">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
           <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
         </svg>
       </button>
-      <button id="music-play" class="w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-105 transition-transform" style="background: linear-gradient(135deg, var(--primary), var(--primary-light));" aria-label="播放">
-        <svg id="play-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+      <button id="music-play" class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-105 transition-transform" style="background: linear-gradient(135deg, #4f46e5, #06b6d4);" aria-label="播放">
+        <svg id="play-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
           <path d="M8 5v14l11-7z"/>
         </svg>
-        <svg id="pause-icon" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 24 24">
+        <svg id="pause-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
           <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
         </svg>
       </button>
-      <button id="music-next" class="p-2 rounded-lg hover:bg-stone-200/50 dark:hover:bg-stone-700/50 transition-colors" aria-label="下一首" style="color: var(--text-primary);">
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <button id="music-next" class="p-1.5 rounded hover:bg-stone-100 transition-colors text-stone-700" aria-label="下一首">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
           <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
         </svg>
       </button>
-      <button id="music-volume" class="p-2 rounded-lg hover:bg-stone-200/50 dark:hover:bg-stone-700/50 transition-colors" aria-label="音量" style="color: var(--text-secondary);">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+      <button id="music-volume" class="p-1.5 rounded hover:bg-stone-100 transition-colors text-stone-500" aria-label="音量">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
           <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
         </svg>
       </button>
@@ -89,7 +89,7 @@ const playlist = [
 
     <!-- 音量条 -->
     <div id="music-volume-bar" class="hidden mt-2">
-      <input type="range" id="music-volume-slider" min="0" max="100" value="70" class="w-full h-1 rounded-full appearance-none cursor-pointer" style="background: linear-gradient(to right, var(--primary), var(--primary-light));" />
+      <input type="range" id="music-volume-slider" min="0" max="100" value="70" class="w-full h-1 rounded-full appearance-none cursor-pointer" style="background: linear-gradient(to right, #4f46e5, #06b6d4);" />
     </div>
   </div>
 </div>

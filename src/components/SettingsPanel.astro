@@ -13,7 +13,7 @@ import {
   <div class="relative">
     <!-- 触发按钮 -->
     <button id="settings-trigger" class="absolute -left-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-l-2xl shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform"
-            style="background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));">
+            style="background: linear-gradient(135deg, #4f46e5, #06b6d4);">
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -21,28 +21,28 @@ import {
     </button>
 
     <!-- 面板内容 -->
-    <div class="glass-board w-80 rounded-l-2xl shadow-2xl overflow-hidden" style="max-height: 90vh;">
-      <div class="p-6 space-y-5 overflow-y-auto" style="max-height: 90vh;">
+    <div class="w-80 max-w-[calc(100vw-2rem)] rounded-l-2xl shadow-2xl overflow-hidden" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); max-height: 90vh; border: 1px solid rgba(0, 0, 0, 0.1); border-right: 0;">
+      <div class="p-6 space-y-5 overflow-y-auto" style="max-height: 90vh; color: #333;">
 
         <!-- 标题 -->
-        <div class="flex items-center gap-2 pb-2 border-b border-stone-200/50">
+        <div class="flex items-center gap-2 pb-2 border-b border-stone-200">
           <span class="text-xl">⚙️</span>
-          <h3 class="text-lg font-bold" style="color: var(--text-primary);">个性化设置</h3>
+          <h3 class="text-lg font-bold text-stone-800">个性化设置</h3>
         </div>
 
         <!-- 主题模式 -->
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+          <label class="block text-sm font-semibold mb-2 text-stone-700">
             🌓 主题模式
           </label>
           <div class="grid grid-cols-3 gap-2">
-            <button data-theme-mode="light" class="theme-mode-btn px-3 py-2 rounded-lg text-xs transition-all" style="background: rgba(255,255,255,0.5); color: #333;">
+            <button data-theme-mode="light" class="theme-mode-btn px-3 py-2 rounded-lg text-xs transition-all bg-white text-stone-700 border border-stone-200">
               ☀️ 浅色
             </button>
-            <button data-theme-mode="dark" class="theme-mode-btn px-3 py-2 rounded-lg text-xs transition-all" style="background: rgba(0,0,0,0.7); color: white;">
+            <button data-theme-mode="dark" class="theme-mode-btn px-3 py-2 rounded-lg text-xs transition-all bg-stone-800 text-white border border-stone-700">
               🌙 暗黑
             </button>
-            <button data-theme-mode="auto" class="theme-mode-btn px-3 py-2 rounded-lg text-xs transition-all" style="background: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(0,0,0,0.7)); color: white;">
+            <button data-theme-mode="auto" class="theme-mode-btn px-3 py-2 rounded-lg text-xs transition-all bg-gradient-to-r from-white to-stone-800 text-stone-700 border border-stone-300">
               ⚙️ 跟随
             </button>
           </div>
@@ -50,7 +50,7 @@ import {
 
         <!-- 主题色 -->
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+          <label class="block text-sm font-semibold mb-2 text-stone-700">
             🎨 主题色
           </label>
           <div class="grid grid-cols-4 gap-2">
@@ -70,8 +70,8 @@ import {
           <!-- 自定义色相 -->
           <div class="mt-3">
             <div class="flex items-center justify-between mb-1">
-              <span class="text-xs" style="color: var(--text-secondary);">色相</span>
-              <span id="hue-value" class="text-xs" style="color: var(--text-secondary);">262°</span>
+              <span class="text-xs text-stone-600">色相</span>
+              <span id="hue-value" class="text-xs text-stone-600">262°</span>
             </div>
             <input
               type="range"
@@ -87,46 +87,43 @@ import {
 
         <!-- 动态背景 -->
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+          <label class="block text-sm font-semibold mb-2 text-stone-700">
             🌌 动态背景
           </label>
           <div class="grid grid-cols-2 gap-2">
             {Object.values(BACKGROUND_MODES).map(bg => (
               <button
                 data-bg-mode={bg.name}
-                class="bg-mode-btn px-2 py-2 rounded-lg text-xs transition-all text-left"
-                style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent;"
+                class="bg-mode-btn px-2 py-2 rounded-lg text-xs transition-all text-left bg-stone-50 text-stone-700 border-2 border-transparent hover:bg-stone-100"
               >
                 {bg.label}
-                <span class="block text-[10px] mt-0.5" style="color: var(--text-secondary);">{bg.description}</span>
+                <span class="block text-[10px] mt-0.5 text-stone-500">{bg.description}</span>
               </button>
             ))}
           </div>
 
           <!-- 自定义背景图 -->
           <div class="mt-3">
-            <label class="text-xs block mb-1" style="color: var(--text-secondary);">自定义背景图 URL</label>
+            <label class="text-xs block mb-1 text-stone-600">自定义背景图 URL</label>
             <input
               type="url"
               id="custom-bg-url"
               placeholder="https://example.com/bg.jpg"
-              class="w-full px-3 py-2 rounded-lg text-xs outline-none"
-              style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border-color);"
+              class="w-full px-3 py-2 rounded-lg text-xs outline-none bg-stone-50 text-stone-800 border border-stone-200"
             />
           </div>
         </div>
 
         <!-- 横幅模式 -->
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+          <label class="block text-sm font-semibold mb-2 text-stone-700">
             🖼️ 横幅模式
           </label>
           <div class="grid grid-cols-2 gap-2">
             {Object.values(BANNER_MODES).map(mode => (
               <button
                 data-banner-mode={mode.name}
-                class="banner-mode-btn px-2 py-2 rounded-lg text-xs transition-all"
-                style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent;"
+                class="banner-mode-btn px-2 py-2 rounded-lg text-xs transition-all bg-stone-50 text-stone-700 border-2 border-transparent hover:bg-stone-100"
               >
                 {mode.label}
               </button>
@@ -136,56 +133,55 @@ import {
 
         <!-- 组件开关 -->
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+          <label class="block text-sm font-semibold mb-2 text-stone-700">
             🧩 组件开关
           </label>
           <div class="space-y-2">
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
-              <span class="text-xs" style="color: var(--text-primary);">首页横幅标题</span>
-              <input type="checkbox" id="show-hero" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100">
+              <span class="text-xs text-stone-700">首页横幅标题</span>
+              <input type="checkbox" id="show-hero" checked class="w-4 h-4 rounded accent-indigo-500" />
             </label>
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
-              <span class="text-xs" style="color: var(--text-primary);">水波纹动画</span>
-              <input type="checkbox" id="show-wave" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100">
+              <span class="text-xs text-stone-700">水波纹动画</span>
+              <input type="checkbox" id="show-wave" checked class="w-4 h-4 rounded accent-indigo-500" />
             </label>
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
-              <span class="text-xs" style="color: var(--text-primary);">毛玻璃内容区</span>
-              <input type="checkbox" id="show-glass" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100">
+              <span class="text-xs text-stone-700">毛玻璃内容区</span>
+              <input type="checkbox" id="show-glass" checked class="w-4 h-4 rounded accent-indigo-500" />
             </label>
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
-              <span class="text-xs" style="color: var(--text-primary);">音乐播放器</span>
-              <input type="checkbox" id="show-music" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100">
+              <span class="text-xs text-stone-700">音乐播放器</span>
+              <input type="checkbox" id="show-music" checked class="w-4 h-4 rounded accent-indigo-500" />
             </label>
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
-              <span class="text-xs" style="color: var(--text-primary);">公告弹窗</span>
-              <input type="checkbox" id="show-announcement" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100">
+              <span class="text-xs text-stone-700">公告弹窗</span>
+              <input type="checkbox" id="show-announcement" checked class="w-4 h-4 rounded accent-indigo-500" />
             </label>
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
-              <span class="text-xs" style="color: var(--text-primary);">浮动头像</span>
-              <input type="checkbox" id="show-avatar" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100">
+              <span class="text-xs text-stone-700">浮动头像</span>
+              <input type="checkbox" id="show-avatar" checked class="w-4 h-4 rounded accent-indigo-500" />
             </label>
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
-              <span class="text-xs" style="color: var(--text-primary);">粒子背景</span>
-              <input type="checkbox" id="show-particles" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100">
+              <span class="text-xs text-stone-700">粒子背景</span>
+              <input type="checkbox" id="show-particles" checked class="w-4 h-4 rounded accent-indigo-500" />
             </label>
-            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-200/30 dark:hover:bg-stone-700/30">
-              <span class="text-xs" style="color: var(--text-primary);">页面动画</span>
-              <input type="checkbox" id="animations-enabled" checked class="w-4 h-4 rounded" style="accent-color: var(--primary);" />
+            <label class="flex items-center justify-between cursor-pointer p-2 rounded-lg hover:bg-stone-100">
+              <span class="text-xs text-stone-700">页面动画</span>
+              <input type="checkbox" id="animations-enabled" checked class="w-4 h-4 rounded accent-indigo-500" />
             </label>
           </div>
         </div>
 
         <!-- 文章布局 -->
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+          <label class="block text-sm font-semibold mb-2 text-stone-700">
             📰 文章布局
           </label>
           <div class="grid grid-cols-2 gap-2">
             {Object.values(POST_LAYOUTS).map(layout => (
               <button
                 data-layout={layout.name}
-                class="layout-btn px-2 py-2 rounded-lg text-xs transition-all"
-                style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent;"
+                class="layout-btn px-2 py-2 rounded-lg text-xs transition-all bg-stone-50 text-stone-700 border-2 border-transparent hover:bg-stone-100"
               >
                 {layout.icon} {layout.label}
               </button>
@@ -195,26 +191,26 @@ import {
 
         <!-- 字体 -->
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+          <label class="block text-sm font-semibold mb-2 text-stone-700">
             🔤 字体
           </label>
           <div class="grid grid-cols-2 gap-2">
-            <button data-font="sans" class="font-btn px-2 py-2 rounded-lg text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent;">无衬线</button>
-            <button data-font="serif" class="font-btn px-2 py-2 rounded-lg text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent; font-family: serif;">衬线体</button>
-            <button data-font="mono" class="font-btn px-2 py-2 rounded-lg text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent; font-family: monospace;">等宽体</button>
-            <button data-font="rounded" class="font-btn px-2 py-2 rounded-lg text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 2px solid transparent;">圆润体</button>
+            <button data-font="sans" class="font-btn px-2 py-2 rounded-lg text-xs bg-stone-50 text-stone-700 border-2 border-transparent hover:bg-stone-100">无衬线</button>
+            <button data-font="serif" class="font-btn px-2 py-2 rounded-lg text-xs bg-stone-50 text-stone-700 border-2 border-transparent hover:bg-stone-100" style="font-family: serif;">衬线体</button>
+            <button data-font="mono" class="font-btn px-2 py-2 rounded-lg text-xs bg-stone-50 text-stone-700 border-2 border-transparent hover:bg-stone-100" style="font-family: monospace;">等宽体</button>
+            <button data-font="rounded" class="font-btn px-2 py-2 rounded-lg text-xs bg-stone-50 text-stone-700 border-2 border-transparent hover:bg-stone-100">圆润体</button>
           </div>
 
           <div class="mt-2 flex gap-2">
-            <button data-fsize="sm" class="fsize-btn px-3 py-1 rounded text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid transparent;">小</button>
-            <button data-fsize="base" class="fsize-btn px-3 py-1 rounded text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid transparent;">中</button>
-            <button data-fsize="lg" class="fsize-btn px-3 py-1 rounded text-xs" style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid transparent;">大</button>
+            <button data-fsize="sm" class="fsize-btn px-3 py-1 rounded text-xs bg-stone-50 text-stone-700 border border-stone-200">小</button>
+            <button data-fsize="base" class="fsize-btn px-3 py-1 rounded text-xs bg-stone-50 text-stone-700 border border-stone-200">中</button>
+            <button data-fsize="lg" class="fsize-btn px-3 py-1 rounded text-xs bg-stone-50 text-stone-700 border border-stone-200">大</button>
           </div>
         </div>
 
         <!-- 自定义内容 -->
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+          <label class="block text-sm font-semibold mb-2 text-stone-700">
             ✏️ 自定义内容
           </label>
           <div class="space-y-2">
@@ -222,49 +218,45 @@ import {
               type="text"
               id="custom-greeting"
               placeholder="问候语（默认：都是风景，幸会！）"
-              class="w-full px-3 py-2 rounded-lg text-xs outline-none"
-              style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border-color);"
+              class="w-full px-3 py-2 rounded-lg text-xs outline-none bg-stone-50 text-stone-800 border border-stone-200"
             />
             <input
               type="text"
               id="custom-announcement"
               placeholder="公告内容"
-              class="w-full px-3 py-2 rounded-lg text-xs outline-none"
-              style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border-color);"
+              class="w-full px-3 py-2 rounded-lg text-xs outline-none bg-stone-50 text-stone-800 border border-stone-200"
             />
             <input
               type="url"
               id="custom-avatar"
               placeholder="自定义头像 URL"
-              class="w-full px-3 py-2 rounded-lg text-xs outline-none"
-              style="background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border-color);"
+              class="w-full px-3 py-2 rounded-lg text-xs outline-none bg-stone-50 text-stone-800 border border-stone-200"
             />
           </div>
         </div>
 
         <!-- 自定义 CSS -->
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+          <label class="block text-sm font-semibold mb-2 text-stone-700">
             🎨 自定义 CSS
           </label>
           <textarea
             id="custom-css"
             placeholder="/* 在此输入自定义 CSS */&#10;.my-class { color: red; }"
             rows="3"
-            class="w-full px-3 py-2 rounded-lg text-xs outline-none font-mono"
-            style="background: rgba(0,0,0,0.3); color: #cdd6f4; border: 1px solid var(--border-color); resize: vertical;"
+            class="w-full px-3 py-2 rounded-lg text-xs outline-none font-mono bg-stone-900 text-green-300 border border-stone-700 resize-y"
           ></textarea>
         </div>
 
         <!-- 操作按钮 -->
-        <div class="pt-4 border-t border-stone-200/30 space-y-2">
-          <button id="export-settings" class="w-full py-2 px-4 rounded-lg text-xs transition-colors" style="background: hsl(var(--primary-hue), 40%, 95%); color: var(--primary);">
+        <div class="pt-4 border-t border-stone-200 space-y-2">
+          <button id="export-settings" class="w-full py-2 px-4 rounded-lg text-xs transition-colors bg-indigo-50 text-indigo-600 hover:bg-indigo-100">
             📤 导出设置
           </button>
-          <button id="import-settings" class="w-full py-2 px-4 rounded-lg text-xs transition-colors" style="background: hsl(var(--primary-hue), 40%, 95%); color: var(--primary);">
+          <button id="import-settings" class="w-full py-2 px-4 rounded-lg text-xs transition-colors bg-indigo-50 text-indigo-600 hover:bg-indigo-100">
             📥 导入设置
           </button>
-          <button id="reset-settings" class="w-full py-2 px-4 rounded-lg text-xs transition-colors" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+          <button id="reset-settings" class="w-full py-2 px-4 rounded-lg text-xs transition-colors bg-red-50 text-red-500 hover:bg-red-100">
             🔄 重置默认设置
           </button>
         </div>
@@ -347,11 +339,11 @@ import {
       buttons.forEach((btn: Element) => {
         const htmlBtn = btn as HTMLElement;
         if (htmlBtn.getAttribute(attr) === value) {
-          htmlBtn.style.borderColor = 'var(--primary)';
-          htmlBtn.style.background = 'hsl(var(--primary-hue), 40%, 95%)';
+          htmlBtn.style.borderColor = '#4f46e5';
+          htmlBtn.style.background = '#eef2ff';
         } else {
           htmlBtn.style.borderColor = 'transparent';
-          htmlBtn.style.background = 'rgba(255,255,255,0.05)';
+          htmlBtn.style.background = '#fafaf9';
         }
       });
     }
