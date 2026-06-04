@@ -212,14 +212,32 @@ const searchIndex = posts
         })
       : searchIndex.slice(0, 6);
 
-    searchResults.innerHTML = results.length
-      ? results.slice(0, 8).map((post) => `
-          <a href="${post.url}" class="block rounded-xl border border-stone-100 p-3 transition-colors hover:bg-stone-50 dark:border-stone-800 dark:hover:bg-stone-800">
-            <span class="block text-sm font-semibold text-stone-800 dark:text-stone-100">${post.title}</span>
-            <span class="mt-1 block line-clamp-2 text-xs text-stone-500">${post.description || '暂无摘要'}</span>
-          </a>
-        `).join('')
-      : '<div class="rounded-xl bg-stone-50 p-4 text-sm text-stone-500 dark:bg-stone-800">没有找到匹配内容</div>';
+    searchResults.replaceChildren();
+
+    if (results.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'rounded-xl bg-stone-50 p-4 text-sm text-stone-500 dark:bg-stone-800';
+      empty.textContent = '没有找到匹配内容';
+      searchResults.appendChild(empty);
+      return;
+    }
+
+    results.slice(0, 8).forEach((post) => {
+      const link = document.createElement('a');
+      link.href = post.url;
+      link.className = 'block rounded-xl border border-stone-100 p-3 transition-colors hover:bg-stone-50 dark:border-stone-800 dark:hover:bg-stone-800';
+
+      const title = document.createElement('span');
+      title.className = 'block text-sm font-semibold text-stone-800 dark:text-stone-100';
+      title.textContent = post.title;
+
+      const description = document.createElement('span');
+      description.className = 'mt-1 block line-clamp-2 text-xs text-stone-500';
+      description.textContent = post.description || '暂无摘要';
+
+      link.append(title, description);
+      searchResults.appendChild(link);
+    });
   }
 
   searchBtn?.addEventListener('click', openSearch);

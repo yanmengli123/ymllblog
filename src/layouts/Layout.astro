@@ -15,7 +15,7 @@ interface Props {
 
 const {
   title = 'YMLL Blog',
-  description = '探索技术与设计的交汇点，记录成长与思考',
+  description = '探索技术、设计与生活的个人博客',
   image,
   type = 'website',
   publishedTime,
@@ -27,8 +27,6 @@ const {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImage = image ? getImageURL(image) : getPageURL('/favicon.svg');
 const siteURL = getPageURL('');
-
-// 生成 JSON-LD
 const jsonLD = generateJSONLD({
   title,
   description,
@@ -50,7 +48,6 @@ const jsonLD = generateJSONLD({
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
 
-    {/* Open Graph */}
     <meta property="og:type" content={type} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
@@ -58,539 +55,272 @@ const jsonLD = generateJSONLD({
     <meta property="og:image" content={ogImage} />
     <meta property="og:site_name" content="YMLL Blog" />
     <meta property="og:locale" content="zh_CN" />
+    {type === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
+    {type === 'article' && updatedTime && <meta property="article:modified_time" content={updatedTime.toISOString()} />}
+    {type === 'article' && author && <meta property="article:author" content={author} />}
+    {type === 'article' && tags && tags.map((tag) => <meta property="article:tag" content={tag} />)}
 
-    {type === 'article' && publishedTime && (
-      <meta property="article:published_time" content={publishedTime.toISOString()} />
-    )}
-    {type === 'article' && updatedTime && (
-      <meta property="article:modified_time" content={updatedTime.toISOString()} />
-    )}
-    {type === 'article' && author && (
-      <meta property="article:author" content={author} />
-    )}
-    {type === 'article' && tags && tags.map(tag => (
-      <meta property="article:tag" content={tag} />
-    ))}
-
-    {/* Twitter */}
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalURL} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={ogImage} />
 
-    {/* Canonical URL */}
     <link rel="canonical" href={canonicalURL} />
-
-    {/* RSS Feed */}
     <link rel="alternate" type="application/rss+xml" title="YMLL Blog RSS" href={`${siteURL}rss.xml`} />
-
-    {/* Favicon */}
     <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
-
-    {/* Title */}
-    <title>{title}</title>
-
-    {/* Preload fonts */}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-    {/* KaTeX Math Rendering */}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
-
-    {/* AOS - Animate On Scroll */}
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
-
-    {/* JSON-LD */}
     <script type="application/ld+json" set:html={JSON.stringify(jsonLD)} />
+    <title>{title}</title>
   </head>
   <body class="text-stone-900 font-sans antialiased theme-bg-gradient" style="color: #333;">
-    {/* 页面加载动画 - dlog.com.cn 紫色风格 */}
-    <div id="page-loader" class="fixed inset-0 z-[9999] bg-white flex items-center justify-center transition-all duration-500">
+    <div id="page-loader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-all duration-500">
       <div class="text-center">
-        {/* Logo */}
-        <div class="w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center shadow-lg animate-pulse"
-             style="background: linear-gradient(135deg, #8163bd, #0f9d58);">
-          <span class="text-white font-bold text-2xl">Y</span>
+        <div class="mx-auto mb-6 flex h-16 w-16 animate-pulse items-center justify-center rounded-2xl shadow-lg" style="background: linear-gradient(135deg, #8163bd, #0f9d58);">
+          <span class="text-2xl font-bold text-white">Y</span>
         </div>
-        {/* 进度条 */}
-        <div class="w-48 h-1.5 bg-stone-200 rounded-full overflow-hidden mb-4">
+        <div class="mb-4 h-1.5 w-48 overflow-hidden rounded-full bg-stone-200">
           <div id="loader-progress" class="h-full rounded-full transition-all duration-300" style="width: 0%; background: linear-gradient(to right, #8163bd, #0f9d58);"></div>
         </div>
-        {/* 提示文字 */}
-        <p class="text-sm text-stone-500">正在加载精彩内容...</p>
+        <p class="text-sm text-stone-500">正在加载内容...</p>
       </div>
     </div>
 
-    {/* 背景装饰 - 仅在非自定义背景时显示，避免遮挡 body 背景 */}
-    <div id="bg-decoration" class="fixed inset-0 -z-10 pointer-events-none" style="background-color: transparent;">
-    </div>
-
-    {/* 鼠标点击特效画布 */}
     <canvas id="click-effect-canvas" class="fixed inset-0 pointer-events-none z-[9998]"></canvas>
-
     <slot />
 
-    {/* AOS Script */}
-    <script is:inline src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script is:inline>
-      document.addEventListener('DOMContentLoaded', function() {
-        AOS.init({
-          easing: 'ease-in-out-sine',
-          duration: 700,
-          delay: 100,
-          once: true
-        });
-      });
-    </script>
-
-    {/* ========== Matery 高级功能 ========== */}
     <script is:inline>
     (function() {
       'use strict';
 
-      // ============ 1. 页面加载动画 ============
       var loader = document.getElementById('page-loader');
       var progress = document.getElementById('loader-progress');
       var loadPercent = 0;
-
-      function updateLoader() {
-        loadPercent += Math.random() * 15 + 5;
-        if (loadPercent > 90) loadPercent = 90;
+      var loaderInterval = setInterval(function() {
+        loadPercent = Math.min(90, loadPercent + 12);
         if (progress) progress.style.width = loadPercent + '%';
-      }
-
-      var loaderInterval = setInterval(updateLoader, 200);
+      }, 180);
 
       window.addEventListener('load', function() {
         clearInterval(loaderInterval);
         if (progress) progress.style.width = '100%';
         setTimeout(function() {
-          if (loader) {
-            loader.style.opacity = '0';
-            loader.style.visibility = 'hidden';
-            setTimeout(function() { loader.style.display = 'none'; }, 500);
-          }
-        }, 300);
+          if (!loader) return;
+          loader.style.opacity = '0';
+          loader.style.visibility = 'hidden';
+          setTimeout(function() {
+            loader.style.display = 'none';
+          }, 400);
+        }, 250);
       });
 
-      // ============ 2. 动态标签栏 ============
-      var OriginTitle = document.title;
+      var originalTitle = document.title;
       var titleTimer;
-
       document.addEventListener('visibilitychange', function() {
+        clearTimeout(titleTimer);
         if (document.hidden) {
-          document.title = 'Σ(っ °Д °;)っ 喔哟，崩溃啦！';
-          clearTimeout(titleTimer);
+          document.title = 'YMLL Blog 等你回来';
         } else {
-          document.title = 'φ(゜▽゜*)♪ 咦，又好了！';
+          document.title = '欢迎回来';
           titleTimer = setTimeout(function() {
-            document.title = OriginTitle;
-          }, 3000);
+            document.title = originalTitle;
+          }, 1800);
         }
       });
 
-      // ============ 3. 鼠标点击特效（烟花） ============
-      var canvas = document.getElementById('click-effect-canvas');
-      if (canvas) {
+      function initTheme() {
+        var savedTheme = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark.matches)) {
+          document.documentElement.classList.add('dark');
+        }
+        prefersDark.addEventListener('change', function(event) {
+          if (!localStorage.getItem('theme')) {
+            document.documentElement.classList.toggle('dark', event.matches);
+          }
+        });
+      }
+
+      function initClickEffect() {
+        var canvas = document.getElementById('click-effect-canvas');
+        if (!canvas) return;
         var ctx = canvas.getContext('2d');
+        if (!ctx) return;
         var particles = [];
-        var colors = ['#8163bd', '#0f9d58', '#42b983', '#79589f', '#bb60d5', '#f59e0b', '#6b4fa8'];
+        var colors = ['#8163bd', '#0f9d58', '#42b983', '#79589f', '#bb60d5'];
 
         function resizeCanvas() {
           canvas.width = window.innerWidth;
           canvas.height = window.innerHeight;
         }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
 
         function createParticles(x, y) {
-          var count = 20 + Math.floor(Math.random() * 15);
-          for (var i = 0; i < count; i++) {
-            var angle = (Math.PI * 2 * i) / count;
-            var speed = 2 + Math.random() * 4;
+          for (var i = 0; i < 18; i++) {
+            var angle = (Math.PI * 2 * i) / 18;
+            var speed = 2 + Math.random() * 3;
             particles.push({
-              x: x, y: y,
+              x: x,
+              y: y,
               vx: Math.cos(angle) * speed,
               vy: Math.sin(angle) * speed,
               life: 1,
-              decay: 0.015 + Math.random() * 0.01,
+              decay: 0.02,
               size: 2 + Math.random() * 3,
-              color: colors[Math.floor(Math.random() * colors.length)]
+              color: colors[Math.floor(Math.random() * colors.length)],
             });
           }
         }
-
-        document.addEventListener('click', function(e) {
-          createParticles(e.clientX, e.clientY);
-        });
 
         function animateParticles() {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-          var alive = [];
-          for (var i = 0; i < particles.length; i++) {
-            var p = particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.1; // gravity
-            p.life -= p.decay;
-
-            if (p.life > 0) {
-              ctx.globalAlpha = p.life;
-              ctx.fillStyle = p.color;
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-              ctx.fill();
-              alive.push(p);
-            }
-          }
-          particles = alive;
+          particles = particles.filter(function(particle) {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.vy += 0.08;
+            particle.life -= particle.decay;
+            if (particle.life <= 0) return false;
+            ctx.globalAlpha = particle.life;
+            ctx.fillStyle = particle.color;
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size * particle.life, 0, Math.PI * 2);
+            ctx.fill();
+            return true;
+          });
           ctx.globalAlpha = 1;
           requestAnimationFrame(animateParticles);
         }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        document.addEventListener('click', function(event) {
+          createParticles(event.clientX, event.clientY);
+        });
         animateParticles();
       }
 
-      // ============ 4. 代码块增强 ============
-      document.querySelectorAll('pre').forEach(function(pre) {
-        // 复制按钮
-        var copyBtn = document.createElement('button');
-        copyBtn.className = 'code-copy-btn';
-        copyBtn.innerHTML = '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>';
-        copyBtn.title = '复制代码';
-        copyBtn.style.cssText = 'position:absolute;top:8px;right:8px;padding:6px 10px;background:rgba(255,255,255,0.1);border:none;border-radius:6px;cursor:pointer;color:#6c7086;transition:all 0.2s;z-index:10;display:flex;align-items:center;justify-content:center;';
-
-        copyBtn.addEventListener('mouseenter', function() {
-          this.style.background = 'rgba(255,255,255,0.2)';
-          this.style.color = '#cdd6f4';
-        });
-        copyBtn.addEventListener('mouseleave', function() {
-          this.style.background = 'rgba(255,255,255,0.1)';
-          this.style.color = '#6c7086';
-        });
-
-        copyBtn.addEventListener('click', function() {
-          var code = pre.querySelector('code');
-          if (code) {
-            navigator.clipboard.writeText(code.textContent).then(function() {
-              copyBtn.innerHTML = '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-              copyBtn.style.color = '#a6e3a1';
+      function initCodeCopy() {
+        document.querySelectorAll('pre').forEach(function(pre) {
+          if (pre.querySelector('.code-copy-btn')) return;
+          var copyBtn = document.createElement('button');
+          copyBtn.className = 'code-copy-btn';
+          copyBtn.type = 'button';
+          copyBtn.textContent = '复制';
+          copyBtn.title = '复制代码';
+          copyBtn.style.cssText = 'position:absolute;top:8px;right:8px;padding:6px 10px;background:rgba(255,255,255,0.1);border:none;border-radius:6px;cursor:pointer;color:#cdd6f4;z-index:10;font-size:12px;';
+          copyBtn.addEventListener('click', function() {
+            var code = pre.querySelector('code');
+            if (!code) return;
+            navigator.clipboard.writeText(code.textContent || '').then(function() {
+              copyBtn.textContent = '已复制';
               setTimeout(function() {
-                copyBtn.innerHTML = '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>';
-                copyBtn.style.color = '#6c7086';
-              }, 2000);
+                copyBtn.textContent = '复制';
+              }, 1600);
             });
-          }
-        });
-
-        pre.style.position = 'relative';
-        pre.appendChild(copyBtn);
-      });
-
-      // ============ 5. 图片点击放大 ============
-      var overlay = document.createElement('div');
-      overlay.id = 'image-overlay';
-      overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;cursor:zoom-out;justify-content:center;align-items:center;';
-      overlay.innerHTML = '<img id="overlay-img" style="max-width:90%;max-height:90%;object-fit:contain;border-radius:8px;" /><button id="overlay-close" style="position:absolute;top:20px;right:20px;background:none;border:none;color:white;font-size:2rem;cursor:pointer;">✕</button>';
-      document.body.appendChild(overlay);
-
-      var overlayImg = document.getElementById('overlay-img');
-      var overlayClose = document.getElementById('overlay-close');
-
-      document.querySelectorAll('.prose img, article img').forEach(function(img) {
-        img.style.cursor = 'zoom-in';
-        img.addEventListener('click', function() {
-          overlayImg.src = this.src;
-          overlay.style.display = 'flex';
-          document.body.style.overflow = 'hidden';
-        });
-      });
-
-      if (overlayClose) overlayClose.addEventListener('click', closeOverlay);
-      overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) closeOverlay();
-      });
-
-      function closeOverlay() {
-        overlay.style.display = 'none';
-        document.body.style.overflow = '';
-      }
-
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeOverlay();
-      });
-
-      // ============ 6. 成就系统 ============
-      var achievements = JSON.parse(localStorage.getItem('ymll_achievements') || '[]');
-
-      function hasAchievement(id) {
-        return achievements.some(function(a) { return a.id === id; });
-      }
-
-      function unlockAchievement(id, title, desc) {
-        if (hasAchievement(id)) return;
-        achievements.push({ id: id, title: title, desc: desc, time: Date.now() });
-        localStorage.setItem('ymll_achievements', JSON.stringify(achievements));
-        showAchievementToast(title, desc);
-      }
-
-      function showAchievementToast(title, desc) {
-        var toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:white;border-left:4px solid #0f9d58;padding:16px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.15);display:flex;align-items:center;gap:12px;transform:translateX(200%);transition:transform 0.4s;z-index:10000;max-width:300px;';
-        toast.innerHTML = '<div style="font-size:1.5rem;">🏆</div><div><strong style="display:block;color:#1a1a1a;">' + title + '</strong><p style="margin:0;font-size:0.875rem;color:#666;">' + desc + '</p></div>';
-        document.body.appendChild(toast);
-
-        setTimeout(function() { toast.style.transform = 'translateX(0)'; }, 100);
-        setTimeout(function() {
-          toast.style.transform = 'translateX(200%)';
-          setTimeout(function() { toast.remove(); }, 400);
-        }, 4000);
-      }
-
-      // 成就检查
-      if (!hasAchievement('first_visit')) {
-        setTimeout(function() {
-          unlockAchievement('first_visit', '🎉 初次相遇', '感谢你来到我的小世界');
-        }, 3000);
-      }
-
-      // 阅读成就
-      var readCount = parseInt(localStorage.getItem('ymll_read_count') || '0');
-      if (readCount >= 5 && !hasAchievement('reader_lv1')) {
-        unlockAchievement('reader_lv1', '📚 初级读者', '已阅读 5 篇文章');
-      }
-      if (readCount >= 10 && !hasAchievement('reader_lv2')) {
-        unlockAchievement('reader_lv2', '📖 中级读者', '已阅读 10 篇文章');
-      }
-
-      // 深夜访客
-      var hour = new Date().getHours();
-      if ((hour >= 23 || hour <= 5) && !hasAchievement('night_owl')) {
-        setTimeout(function() {
-          unlockAchievement('night_owl', '🦉 夜猫子', '深夜还在探索知识');
-        }, 5000);
-      }
-
-      // ============ 7. 控制台彩蛋 ============
-      console.log('%c╔════════════════════════════════════════╗', 'color: #8163bd; font-weight: bold;');
-      console.log('%c║  🎉 欢迎来到 YMLL Blog 源代码！       ║', 'color: #8163bd; font-weight: bold;');
-      console.log('%c║                                        ║', 'color: #8163bd; font-weight: bold;');
-      console.log('%c║  👨‍💻 开发者: YMLL                       ║', 'color: #8163bd; font-weight: bold;');
-      console.log('%c║  🌐 博客: https://yanmengli123.github.io/ymllblog  ║', 'color: #8163bd; font-weight: bold;');
-      console.log('%c║  💬 交流: 欢迎留言~                    ║', 'color: #8163bd; font-weight: bold;');
-      console.log('%c║                                        ║', 'color: #8163bd; font-weight: bold;');
-      console.log('%c║  ✨ 试试输入: blog.help()              ║', 'color: #0f9d58; font-weight: bold;');
-      console.log('%c╚════════════════════════════════════════╝', 'color: #8163bd; font-weight: bold;');
-
-      window.blog = {
-        help: function() {
-          console.log('%c📖 可用命令:', 'color: #8163bd; font-weight: bold; font-size: 14px;');
-          console.log('%c  blog.stats()    - 查看博客统计', 'color: #42b983;');
-          console.log('%c  blog.achievements() - 查看成就', 'color: #42b983;');
-          console.log('%c  blog.theme()    - 切换主题', 'color: #42b983;');
-          console.log('%c  blog.secret()   - 隐藏彩蛋', 'color: #0f9d58;');
-        },
-        stats: function() {
-          console.log('%c📊 博客统计:', 'color: #8163bd; font-weight: bold; font-size: 14px;');
-          console.log('%c  📄 文章: 9 篇', 'color: #42b983;');
-          console.log('%c  🏷️  标签: 22 个', 'color: #42b983;');
-          console.log('%c  ⏱️  加载时间: ' + performance.now().toFixed(2) + 'ms', 'color: #42b983;');
-        },
-        achievements: function() {
-          var all = JSON.parse(localStorage.getItem('ymll_achievements') || '[]');
-          console.log('%c🏆 已解锁成就 (' + all.length + '):', 'color: #0f9d58; font-weight: bold; font-size: 14px;');
-          all.forEach(function(a) {
-            console.log('%c  ' + a.title + ' - ' + a.desc, 'color: #42b983;');
           });
-          if (all.length === 0) console.log('%c  继续探索来解锁成就吧！', 'color: #999;');
-        },
-        theme: function() {
-          document.documentElement.classList.toggle('dark');
-          console.log('%c🎨 主题已切换！', 'color: #8163bd; font-weight: bold;');
-        },
-        secret: function() {
-          console.log('%c🔓 秘密解锁！', 'color: #0f9d58; font-weight: bold; font-size: 16px;');
-          console.log('%c🎁 源代码: https://github.com/yanmengli123/ymllblog', 'color: #42b983;');
-          document.body.style.animation = 'rainbow 2s linear';
-          setTimeout(function() { document.body.style.animation = ''; }, 2000);
-        }
-      };
-
-      // ============ 8. 返回顶部按钮 ============
-      var backToTop = document.createElement('button');
-      backToTop.id = 'back-to-top';
-      backToTop.innerHTML = '↑';
-      backToTop.style.cssText = 'position:fixed;bottom:80px;right:20px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8163bd,#0f9d58);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);opacity:0;transform:translateY(20px);transition:all 0.3s;z-index:100;';
-      document.body.appendChild(backToTop);
-
-      window.addEventListener('scroll', function() {
-        if (window.scrollY > 500) {
-          backToTop.style.opacity = '1';
-          backToTop.style.transform = 'translateY(0)';
-        } else {
-          backToTop.style.opacity = '0';
-          backToTop.style.transform = 'translateY(20px)';
-        }
-      });
-
-      backToTop.addEventListener('click', function() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-
-      // ============ 9. 自动夜间模式 ============
-      function initAutoDarkMode() {
-        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-        var hour = new Date().getHours();
-        var savedTheme = localStorage.getItem('theme');
-
-        // 优先使用用户手动选择
-        if (savedTheme) {
-          if (savedTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-          }
-          return;
-        }
-
-        // 系统偏好或时间规则（19:00-7:00 自动深色）
-        var shouldDark = prefersDark.matches || hour >= 19 || hour < 7;
-
-        if (shouldDark) {
-          document.documentElement.classList.add('dark');
-        }
-
-        // 监听系统主题变化
-        prefersDark.addEventListener('change', function(e) {
-          if (!localStorage.getItem('theme')) {
-            document.documentElement.classList.toggle('dark', e.matches);
-          }
-        });
-      }
-      initAutoDarkMode();
-
-      // ============ 10. 鼠标跟随光晕 ============
-      var mouseFollower = document.createElement('div');
-      mouseFollower.id = 'mouse-follower';
-      mouseFollower.style.cssText = 'position:fixed;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle,rgba(129,99,189,0.3),rgba(15,157,88,0.1));pointer-events:none;z-index:9997;transition:transform 0.15s ease-out;mix-blend-mode:screen;';
-      document.body.appendChild(mouseFollower);
-
-      var mouseX = 0, mouseY = 0;
-      var followerX = 0, followerY = 0;
-
-      document.addEventListener('mousemove', function(e) {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-      });
-
-      function animateFollower() {
-        followerX += (mouseX - followerX) * 0.15;
-        followerY += (mouseY - followerY) * 0.15;
-        mouseFollower.style.transform = 'translate(' + (followerX - 12) + 'px, ' + (followerY - 12) + 'px)';
-        requestAnimationFrame(animateFollower);
-      }
-      animateFollower();
-
-      // ============ 11. 阅读剩余时间 (文章页) ============
-      var articleContent = document.querySelector('.prose, .post-content, article');
-      if (articleContent) {
-        var readingTimeEl = document.createElement('div');
-        readingTimeEl.id = 'reading-time-remain';
-        readingTimeEl.style.cssText = 'position:fixed;bottom:80px;left:20px;background:white;padding:8px 16px;border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-size:0.875rem;color:#666;z-index:100;opacity:0;transition:opacity 0.3s;display:flex;align-items:center;gap:6px;';
-        readingTimeEl.innerHTML = '⏱️ 计算中...';
-        document.body.appendChild(readingTimeEl);
-
-        var totalWords = articleContent.textContent.trim().length;
-        var readSpeed = 400; // 中文阅读速度 字/分钟
-
-        window.addEventListener('scroll', function() {
-          var scrollTop = window.scrollY;
-          var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-          var percent = Math.min(100, Math.max(0, (scrollTop / docHeight) * 100));
-
-          if (percent > 10 && percent < 90) {
-            var remainWords = totalWords * (1 - percent / 100);
-            var remainMinutes = Math.ceil(remainWords / readSpeed);
-            readingTimeEl.innerHTML = '⏱️ 剩余约 ' + remainMinutes + ' 分钟';
-            readingTimeEl.style.opacity = '1';
-          } else {
-            readingTimeEl.style.opacity = '0';
-          }
+          pre.style.position = 'relative';
+          pre.appendChild(copyBtn);
         });
       }
 
-      // ============ 12. 文章更新提醒 ============
-      var updatedBadges = document.querySelectorAll('[data-updated]');
-      updatedBadges.forEach(function(badge) {
-        var updatedDate = new Date(badge.getAttribute('data-updated'));
-        var now = new Date();
-        var diffDays = Math.floor((now - updatedDate) / (1000 * 60 * 60 * 24));
+      function initImagePreview() {
+        var overlay = document.createElement('div');
+        overlay.id = 'image-overlay';
+        overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;cursor:zoom-out;justify-content:center;align-items:center;';
+        var overlayImg = document.createElement('img');
+        overlayImg.id = 'overlay-img';
+        overlayImg.alt = '';
+        overlayImg.style.cssText = 'max-width:90%;max-height:90%;object-fit:contain;border-radius:8px;';
+        var closeBtn = document.createElement('button');
+        closeBtn.id = 'overlay-close';
+        closeBtn.type = 'button';
+        closeBtn.textContent = '关闭';
+        closeBtn.style.cssText = 'position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.12);border:none;border-radius:999px;color:white;padding:8px 14px;cursor:pointer;';
+        overlay.append(overlayImg, closeBtn);
+        document.body.appendChild(overlay);
 
-        if (diffDays < 7) {
-          badge.style.display = 'inline-flex';
-          badge.innerHTML = '🔄 最近更新';
+        function closeOverlay() {
+          overlay.style.display = 'none';
+          document.body.style.overflow = '';
         }
-      });
 
-      // ============ 13. 邮件订阅弹窗 ============
-      var hasShownSubscribe = localStorage.getItem('ymll_subscribe_shown');
-      if (!hasShownSubscribe) {
-        setTimeout(function() {
-          var modal = document.createElement('div');
-          modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;';
-          modal.innerHTML = '<div style="background:white;border-radius:16px;padding:2rem;max-width:400px;width:90%;text-align:center;position:relative;"><button onclick="this.closest(\'div[style]\').remove()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;">✕</button><div style="font-size:3rem;margin-bottom:1rem;">📬</div><h3 style="font-size:1.25rem;font-weight:bold;margin-bottom:0.5rem;color:#1a1a1a;">订阅我的周报</h3><p style="color:#666;margin-bottom:1.5rem;font-size:0.875rem;">每周分享技术洞察、设计灵感和个人思考</p><form onsubmit="event.preventDefault();localStorage.setItem(\'ymll_subscribe_shown\',\'true\');this.closest(\'div[style]\').remove();alert(\'感谢订阅！\');" style="display:flex;gap:0.5rem;"><input type="email" placeholder="your@email.com" required style="flex:1;padding:0.75rem;border:2px solid #e5e7eb;border-radius:8px;outline:none;"><button type="submit" style="padding:0.75rem 1.5rem;background:linear-gradient(to right,#8163bd,#0f9d58);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">订阅</button></form><p style="color:#999;font-size:0.75rem;margin-top:1rem;">🔒 我们尊重您的隐私，随时可取消订阅</p></div>';
-
-          // 30秒后或滚动50%后显示
-          var shown = false;
-          function showSubscribe() {
-            if (shown) return;
-            shown = true;
-            document.body.appendChild(modal);
-            localStorage.setItem('ymll_subscribe_shown', 'true');
-          }
-
-          setTimeout(showSubscribe, 30000);
-
-          window.addEventListener('scroll', function() {
-            var percent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-            if (percent > 0.5) showSubscribe();
+        document.querySelectorAll('.prose img, article img').forEach(function(img) {
+          img.style.cursor = 'zoom-in';
+          img.addEventListener('click', function() {
+            overlayImg.src = img.currentSrc || img.src;
+            overlayImg.alt = img.alt || '';
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
           });
-        }, 10000);
-      }
-
-      // ============ 14. 页面滚动进度 (文章页) ============
-      var progressBar = document.getElementById('reading-progress');
-      if (progressBar) {
-        window.addEventListener('scroll', function() {
-          var scrollTop = window.scrollY;
-          var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-          var percent = Math.min(100, Math.max(0, (scrollTop / docHeight) * 100));
-          progressBar.style.width = percent + '%';
+        });
+        closeBtn.addEventListener('click', closeOverlay);
+        overlay.addEventListener('click', function(event) {
+          if (event.target === overlay) closeOverlay();
+        });
+        document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape') closeOverlay();
         });
       }
 
+      function createSubscribePrompt() {
+        if (localStorage.getItem('ymll_subscribe_prompt_seen')) return;
+        var prompt = document.createElement('div');
+        prompt.id = 'subscribe-prompt';
+        prompt.style.cssText = 'position:fixed;right:20px;bottom:88px;z-index:1000;max-width:320px;border-radius:16px;background:white;border:1px solid rgba(0,0,0,.08);box-shadow:0 16px 40px rgba(0,0,0,.16);padding:16px;';
+
+        var title = document.createElement('div');
+        title.textContent = '订阅更新';
+        title.style.cssText = 'font-weight:700;margin-bottom:6px;color:#1f2937;';
+        var desc = document.createElement('p');
+        desc.textContent = '通过 RSS 获取最新文章，无需邮箱，也不会打扰你。';
+        desc.style.cssText = 'font-size:13px;color:#6b7280;margin:0 0 12px;';
+        var actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:8px;';
+        var rssLink = document.createElement('a');
+        rssLink.href = '/ymllblog/rss.xml';
+        rssLink.textContent = '打开 RSS';
+        rssLink.style.cssText = 'flex:1;text-align:center;border-radius:10px;background:#10b981;color:white;padding:8px 10px;font-size:13px;font-weight:600;text-decoration:none;';
+        var close = document.createElement('button');
+        close.type = 'button';
+        close.textContent = '稍后';
+        close.style.cssText = 'border:0;background:#f3f4f6;border-radius:10px;padding:8px 10px;font-size:13px;cursor:pointer;';
+        close.addEventListener('click', function() {
+          localStorage.setItem('ymll_subscribe_prompt_seen', 'true');
+          prompt.remove();
+        });
+        actions.append(rssLink, close);
+        prompt.append(title, desc, actions);
+        document.body.appendChild(prompt);
+      }
+
+      function initBackToTop() {
+        if (document.getElementById('global-back-to-top')) return;
+        var button = document.createElement('button');
+        button.id = 'global-back-to-top';
+        button.type = 'button';
+        button.textContent = '↑';
+        button.setAttribute('aria-label', '返回顶部');
+        button.style.cssText = 'position:fixed;bottom:24px;right:20px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8163bd,#0f9d58);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);opacity:0;transform:translateY(20px);transition:all 0.3s;z-index:100;';
+        document.body.appendChild(button);
+        window.addEventListener('scroll', function() {
+          var visible = window.scrollY > 500;
+          button.style.opacity = visible ? '1' : '0';
+          button.style.transform = visible ? 'translateY(0)' : 'translateY(20px)';
+        }, { passive: true });
+        button.addEventListener('click', function() {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      initTheme();
+      initClickEffect();
+      initCodeCopy();
+      initImagePreview();
+      initBackToTop();
+      setTimeout(createSubscribePrompt, 12000);
     })();
     </script>
   </body>
 </html>
-
-<style is:global>
-  /* Custom scrollbar - additional styling */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #b8a5d0;
-    border-radius: 9999px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #8163bd;
-  }
-</style>
