@@ -54,7 +54,12 @@ assert.match(music, /interface Props[\s\S]*variant\?: 'floating' \| 'sidebar'/, 
 assert.match(music, /const isSidebar = variant === 'sidebar'/, 'music player should branch on sidebar variant');
 assert.match(music, /music\.163\.com\/outchain\/player/, 'music player should use NetEase official iframe player');
 assert.match(music, /id="netease-player-frame"/, 'music player should render a NetEase iframe');
+assert.match(music, /type=0/, 'music player should use NetEase official playlist mode for built-in switching');
+assert.match(music, /playerHeight = 430/, 'music player should use the full NetEase player height for playlist and lyric-capable UI');
+assert.match(music, /data-player-provider="netease-cloud-music"/, 'music player should expose the official provider for runtime checks');
+assert.match(music, /playlistId\?: string/, 'music player should allow swapping the NetEase playlist id without rewriting component logic');
 assert.doesNotMatch(music, /new Audio\(/, 'music player should not rely on unstable NetEase mp3 direct links');
+assert.doesNotMatch(music, /music-song-btn/, 'music player should not duplicate playlist switching outside the official iframe');
 
 const announcement = read('src/components/Announcement.astro');
 assert.match(announcement, /interface Props[\s\S]*variant\?: 'floating' \| 'sidebar'/, 'announcement should support floating and sidebar variants');
