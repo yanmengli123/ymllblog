@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>YMLL Blog 内容管理</title>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; }
+      body { background: #0f172a; }
+    </style>
+  </head>
+  <body>
+    <!--
+      Sveltia CMS — Git-based, browser-only, GitHub Device Flow auth.
+      Loaded from ESM CDN; no backend required.
+      Config is loaded from ./config.yml relative to this file.
+    -->
+    <script type="module">
+      // 动态 BASE_URL：让本地 dev (http://localhost:4321/ymllblog/admin)
+      // 与生产 (https://ymllblog.pages.dev/admin) 都能工作
+      const base = document.baseURI.replace(/\/admin\/.*$/, '/');
+      const configUrl = `${base}admin/config.yml`;
+      const sveltiaUrl = 'https://unpkg.com/@sveltia/cms@0.110.0/dist/sveltia-cms.js';
+
+      const { init } = await import(sveltiaUrl);
+      const config = await fetch(configUrl).then((r) => r.text()).then((t) => {
+        // Sveltia 在浏览器里解析 YAML——使用其内置 loader
+        return t;
+      });
+
+      // Sveltia 会自动 fetch config.yml 并解析；
+      // 这里只需要 init() 即可（不要手动传 config）
+      init();
+    </script>
+  </body>
+</html>

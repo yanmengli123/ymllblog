@@ -1,0 +1,28 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      astro-and-plugins:
+        patterns:
+          - "astro*"
+          - "@astrojs/*"
+      react-and-deps:
+        patterns:
+          - "react*"
+          - "framer-motion"
+      lint-and-tools:
+        patterns:
+          - "@biomejs/*"
+          - "markdownlint*"
+          - "lychee*"
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "deps"
+      include: "scope"

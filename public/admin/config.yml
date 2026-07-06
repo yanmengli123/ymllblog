@@ -1,0 +1,107 @@
+backend:
+  name: github
+  repo: yanmengli123/ymllblog
+  branch: main
+  # Sveltia 原生支持 GitHub Device Flow，无需 OAuth proxy
+  commit_messages:
+    create: 'content: 新建文章 “{{slug}}”'
+    update: 'content: 更新文章 “{{slug}}”'
+    delete: 'content: 删除文章 “{{slug}}”'
+    uploadMedia: 'content: 上传媒体 {{path}}'
+    deleteMedia: 'content: 删除媒体 {{path}}'
+
+media_folder: 'public/uploads'
+public_folder: '/ymllblog/uploads'
+
+# 必须与 src/content.config.ts 中的 Zod schema 字段一一对应
+# 任何一个字段不一致都会导致 Astro 构建失败
+collections:
+  - name: blog
+    label: '文章管理'
+    label_singular: '文章'
+    folder: src/content/blog
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    extension: md
+    format: yaml-frontmatter
+    editor:
+      preview: false
+    view_filters:
+      - label: '已发布 (draft=false)'
+        field: draft
+        pattern: false
+      - label: '草稿 (draft=true)'
+        field: draft
+        pattern: true
+      - label: '精选 (featured=true)'
+        field: featured
+        pattern: true
+    view_groups:
+      - label: '年份'
+        field: pubDate
+        pattern: '\d{4}'
+    fields:
+      - label: '文章标题'
+        name: title
+        widget: string
+      - label: '文章描述 (用于列表与 SEO)'
+        name: description
+        widget: text
+        hint: '一句话概括，搜索引擎会用作 description meta'
+      - label: '发布日期'
+        name: pubDate
+        widget: datetime
+        picker_utc: false
+        format: 'YYYY-MM-DD HH:mm:ss'
+      - label: '更新日期'
+        name: updatedDate
+        widget: datetime
+        required: false
+        picker_utc: false
+        format: 'YYYY-MM-DD HH:mm:ss'
+      - label: '作者'
+        name: author
+        widget: string
+        default: 'YMLL'
+        hint: '默认 YMLL，多作者时改为具体名字'
+      - label: '标签'
+        name: tags
+        widget: list
+        required: false
+        default: []
+        hint: '中文标签也可，例如 ["React", "前端"]'
+      - label: '分类'
+        name: category
+        widget: string
+        required: false
+      - label: '封面图路径'
+        name: cover
+        widget: image
+        required: false
+        allow_multiple: false
+        media_library:
+          config:
+            multiple: false
+      - label: '草稿'
+        name: draft
+        widget: boolean
+        default: false
+        required: false
+        hint: '开启后 Astro 构建时不会生成该文章'
+      - label: '精选文章'
+        name: featured
+        widget: boolean
+        default: false
+        required: false
+        hint: '首页 FeaturedPosts 区域展示'
+      - label: '语言'
+        name: lang
+        widget: select
+        default: 'zh-CN'
+        options:
+          - { label: '简体中文', value: 'zh-CN' }
+          - { label: 'English',   value: 'en' }
+      - label: '正文 (Markdown)'
+        name: body
+        widget: markdown

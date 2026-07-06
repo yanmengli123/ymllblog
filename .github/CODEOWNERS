@@ -1,0 +1,8 @@
+# Code owners — for now, the owner is the only reviewer.
+# When collaborators join, expand this to enforce per-area review.
+
+* @yanmengli123
+/public/admin/ @yanmengli123
+/.github/workflows/ @yanmengli123
+/astro.config.mjs @yanmengli123
+/src/content.config.ts @yanmengli123
