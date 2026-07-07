@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-YMLL Blog — a Chinese-language personal tech/design blog built as a fully static site. Deployed to GitHub Pages at `https://yanmengli123.github.io/ymllblog`. Inspired by Hexo Matery theme and dlog.com.cn layout patterns. Features a comprehensive personalization system (8 color themes, 8 background modes, 5 banner modes, custom CSS, etc.) accessible via a right-side settings panel.
+YMLL Blog — a Chinese-language personal tech/design blog built as a fully static site. **Primary host: Cloudflare Pages at `https://ymllblog.pages.dev`** (legacy GitHub Pages mirror at `https://yanmengli123.github.io/ymllblog`). Inspired by Hexo Matery theme and dlog.com.cn layout patterns. Features a comprehensive personalization system (8 color themes, 8 background modes, 5 banner modes, custom CSS, etc.) accessible via a right-side settings panel.
 
 ## Tech Stack
 
@@ -13,19 +13,27 @@ YMLL Blog — a Chinese-language personal tech/design blog built as a fully stat
 - **Interactivity:** React 18 + Framer Motion 11 (only `AnimatedPostCard.tsx`)
 - **Animations:** AOS (Animate On Scroll), CSS keyframes, IntersectionObserver, canvas particles
 - **Math Rendering:** KaTeX via `remark-math` + `rehype-katex`
+- **Search:** Pagefind (build-time WASM index, lazy-loaded on first keystroke)
+- **Comments:** giscus → GitHub Discussions backend
+- **CMS:** Sveltia CMS via GitHub Device Flow (browser-only, no OAuth server)
 - **Language:** TypeScript (strict mode)
-- **Deployment:** GitHub Pages via GitHub Actions (auto-deploy on push to `main`)
+- **Deployment:** Cloudflare Pages (auto-deploy on push to `main`) + legacy GitHub Pages fallback
 
 ## Commands
 
 ```bash
-npm run dev      # Dev server at http://localhost:4321/ymllblog  (base path is mandatory in URLs)
-npm run build    # Static build to dist/ + auto-generates sitemap.xml  (chains `astro build && node scripts/generate-sitemap.mjs`)
-npm run preview  # Preview built site locally
+npm run dev             # Dev server at http://localhost:4321/ymllblog  (base path is mandatory in URLs)
+npm run build           # Static build to dist/ + auto-generates sitemap.xml  (chains `astro build && node scripts/generate-sitemap.mjs`)
+npm run build:pagefind  # Rebuild only the Pagefind index (rarely needed — runs as part of build)
+npm run preview         # Preview built site locally
 
 # Tests — run individually with `node tests/<file>.test.mjs`. They use only Node's `node:assert`, no test framework.
 node tests/home-layout.test.mjs     # Home page layout + component structure assertions
-node tests/runtime-safety.test.mjs  # XSS safety, inline handler, and sitemap script assertions
+node tests/runtime-safety.test.mjs  # XSS safety, inline handler, sitemap, _headers, _redirects assertions
+node tests/smoke-production.mjs     # Live HTTP probes against the deployed site. Optional env: SMOKE_BASE_URL (default https://ymllblog.pages.dev)
+
+# One-shot ops
+bash scripts/enable-branch-protection.sh   # Apply full main-branch protection ruleset via gh CLI
 ```
 
 No linting, no pre-commit hooks. CI runs `.github/workflows/ci.yml` on every PR and push to `main` (test + build + link-check + markdownlint). Deployment to GitHub Pages is currently inactive (workflow file repurposed as CI); Cloudflare Pages is the recommended primary host — see `docs/RUNBOOK.md` for migration steps.
@@ -176,13 +184,21 @@ Both `public/_headers` and `public/_redirects` are honored by Cloudflare Pages a
 | `src/components/SettingsPanel.astro` | Side panel with all personalization controls |
 | `src/components/ParticlesBg.astro` | Dynamic particle canvas (auto-starts/stops based on body class) |
 | `public/admin/index.html` + `public/admin/config.yml` | Sveltia CMS browser-based editor (Git-backed, no backend). Fields MUST match `src/content.config.ts`. |
+| `src/components/PagefindSearch.astro` | Lazy-loads Pagefind WASM on first search keystroke. Wired into `Header.astro` (Pagefind first, static fallback). |
+| `src/components/GiscusComments.astro` | GitHub Discussions-backed comment widget at the bottom of every post. Placeholder `repoId`/`categoryId` must be replaced after one-time giscus.app setup. |
+| `public/_headers` | Cloudflare Pages edge config: CSP, HSTS, asset caching, admin noindex. |
+| `public/_redirects` | Cloudflare Pages edge config: legacy `/ymllblog/*` → `/` for old bookmark compatibility. |
+| `scripts/generate-sitemap.mjs` | Post-build sitemap generator. Reads `dist/` and writes `sitemap.xml`. Reads `SITEMAP_SITE_ROOT` env (default GH Pages URL). |
+| `scripts/enable-branch-protection.sh` | One-shot gh CLI script that applies the full main-branch ruleset (no force-push, PR-only, 1 review, 4 required CI checks). |
+| `tests/smoke-production.mjs` | Live HTTP probes against the deployed site. Run after deploys to verify production health. |
 | `docs/ARCHITECTURE.md` | System diagram, source-of-truth model, deployment topology. Read before changing architecture. |
-| `docs/RUNBOOK.md` | Daily ops, incident response, dynamic-feature playbook, custom-domain steps. |
-| `.github/workflows/ci.yml` | Test + build + link-check + markdownlint on every PR. Does NOT deploy. Rename of the original `deploy.yml` — that file now runs CI; deployment is handled by Cloudflare Pages once connected. |
+| `docs/RUNBOOK.md` | Daily ops, incident response, dynamic-feature playbook, custom-domain steps, CF Pages deploy steps. |
+| `docs/SVELTIA-CMS.md` | Sveltia CMS install, upgrade, field-parity contract. |
+| `docs/OBSERVABILITY.md` | UptimeRobot + Cloudflare Web Analytics setup, privacy posture, alerting escalation. |
+| `.github/workflows/ci.yml` | Test + build + link-check + markdownlint on every PR. Does NOT deploy. Originally was `deploy.yml`; deployment is now handled by Cloudflare Pages. |
 | `.github/dependabot.yml` | Weekly dependency PRs, grouped by area. |
 | `.github/CODEOWNERS` | Code-review routing (single owner for now). |
 | `.markdownlint.jsonc` | Markdown lint rules for `src/content/blog/`. |
-| `.github/workflows/deploy.yml` | GitHub Pages deploy on push to main |
 
 ## Design System
 
@@ -212,9 +228,12 @@ Both `public/_headers` and `public/_redirects` are honored by Cloudflare Pages a
 13. **XSS safety:** `runtime-safety.test.mjs` enforces that search results use `createElement`/`textContent` (not `innerHTML`), and that layouts avoid inline `onclick`/`onsubmit` handlers. Keep event wiring in `<script>` blocks, not inline attributes.
 14. **Header search modal:** `Header.astro` must expose `#search-modal` (real modal element), nav links must carry `data-nav-link` and `data-active="true"` for the current page, the theme button must persist via `localStorage.setItem('theme', ...)`, and the search input must filter via an `input` event listener. `home-layout.test.mjs` enforces all of these — don't strip them when refactoring the header.
 15. **CMS schema ↔ Zod schema parity:** `public/admin/config.yml` and `src/content.config.ts` define overlapping schemas. They must stay in sync — see `docs/ARCHITECTURE.md` § "Source of truth". Add a new field to both files in the same commit, or builds will silently break.
-16. **Workflow file rename:** the original `.github/workflows/deploy.yml` was repurposed to `.github/workflows/ci.yml` (test + build + link-check + markdownlint). It no longer deploys. Deployment to GitHub Pages is disabled until you reconnect Cloudflare Pages (see `docs/RUNBOOK.md`). If you need the old GitHub Pages deploy back, the original workflow is in git history at commit `241b78e`.
+16. **Workflow file rename history:** the original `.github/workflows/deploy.yml` (GitHub Pages deploy) was repurposed to `.github/workflows/ci.yml` (test + build + link-check + markdownlint). It no longer deploys. The actual deploy is now Cloudflare Pages (auto-wired to push-to-main on `yanmengli123/ymllblog`). If you need to redeploy to GitHub Pages as a fallback, the original `deploy.yml` workflow is preserved in git history at commit `241b78e` — reapply it manually.
 17. **`/admin` route under base path:** the Sveltia CMS entry lives at `public/admin/index.html` and is served at `${base}/admin/` — Astro copies `public/*` to `dist/*` verbatim, so the `/ymllblog/admin` URL works without any route config. If you ever add a custom domain (see RUNBOOK), the path stays the same.
 18. **Cloudflare Pages env vars:** `BASE_URL=/` and `SITEMAP_SITE_ROOT=https://ymllblog.pages.dev` must be set in the Cloudflare dashboard (Workers & Pages → project → Settings → Environment variables) for the deployment to produce correct root-relative URLs and a sitemap pointing at the live host. Without `BASE_URL=/` the site will be reachable at `https://ymllblog.pages.dev/ymllblog/` instead of `https://ymllblog.pages.dev/`. See `docs/RUNBOOK.md` § "Deploying to Cloudflare Pages".
 19. **Env-var changes don't auto-redeploy on Cloudflare Pages:** after changing `BASE_URL` or `SITEMAP_SITE_ROOT`, trigger a manual redeploy from the Deployments tab. GitHub Actions has no such constraint — pushes auto-trigger CI.
 20. **`BASE_URL=/` on Windows local builds** corrupts asset URLs to absolute Windows paths (e.g. `/D:/Program Files/Git/_astro/...`). This is a Windows + Astro `BASE_URL=/` resolution quirk; **always test the GH Pages-style build locally** (`unset BASE_URL` so it falls back to `/ymllblog`), and rely on the Linux Cloudflare runner for `BASE_URL=/` builds. The GitHub Actions CI runs on Linux too, so this only affects manual local builds on Windows.
 21. **`package.json` and `package-lock.json` MUST be committed together.** Cloudflare Pages uses `npm ci` (strict install from lockfile); if the lockfile is out of sync, the build fails with EUSAGE. After any `package.json` change — even adding a single dev-dep — run `npm install` locally and commit the regenerated `package-lock.json` in the same commit. If you only commit `package.json`, the next Cloudflare deploy will fail.
+22. **`GiscusComments.astro` ships with placeholder credentials** (`R_PLACEHOLDER_REPLACE_AFTER_GISCUS_SETUP` etc.). Until replaced via `https://giscus.app/`, the widget renders but fails to load comments. The build itself succeeds — this only affects runtime behavior. Don't treat the placeholder values as a build error.
+23. **CI checks required for `main`:** when `scripts/enable-branch-protection.sh` is run, the ruleset requires these exact job names: `test`, `build`, `link-check`, `markdown-lint`. Renaming any of them in `.github/workflows/ci.yml` will block all future merges until the ruleset is updated.
+24. **`tests/smoke-production.mjs` is a runtime probe, not a build-time test.** It runs `fetch()` against the live site and exits 1 on any failed probe. Run it manually after a Cloudflare deploy completes, or wire it into the CI workflow as a post-deploy job. Set `SMOKE_BASE_URL` to the preview URL when testing PR previews (`https://<hash>.ymllblog.pages.dev`).
