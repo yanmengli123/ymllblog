@@ -40,7 +40,8 @@ assert.match(packageJson, /node scripts\/generate-sitemap\.mjs/, 'build script s
 
 const sitemapScript = read('scripts/generate-sitemap.mjs');
 assert.match(sitemapScript, /sitemap\.xml/, 'sitemap script should write sitemap.xml');
-assert.match(sitemapScript, /https:\/\/yanmengli123\.github\.io\/ymllblog/, 'sitemap script should use the GitHub Pages base URL');
+assert.match(sitemapScript, /SITEMAP_SITE_ROOT/, 'sitemap script should read site root from env so it works on both GH Pages and Cloudflare');
+assert.match(sitemapScript, /yanmengli123\.github\.io/, 'sitemap script should default to the GitHub Pages URL when env is unset');
 assert.match(sitemapScript, /encodeURIComponent/, 'sitemap script should URL-encode dynamic path segments');
 assert.match(sitemapScript, /escapeXml/, 'sitemap script should XML-escape URLs');
 

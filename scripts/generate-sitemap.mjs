@@ -2,7 +2,11 @@ import { readdir, writeFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 
 const distDir = join(process.cwd(), 'dist');
-const siteRoot = 'https://yanmengli123.github.io/ymllblog';
+// SITEMAP_SITE_ROOT controls the URL prefix written into sitemap.xml.
+//   - GitHub Pages:  defaults to https://yanmengli123.github.io/ymllblog
+//   - Cloudflare Pages: set to https://<project>.pages.dev in the dashboard
+//   - Custom domain:  set to https://yourdomain.tld
+const siteRoot = process.env.SITEMAP_SITE_ROOT ?? 'https://yanmengli123.github.io/ymllblog';
 
 async function listHtmlFiles(dir) {
   const entries = await readdir(dir, { withFileTypes: true });

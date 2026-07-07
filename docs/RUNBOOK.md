@@ -108,7 +108,49 @@ All of these can be added **without** buying a domain or running a server.
 2. Cloudflare Pages → project → "Custom domains" → "Set up a custom domain" → enter the domain.
 3. Cloudflare auto-detects if DNS is on Cloudflare; if not, it shows you the CNAME records to add at your registrar.
 4. SSL is provisioned automatically within ~5 min.
-5. Update `astro.config.mjs` `site:` field to your new domain. Update the sitemap script in [scripts/generate-sitemap.mjs](../scripts/generate-sitemap.mjs).
-6. Optionally add an RSS link with the new domain.
+5. Update env vars in Cloudflare Pages → Settings → Environment variables:
+   - `BASE_URL` = `/`
+   - `SITEMAP_SITE_ROOT` = `https://yourdomain.tld`
+6. Trigger a new deployment from the Cloudflare dashboard (env-var changes don't auto-redeploy).
+7. Update `astro.config.mjs` `site:` field to your new domain (used for canonical URLs).
 
-The build itself does not need to change — only config.
+The build itself does not need to change — only env vars.
+
+## Deploying to Cloudflare Pages (one-time setup)
+
+Cloudflare Pages is the recommended primary host (faster in China, free preview deploys, free unlimited bandwidth, instant rollback). To set it up:
+
+1. Cloudflare Dashboard → **Workers & Pages** → **Create** → **Pages** → **Import from Git**.
+2. Authorize Cloudflare to read `yanmengli123/ymllblog`. Select it. Click **Begin setup**.
+3. Configure build:
+   - Framework preset: **Astro**
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+   - Root directory: *(leave blank)*
+4. **Environment variables** (Settings → Environment variables after the first deploy also works):
+   - `BASE_URL` = `/` (overrides the default `/ymllblog` so URLs are root-relative)
+   - `SITEMAP_SITE_ROOT` = `https://ymllblog.pages.dev` (so sitemap.xml points to the live host)
+   - `NODE_VERSION` = `20`
+5. Click **Save and Deploy**. First build takes ~1 min.
+6. After the first successful deploy, your site is live at `https://ymllblog.pages.dev`.
+
+### Preview deployments (PR previews)
+
+Open any PR → Cloudflare automatically comments with a `https://<hash>.ymllblog.pages.dev` preview link. That preview reflects the PR's code with the PR's `BASE_URL=/`. To share a preview with a collaborator before merge, send them that link.
+
+### Instant rollback
+
+Cloudflare Pages → project → **Deployments** tab → click any prior successful deployment → **"Rollback to this deploy"**. Reverts production in ~10 seconds.
+
+### Removing the GitHub Pages fallback
+
+Once Cloudflare has been the production host for ≥1 week with no incidents, you can remove `BASE_URL=/ymllblog` as the fallback default in `astro.config.mjs` (it currently defaults to that for local dev convenience and for the legacy GH Pages workflow). The GitHub Actions deploy is already disabled by renaming `deploy.yml` → `ci.yml`, so no further cleanup is needed unless you want to delete the old Pages site entirely.
+
+## Re-enabling the GitHub Pages deploy (rollback path)
+
+If Cloudflare is unavailable for an extended period:
+
+1. `git revert` the commit that renamed `deploy.yml` → `ci.yml` (or check out the original from git history at commit `241b78e`).
+2. Push to `main`.
+3. The GitHub Pages site at `https://yanmengli123.github.io/ymllblog/` will resume within ~1 min.
+4. Update the `BASE_URL` and `SITEMAP_SITE_ROOT` env defaults in code to point back to GH Pages if needed.
