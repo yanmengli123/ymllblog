@@ -1,0 +1,12 @@
+# Cloudflare Pages redirects
+# https://developers.cloudflare.com/pages/configuration/redirects/
+
+# Legacy GitHub Pages subpath compatibility.
+# Any /ymllblog/* request (e.g. from old links/bookmarks) → strip the prefix.
+# Only safe to enable when Cloudflare Pages is the canonical host.
+/ymllblog/*   /:splat   301
+
+# Force HTTPS — Cloudflare already does this at the edge, but explicit is clearer.
+# http://*:hostname/*  https://:hostname/:splat  301
+
+# Trailing-slash normalization handled by Astro — no rule needed.

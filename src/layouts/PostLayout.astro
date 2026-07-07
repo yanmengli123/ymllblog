@@ -3,6 +3,7 @@ import Layout from './Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import MermaidSupport from '../components/MermaidSupport.astro';
+import GiscusComments from '../components/GiscusComments.astro';
 import { getRelatedPosts } from '../lib/posts';
 import { getPageURL } from '../lib/seo';
 
@@ -165,6 +166,8 @@ const updatedDate = frontmatter.updatedDate?.toLocaleDateString('zh-CN', {
               </div>
             </section>
           )}
+
+          <GiscusComments />
         </article>
 
         <aside class="hidden xl:block">

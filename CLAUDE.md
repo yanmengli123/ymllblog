@@ -138,6 +138,15 @@ The site has a browser-based CMS at `/admin` (`public/admin/index.html` + `confi
 ### RSS / Subscription
 `@astrojs/rss` is a dependency but the project does **not** use a fake email form anywhere — `runtime-safety.test.mjs` enforces the absence of one. Subscriptions go through `/rss.xml` only. Both `Header.astro` and `PostLayout.astro` link to `${base}/rss.xml`; the in-page subscription prompt (`createSubscribePrompt` in `Layout.astro`) also points to RSS.
 
+### Search (Pagefind)
+`src/components/PagefindSearch.astro` lazy-loads the Pagefind WASM+JS bundle on first search keystroke. `Header.astro`'s input listener first calls `window.__ymll_pagefind()`; if Pagefind isn't available (dev mode, before WASM loads), it falls back to the static `searchIndex` of post titles/descriptions/tags. The Pagefind index is generated at build time by `pagefind --site dist`, chained into `npm run build`.
+
+### Comments (giscus)
+`src/components/GiscusComments.astro` renders a giscus widget at the bottom of every blog post. giscus uses GitHub Discussions as the backend — no database, no server. **One-time setup required**: enable Discussions on the repo, install the giscus app, then replace the placeholder `repoId` / `categoryId` props in `GiscusComments.astro` with the values from <https://giscus.app/>. See `docs/RUNBOOK.md` § "Adding dynamic features".
+
+### Cloudflare Pages infra files
+Both `public/_headers` and `public/_redirects` are honored by Cloudflare Pages at the edge — no Astro/Vite config needed. `_headers` sets CSP, HSTS, asset caching, and admin noindex. `_redirects` rewrites legacy `/ymllblog/*` URLs to root so old bookmarks keep working after migrating off GitHub Pages. `runtime-safety.test.mjs` asserts both files contain the required entries.
+
 ### Music Player
 `MusicPlayer.astro` uses the **official NetEase Cloud Music iframe** (`music.163.com/outchain/player`, `type=0` playlist mode, full 430px height). It exposes `data-player-provider="netease-cloud-music"` and accepts a `playlistId?: string` prop so the playlist can be swapped without editing the component. The component must NOT use `new Audio()` or render a `music-song-btn` — direct mp3 links are unstable, so playlist switching is delegated to the iframe. `runtime-safety.test.mjs` enforces this.
 

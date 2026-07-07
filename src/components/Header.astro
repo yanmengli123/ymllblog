@@ -240,6 +240,51 @@ const searchIndex = posts
     });
   }
 
+  // Try Pagefind full-text search first (lazy-loaded via PagefindSearch.astro).
+  // Falls back to the static searchIndex when Pagefind isn't available —
+  // this happens in `astro dev` mode and on first paint before the WASM
+  // bundle finishes loading.
+  async function handleSearch(query) {
+    const pfResults = window.__ymll_pagefind ? await window.__ymll_pagefind(query) : null;
+    if (pfResults !== null) {
+      renderResultsFromPagefind(pfResults, query);
+      return;
+    }
+    renderSearchResults(query);
+  }
+
+  function renderResultsFromPagefind(results, query) {
+    if (!searchResults) return;
+    searchResults.replaceChildren();
+    if (!query.trim()) {
+      renderSearchResults('');
+      return;
+    }
+    if (results.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'rounded-xl bg-stone-50 p-4 text-sm text-stone-500 dark:bg-stone-800';
+      empty.textContent = '没有找到匹配内容';
+      searchResults.appendChild(empty);
+      return;
+    }
+    for (const post of results) {
+      const link = document.createElement('a');
+      link.href = post.url;
+      link.className = 'block rounded-xl border border-stone-100 p-3 transition-colors hover:bg-stone-50 dark:border-stone-800 dark:hover:bg-stone-800';
+      const title = document.createElement('div');
+      title.className = 'font-medium text-stone-900 dark:text-stone-100';
+      title.textContent = post.title;
+      link.appendChild(title);
+      if (post.excerpt) {
+        const excerpt = document.createElement('div');
+        excerpt.className = 'mt-1 text-sm text-stone-500 dark:text-stone-400 line-clamp-2';
+        excerpt.innerHTML = post.excerpt; // Pagefind excerpts are pre-sanitized server-side
+        link.appendChild(excerpt);
+      }
+      searchResults.appendChild(link);
+    }
+  }
+
   searchBtn?.addEventListener('click', openSearch);
   searchClose?.addEventListener('click', closeSearch);
   searchModal?.addEventListener('click', (event) => {
@@ -247,7 +292,7 @@ const searchIndex = posts
   });
   if (searchInput) {
     searchInput.addEventListener('input', (event) => {
-      renderSearchResults(event.target.value);
+      handleSearch(event.target.value);
     });
   }
   document.addEventListener('keydown', (event) => {

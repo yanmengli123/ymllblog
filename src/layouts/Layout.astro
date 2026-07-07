@@ -1,6 +1,7 @@
 ---
 import { getPageURL, getImageURL, generateJSONLD } from '../lib/seo';
 import '../styles/global.css';
+import PagefindSearch from '../components/PagefindSearch.astro';
 
 interface Props {
   title?: string;
@@ -322,5 +323,6 @@ const jsonLD = generateJSONLD({
       setTimeout(createSubscribePrompt, 12000);
     })();
     </script>
+    <PagefindSearch />
   </body>
 </html>

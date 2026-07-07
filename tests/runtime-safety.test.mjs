@@ -45,4 +45,15 @@ assert.match(sitemapScript, /yanmengli123\.github\.io/, 'sitemap script should d
 assert.match(sitemapScript, /encodeURIComponent/, 'sitemap script should URL-encode dynamic path segments');
 assert.match(sitemapScript, /escapeXml/, 'sitemap script should XML-escape URLs');
 
+const headersFile = read('public/_headers');
+assert.match(headersFile, /Content-Security-Policy/, 'public/_headers should set a CSP');
+assert.match(headersFile, /Strict-Transport-Security/, 'public/_headers should enable HSTS');
+assert.match(headersFile, /X-Content-Type-Options/, 'public/_headers should disable MIME sniffing');
+assert.match(headersFile, /\/admin\/\*/, 'public/_headers should apply a special rule to /admin (e.g. noindex)');
+assert.match(headersFile, /giscus\.app/, 'CSP must allow giscus.app (comment widget)');
+assert.match(headersFile, /Cache-Control.*immutable/, 'public/_headers should cache-bust hashed /_astro/* assets');
+
+const redirectsFile = read('public/_redirects');
+assert.match(redirectsFile, /\/ymllblog\//, 'public/_redirects should rewrite legacy /ymllblog/* to root for Cloudflare Pages');
+
 console.log('runtime safety tests passed');
