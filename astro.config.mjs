@@ -10,8 +10,14 @@ import rehypeKatex from 'rehype-katex';
 //   - Local dev defaults to '/' so http://localhost:4321/ just works
 const base = process.env.BASE_URL ?? '/ymllblog';
 
+// SITE controls the canonical host for RSS / sitemap / OG tags.
+//   - GitHub Pages default: https://yanmengli123.github.io/ymllblog
+//   - Cloudflare Pages:  set SITEMAP_SITE_ROOT=https://ymllblog.pages.dev in dashboard
+//   - Custom domain:    set SITEMAP_SITE_ROOT=https://yourdomain.tld
+const site = process.env.SITEMAP_SITE_ROOT ?? 'https://yanmengli123.github.io/ymllblog';
+
 export default defineConfig({
-  site: 'https://yanmengli123.github.io',
+  site,
   base,
   integrations: [
     tailwind(),
