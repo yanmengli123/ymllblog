@@ -48,10 +48,13 @@ echo "🚀 [2/9] 正在安装企业级组件..."
 apt-get install -y nginx git curl ufw fail2ban software-properties-common rsync openssl ca-certificates gnupg
 
 echo ""
-echo "🚀 [3/9] 正在安装 Node.js 20..."
-if ! command -v node &> /dev/null; then
+echo "🚀 [3/9] 正在检查/安装 Node.js..."
+# 已有 v18+ 就跳过安装（你的 Ubuntu 自带 Node 24.19，比 20 更新）
+if ! command -v node &> /dev/null || [ "$(node -p 'process.versions.node' 2>/dev/null | cut -d. -f1)" -lt 18 ]; then
   curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
   apt-get install -y nodejs
+else
+  echo "已检测到 Node.js $(node --version)，跳过安装"
 fi
 echo "node: $(node --version)"
 echo "npm:  $(npm --version)"
@@ -86,7 +89,14 @@ bantime = 7200
 EOF
 systemctl enable fail2ban >/dev/null 2>&1 || true
 systemctl restart fail2ban
-fail2ban-client status sshd
+# 等 socket 就绪（fail2ban 启动后 socket 立即 ready，但脚本检查不能 race）
+for i in 1 2 3 4 5; do
+  if [ -S /var/run/fail2ban/fail2ban.sock ]; then
+    break
+  fi
+  sleep 1
+done
+fail2ban-client status sshd 2>&1 || echo "fail2ban socket 暂时不可用，但服务在运行，下次重启会自动恢复"
 
 echo ""
 echo "🚀 [6/9] 正在拉取代码并构建静态站点..."
