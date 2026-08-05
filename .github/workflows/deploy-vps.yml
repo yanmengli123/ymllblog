@@ -74,6 +74,21 @@ jobs:
       url: https://yanmengli.cn
 
     steps:
+      - name: Debug SSH connectivity
+        run: |
+          echo "--- Debug: write private key ---"
+          echo "${{ secrets.VPS_SSH_KEY }}" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          ls -la /tmp/deploy_key
+          echo "--- First 3 lines of key ---"
+          head -3 /tmp/deploy_key
+          echo "--- Last 3 lines of key ---"
+          tail -3 /tmp/deploy_key
+          echo "--- Test ssh connection ---"
+          ssh -v -i /tmp/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "echo 'GITHUB ACTIONS SSH OK' && uname -a" 2>&1 | tail -30
+
       - name: Deploy dist/ to VPS via rsync over SSH
         uses: burnett01/rsync-deployments@5.2
         with:
