@@ -1,0 +1,138 @@
+name: Deploy to VPS
+
+# 自动部署到 https://yanmengli.cn
+# - push 到 main → 部署生产
+# - PR 打开 → 部署预览分支（独立目录，不影响生产）
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 防止并发部署（同一时间只能跑一个 deploy job）
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Contract tests
+        run: |
+          node tests/home-layout.test.mjs
+          node tests/runtime-safety.test.mjs
+
+      - name: Type check
+        run: npx astro check
+
+      - name: Build
+        env:
+          # CF Pages 和 VPS 都用同一份环境变量配置，保证两边构建产物一致
+          BASE_URL: /
+          SITEMAP_SITE_ROOT: https://yanmengli.cn
+          CI: true
+        run: npm run build
+
+      - name: Verify build artifacts
+        run: |
+          test -f dist/sitemap.xml
+          test -f dist/rss.xml
+          test -d dist/_astro
+          echo "Build artifacts OK"
+
+      - name: Upload artifact (retained 7 days for debugging)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          retention-days: 7
+          if-no-files-found: error
+
+  deploy-production:
+    name: Deploy to VPS (production)
+    # 只在 push 到 main 时部署（PR 走 preview-deploy，不走这条）
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://yanmengli.cn
+
+    steps:
+      - name: Deploy dist/ to VPS via rsync over SSH
+        uses: burnett01/rsync-deployments@5.2
+        with:
+          switches: -avzr --delete --exclude='.git'
+          path: dist/
+          remote_path: /var/www/yanmengli/html/
+          remote_host: ${{ secrets.VPS_HOST }}
+          remote_user: ${{ secrets.VPS_USER }}
+          remote_key: ${{ secrets.VPS_SSH_KEY }}
+          # rsync 直接覆盖文件，不需要 SSH 在远端执行命令
+          # 因为密钥 authorized_keys 里强制 command= 只允许这个 rsync
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying https://yanmengli.cn is live..."
+          sleep 5
+          curl -sI https://yanmengli.cn | head -1 || exit 1
+          curl -sI https://yanmengli.cn/ymllblog/blog/ | head -1 || exit 1
+          echo "✅ Production deploy verified"
+
+      - name: Notify success
+        if: success()
+        run: |
+          echo "🎉 Production deployed: https://yanmengli.cn"
+          echo "Commit: ${{ github.sha }}"
+          echo "Author: ${{ github.actor }}"
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          echo "❌ Production deploy FAILED"
+          echo "Commit: ${{ github.sha }}"
+          echo "Check: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          # 如果你想接 Slack/Discord/邮件告警，加 webhook 调用在这里
+
+  deploy-preview:
+    name: Deploy PR preview
+    # 只在 PR 时跑，部署到独立子目录（不影响生产）
+    if: github.event_name == 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: preview-${{ github.event.pull_request.number }}
+
+    steps:
+      - name: Deploy to preview subdirectory
+        uses: burnett01/rsync-deployments@5.2
+        with:
+          switches: -avzr --delete
+          path: dist/
+          remote_path: /var/www/yanmengli/preview-${{ github.event.pull_request.number }}/
+          remote_host: ${{ secrets.VPS_HOST }}
+          remote_user: ${{ secrets.VPS_USER }}
+          remote_key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: Comment preview URL on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: preview
+          message: |
+            🌐 Preview: https://preview-${{ github.event.pull_request.number }}.yanmengli.cn
+            _(该域名需要在 Cloudflare / DNS 中配置 wildcard，前缀指向 VPS — 见 docs/DEPLOY-AUTOMATION.md)_
