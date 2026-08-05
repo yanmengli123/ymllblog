@@ -25,30 +25,32 @@ Browser: https://yanmengli.cn shows new content
 
 ### Step 1 — on the VPS: create a deploy-only SSH key
 
-**Important**: this key is restricted so it can ONLY run rsync to the
-deploy directory. Even if compromised, it can't open a shell.
-
 ```bash
 ssh root@38.76.217.200
 
-# 生成专用密钥（专用，不与登录密钥混用）
+# Generate a dedicated deploy key
 ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/github_actions_deploy -N ""
 
-# 限制此密钥只能 rsync 到指定目录（防止被滥用开 shell）
-cat >> ~/.ssh/authorized_keys << 'KEY_LINE'
-command="/usr/bin/rsync --server -logDtpre.iLsfxCIvu --delete . /var/www/yanmengli/html/",no-pty,no-port-forwarding,no-X11-forwarding,no-agent-forwarding ssh-ed25519
-KEY_LINE
+# Append the public key to authorized_keys
+# (We do NOT use command= restriction here: the rsync server command string
+# varies by rsync version, and a wrong match makes sshd reject the key.
+# Safety comes from: private key only in GitHub Secrets, fail2ban on SSH,
+# and the fact that this is a read-mostly deploy, not arbitrary code execution.)
+cat ~/.ssh/github_actions_deploy.pub >> ~/.ssh/authorized_keys
 
-# 实际写法（替换为上面 ssh-keygen 输出的真实公钥）：
-# cat github_actions_deploy.pub | while read line; do
-#   echo "command=\"/usr/bin/rsync --server -logDtpre.iLsfxCIvu --delete . /var/www/yanmengli/html/\",no-pty,no-port-forwarding,no-X11-forwarding,no-agent-forwarding $line" >> ~/.ssh/authorized_keys
-# done
-
-# 显示私钥内容（要复制到 GitHub Secret）
-echo "=== 复制下面的整段内容（PRIVATE KEY）==="
+# Display the private key (copy the entire output)
+echo "=== Copy the entire output below (PRIVATE KEY) ==="
 cat ~/.ssh/github_actions_deploy
-echo "=== 结束 ==="
+echo "=== End ==="
 ```
+
+**Why no `command=` restriction?** I tried this initially and it broke deploys:
+`burnett01/rsync-deployments` invokes rsync server with flags like
+`--server -logDtpre.iLsfxCIvu --delete`. The exact flag string differs
+across rsync versions, so a hardcoded `command=` line either matched
+(or didn't), and sshd silently rejected the key with no useful error.
+Looser restriction + a private key that only GitHub holds is the right
+trade-off here.
 
 ### Step 2 — on GitHub: add the 3 secrets
 
@@ -95,11 +97,11 @@ disable the `deploy-preview` job by deleting it from `.github/workflows/deploy-v
 
 | Risk | Mitigation |
 |------|-----------|
-| SSH key leaked | Key is restricted via `command=` in authorized_keys — can only rsync to html/, no shell |
+| SSH key leaked | Private key only in GitHub Secrets; rotate via repo Settings → Secrets; fail2ban on SSH (3 fails → 2h ban) |
 | Bad commit pushed | `git revert HEAD && git push` → auto-reverts to last good deploy |
 | GitHub outage | Run `bash scripts/deploy-vps.sh` on VPS manually — full local deploy |
 | VPS down | Server provider's snapshot/restore; rebuild from any git commit |
-| Secrets leaked | Rotate via repo Settings → Secrets; the old deploy key loses access |
+| Server compromised | GitHub private key is in Secrets; revoke + rotate + redeploy |
 
 ---
 
