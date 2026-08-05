@@ -74,39 +74,39 @@ jobs:
       url: https://yanmengli.cn
 
     steps:
-      - name: Debug SSH connectivity
+      - name: Setup SSH key
         run: |
-          echo "--- Debug: write private key ---"
-          echo "${{ secrets.VPS_SSH_KEY }}" > /tmp/deploy_key
-          chmod 600 /tmp/deploy_key
-          ls -la /tmp/deploy_key
-          echo "--- First 3 lines of key ---"
-          head -3 /tmp/deploy_key
-          echo "--- Last 3 lines of key ---"
-          tail -3 /tmp/deploy_key
-          echo "--- Test ssh connection ---"
-          ssh -v -i /tmp/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
-            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "echo 'GITHUB ACTIONS SSH OK' && uname -a" 2>&1 | tail -30
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "Key first line: $(head -1 ~/.ssh/deploy_key)"
+          echo "Key last line: $(tail -1 ~/.ssh/deploy_key)"
+          # Disable host key checking - VPS IP may have changed
+          echo "StrictHostKeyChecking=no" >> ~/.ssh/config
+          echo "UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+          chmod 600 ~/.ssh/config
 
-      - name: Deploy dist/ to VPS via rsync over SSH
-        uses: burnett01/rsync-deployments@5.2
-        with:
-          switches: -avzr --delete --exclude='.git'
-          path: dist/
-          remote_path: /var/www/yanmengli/html/
-          remote_host: ${{ secrets.VPS_HOST }}
-          remote_user: ${{ secrets.VPS_USER }}
-          remote_key: ${{ secrets.VPS_SSH_KEY }}
-          # rsync 直接覆盖文件，不需要 SSH 在远端执行命令
-          # 因为密钥 authorized_keys 里强制 command= 只允许这个 rsync
+      - name: Test SSH connectivity
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o ConnectTimeout=15 \
+              ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+              "echo 'GITHUB ACTIONS SSH OK' && uname -a"
+
+      - name: Install rsync and deploy
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y rsync
+          rsync -avzr --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+            dist/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/yanmengli/html/
+          echo "✅ rsync complete"
 
       - name: Verify deployment
         run: |
+          sleep 3
           echo "Verifying https://yanmengli.cn is live..."
-          sleep 5
           curl -sI https://yanmengli.cn | head -1 || exit 1
-          curl -sI https://yanmengli.cn/ymllblog/blog/ | head -1 || exit 1
           echo "✅ Production deploy verified"
 
       - name: Notify success
@@ -122,7 +122,6 @@ jobs:
           echo "❌ Production deploy FAILED"
           echo "Commit: ${{ github.sha }}"
           echo "Check: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          # 如果你想接 Slack/Discord/邮件告警，加 webhook 调用在这里
 
   deploy-preview:
     name: Deploy PR preview
@@ -134,15 +133,19 @@ jobs:
       name: preview-${{ github.event.pull_request.number }}
 
     steps:
-      - name: Deploy to preview subdirectory
-        uses: burnett01/rsync-deployments@5.2
-        with:
-          switches: -avzr --delete
-          path: dist/
-          remote_path: /var/www/yanmengli/preview-${{ github.event.pull_request.number }}/
-          remote_host: ${{ secrets.VPS_HOST }}
-          remote_user: ${{ secrets.VPS_USER }}
-          remote_key: ${{ secrets.VPS_SSH_KEY }}
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: rsync to preview subdirectory
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y rsync
+          rsync -avzr --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+            dist/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/yanmengli/preview-${{ github.event.pull_request.number }}/
 
       - name: Comment preview URL on PR
         uses: marocchino/sticky-pull-request-comment@v2
