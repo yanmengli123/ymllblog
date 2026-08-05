@@ -126,8 +126,49 @@ chmod -R 755 "$HTML_DIR"
 echo "已部署 $(find "$HTML_DIR" -type f | wc -l) 个文件到 $HTML_DIR"
 
 echo ""
-echo "🚀 [8/9] 正在配置 Nginx..."
-cat > /etc/nginx/sites-available/"$DOMAIN" << 'NGINX_EOF'
+echo "🚀 [8/9] 正在配置 Nginx（临时 HTTP 配置用于证书申请）..."
+cat > /etc/nginx/sites-available/"$DOMAIN" << 'NGINX_TEMP_EOF'
+server {
+    listen 80;
+    listen [::]:80;
+    server_name yanmengli.cn www.yanmengli.cn;
+    root /var/www/yanmengli/html;
+    index index.html;
+    location / { try_files $uri $uri/ =404; }
+}
+NGINX_TEMP_EOF
+
+ln -sf /etc/nginx/sites-available/"$DOMAIN" /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+nginx -t
+systemctl restart nginx || echo "nginx 启动失败，详情见下"
+echo "nginx 临时 HTTP 配置已就绪（用于 certbot 验证）"
+
+echo ""
+echo "🚀 [9/9] 正在申请 Let's Encrypt HTTPS 证书..."
+apt-get install -y certbot
+if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+  certbot certonly --webroot -w "$HTML_DIR" \
+    -d "$DOMAIN" -d "www.$DOMAIN" \
+    --non-interactive --agree-tos -m "$ADMIN_EMAIL"
+  CERT_RESULT=$?
+  if [ $CERT_RESULT -ne 0 ]; then
+    echo "❌ 证书申请失败，请检查："
+    echo "  1. DNS 解析：nslookup yanmengli.cn 应该返回 $SERVER_IP"
+    echo "  2. 80 端口：ss -tlnp | grep :80 应有 nginx"
+    echo "  3. 验证：curl http://yanmengli.cn/.well-known/acme-challenge/test 应该返回 404（说明路由通了）"
+    exit 1
+  fi
+else
+  echo "证书已存在，跳过申请"
+fi
+
+systemctl enable certbot.timer >/dev/null 2>&1 || true
+systemctl start certbot.timer
+
+# 切到完整 HTTPS 配置
+echo "切换到完整 HTTPS 配置（含 SSL + 安全头）..."
+cat > /etc/nginx/sites-available/"$DOMAIN" << 'NGINX_FULL_EOF'
 server {
     listen 80;
     listen [::]:80;
@@ -199,28 +240,89 @@ server {
         try_files $uri $uri/ =404;
     }
 }
-NGINX_EOF
+NGINX_FULL_EOF
 
-ln -sf /etc/nginx/sites-available/"$DOMAIN" /etc/nginx/sites-enabled/
-rm -f /etc/nginx/sites-enabled/default
+nginx -t && systemctl restart nginx
+echo "✅ nginx 完整 HTTPS 配置已生效"
+
+# 切到完整 HTTPS 配置（含 SSL 证书 + 安全头 + /ymllblog/ 重定向）
+cat > /etc/nginx/sites-available/"$DOMAIN" << 'NGINX_FULL_EOF'
+server {
+    listen 80;
+    listen [::]:80;
+    server_name yanmengli.cn www.yanmengli.cn;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/yanmengli/html;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name yanmengli.cn www.yanmengli.cn;
+
+    root /var/www/yanmengli/html;
+    index index.html;
+
+    ssl_certificate     /etc/letsencrypt/live/yanmengli.cn/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yanmengli.cn/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net https://music.163.com https://*.music.126.net https://*.netease.com https://giscus.app https://*.giscus.app; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://unpkg.com https://giscus.app; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https: blob: https://*.githubusercontent.com; media-src 'self' https://*.music.126.net https://music.163.com; frame-src https://music.163.com https://*.music.126.net https://open.spotify.com https://www.youtube.com https://giscus.app; connect-src 'self' https://api.github.com https://*.githubusercontent.com https://giscus.app https://*.giscus.app; worker-src 'self' blob:; manifest-src 'self'" always;
+
+    location ^~ /ymllblog/ {
+        rewrite ^/ymllblog/(.*)$ /$1 permanent;
+    }
+
+    location ~ /\. { deny all; }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    location ~* /(sitemap\.xml|rss\.xml|robots\.txt)$ {
+        expires 1h;
+        add_header Cache-Control "public, max-age=3600";
+    }
+
+    location ^~ /admin/ {
+        add_header X-Robots-Tag "noindex, nofollow" always;
+        add_header Cache-Control "no-store" always;
+    }
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/javascript application/json application/xml image/svg+xml;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+NGINX_FULL_EOF
+
 nginx -t
-echo "nginx 配置验证通过"
-
-echo ""
-echo "🚀 [9/9] 正在申请 Let's Encrypt HTTPS 证书..."
-apt-get install -y certbot
-# 已存在证书则跳过（续期由 certbot.timer 负责）
-if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
-  certbot certonly --webroot -w "$HTML_DIR" \
-    -d "$DOMAIN" -d "www.$DOMAIN" \
-    --non-interactive --agree-tos -m "$ADMIN_EMAIL"
-else
-  echo "证书已存在，跳过申请（certbot.timer 会自动续期）"
-fi
-
-systemctl enable certbot.timer >/dev/null 2>&1 || true
-systemctl start certbot.timer
 systemctl restart nginx
+echo "nginx 完整 HTTPS 配置已生效"
 
 echo ""
 echo "============================================================"
