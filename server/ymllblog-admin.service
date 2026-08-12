@@ -1,0 +1,28 @@
+[Unit]
+Description=YMLL Blog Admin API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/yanmengli/admin-runtime
+Environment=NODE_ENV=production
+Environment=ADMIN_HOST=127.0.0.1
+Environment=ADMIN_PORT=8787
+Environment=CONTENT_BACKEND=github
+EnvironmentFile=/etc/ymllblog-admin.env
+ExecStart=/usr/bin/node /var/www/yanmengli/admin-runtime/admin-server.mjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/var/www/yanmengli/admin-runtime
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

@@ -186,8 +186,8 @@ jobs:
 
 ## 8. Daily ops
 
-- **Write a post**: browse to `https://yanmengli.cn/admin/` → Sveltia CMS → commit → auto-deploy (if CI set up) or re-run deploy script.
-- **Check health**: `systemctl status nginx`, `certbot certificates`, `fail2ban-client status sshd`.
+- **Write a post**: browse to `https://yanmengli.cn/admin/` → log in with the administrator username/password → save → Git commit and automatic deploy.
+- **Check health**: `systemctl status nginx ymllblog-admin`, `curl http://127.0.0.1:8787/admin-api/health`, `certbot certificates`, `fail2ban-client status sshd`.
 - **Backup**: Git history is the backup. Add `git remote add backup git@gitlab.com:you/ymllblog.git && git push backup main` for a second copy.
 
 ---

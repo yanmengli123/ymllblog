@@ -8,342 +8,94 @@ import { getRelatedPosts } from '../lib/posts';
 import { getPageURL } from '../lib/seo';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-
 interface Props {
-  frontmatter: {
-    title: string;
-    description: string;
-    pubDate: Date;
-    updatedDate?: Date;
-    author: string;
-    tags: string[];
-    category?: string;
-    cover?: string;
-    draft: boolean;
-    featured: boolean;
-    lang: string;
-  };
-  headings: {
-    depth: number;
-    slug: string;
-    text: string;
-  }[];
+  frontmatter: { title: string; description: string; pubDate: Date; updatedDate?: Date; author: string; tags: string[]; category?: string; cover?: string; draft: boolean; featured: boolean; lang: string; };
+  headings: { depth: number; slug: string; text: string; }[];
   slug: string;
 }
-
 const { frontmatter, headings, slug } = Astro.props;
-const tocHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
-const relatedPosts = await getRelatedPosts({ slug, data: { tags: frontmatter.tags } } as any, 4);
+const toc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
+const related = await getRelatedPosts({ id: slug, data: { tags: frontmatter.tags } }, 3);
 const articleURL = getPageURL(`/blog/${slug}`);
-const twitterShareURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(frontmatter.title)}&url=${encodeURIComponent(articleURL)}`;
-const formattedDate = frontmatter.pubDate.toLocaleDateString('zh-CN', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
-const updatedDate = frontmatter.updatedDate?.toLocaleDateString('zh-CN', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
+const date = frontmatter.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+const updated = frontmatter.updatedDate?.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
-<Layout
-  title={`${frontmatter.title} - YMLL Blog`}
-  description={frontmatter.description}
-  image={frontmatter.cover}
-  type="article"
-  publishedTime={frontmatter.pubDate}
-  updatedTime={frontmatter.updatedDate}
-  author={frontmatter.author}
-  tags={frontmatter.tags}
->
+<Layout motion="reading" title={`${frontmatter.title}｜YMLL Blog`} description={frontmatter.description} image={frontmatter.cover} type="article" publishedTime={frontmatter.pubDate} updatedTime={frontmatter.updatedDate} author={frontmatter.author} tags={frontmatter.tags}>
   <Header />
-  <div id="reading-progress" class="fixed left-0 top-0 z-[60] h-1 bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-100" style="width: 0%"></div>
+  <div id="reading-progress" class="reading-progress fixed left-0 right-0 top-0 z-[70] h-[3px]" style="background: var(--brand);"></div>
+  <main id="main-content" class="pb-24 pt-28">
+    <article>
+      <header class="site-shell max-w-5xl py-10 sm:py-16" data-reveal>
+        <a href={`${base}/blog`} class="text-sm font-semibold" style="color: var(--brand-deep);">← 返回文章</a>
+        <div class="mt-10 flex flex-wrap items-center gap-3 text-xs" style="color: var(--muted);">
+          {frontmatter.category && <span class="font-semibold uppercase tracking-[0.15em]" style="color: var(--brand-deep);">{frontmatter.category}</span>}
+          <time datetime={frontmatter.pubDate.toISOString()}>{date}</time>
+          {updated && <span>更新于 {updated}</span>}
+        </div>
+        <h1 class="mt-6 max-w-4xl font-display text-4xl font-black leading-[1.2] sm:text-6xl">{frontmatter.title}</h1>
+        <p class="mt-7 max-w-3xl text-lg leading-8 sm:text-xl" style="color: var(--muted);">{frontmatter.description}</p>
+        <div class="mt-8 flex flex-wrap items-center justify-between gap-5 border-t pt-6" style="border-color: var(--line);">
+          <div class="flex items-center gap-3"><span class="grid h-11 w-11 place-items-center rounded-full text-sm font-bold" style="background: var(--brand-soft); color: var(--brand-deep);">{frontmatter.author[0]}</span><span><strong class="block text-sm">{frontmatter.author}</strong><small style="color: var(--muted);">独立写作者</small></span></div>
+          <div class="flex flex-wrap gap-2">{frontmatter.tags.map((tag) => <a href={`${base}/tags/${tag}`} class="tag-pill">#{tag}</a>)}</div>
+        </div>
+      </header>
 
-  <main class="pt-20 pb-16">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="grid gap-8 xl:grid-cols-[14rem_minmax(0,1fr)_18rem]">
-        <aside class="hidden xl:block">
-          <div class="sticky top-24 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-            <h2 class="mb-4 text-sm font-bold text-stone-900">目录</h2>
-            <nav class="space-y-1" aria-label="文章目录">
-              {tocHeadings.map((heading) => (
-                <a
-                  href={`#${heading.slug}`}
-                  data-heading={heading.slug}
-                  class:list={[
-                    'toc-link block rounded-lg py-1.5 px-3 text-sm transition-all',
-                    heading.depth === 2 ? 'font-medium text-stone-700' : 'pl-6 text-stone-500',
-                  ]}
-                >
-                  {heading.text}
-                </a>
-              ))}
+      {frontmatter.cover && <figure class="site-shell max-w-6xl pb-10" data-reveal><img src={frontmatter.cover} alt="" class="aspect-[16/8] w-full rounded-[2rem] border object-cover" style="border-color: var(--line);" loading="eager" /><figcaption class="sr-only">{frontmatter.title}</figcaption></figure>}
+
+      <div class="site-shell grid max-w-6xl gap-12 lg:grid-cols-[minmax(0,1fr)_15rem]">
+        <div class="min-w-0">
+          {toc.length > 0 && <details class="surface mb-8 rounded-2xl p-5 lg:hidden"><summary class="cursor-pointer font-semibold">本文目录</summary><nav class="mt-4 grid gap-2" aria-label="移动端文章目录">{toc.map((heading) => <a href={`#${heading.slug}`} class:list={['text-sm hover:underline', heading.depth === 3 && 'pl-4']} style="color: var(--muted);">{heading.text}</a>)}</nav></details>}
+          <div class="article-prose"><slot /></div>
+
+          <div class="mt-14 flex flex-wrap items-center justify-between gap-5 border-y py-6" style="border-color: var(--line);">
+            <p class="text-sm" style="color: var(--muted);">觉得有帮助？把它分享给需要的人。</p>
+            <button id="share-article" data-share-url={articleURL} data-share-title={frontmatter.title} class="button-secondary"><span id="share-label">分享文章</span></button>
+          </div>
+
+          {related.length > 0 && <section class="mt-16" data-reveal><p class="eyebrow">Keep reading</p><h2 class="font-display text-3xl font-bold">继续阅读</h2><div class="mt-7 grid gap-4 sm:grid-cols-3">{related.map((post, index) => <a href={`${base}/blog/${post.id}`} class="motion-card surface group rounded-2xl p-5" style={`--reveal-order: ${index};`} data-reveal><small style="color: var(--brand);">0{index + 1}</small><h3 class="motion-card-title mt-5 font-display text-lg font-bold leading-snug group-hover:text-emerald-700 dark:group-hover:text-emerald-300">{post.data.title}</h3><time class="mt-4 block text-xs" style="color: var(--muted);">{post.data.pubDate.toLocaleDateString('zh-CN')}</time></a>)}</div></section>}
+
+          <GiscusComments />
+        </div>
+
+        <aside class="hidden lg:block">
+          <div class="sticky top-28">
+            <p class="mb-4 text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--muted);">On this page</p>
+            <nav class="border-l" style="border-color: var(--line);" aria-label="文章目录">
+              {toc.length ? toc.map((heading) => <a href={`#${heading.slug}`} data-heading={heading.slug} class:list={['toc-link block border-l py-2 pl-4 text-sm transition hover:text-emerald-700', heading.depth === 3 && 'pl-7 text-xs']} style="border-color: transparent; color: var(--muted);">{heading.text}</a>) : <span class="block pl-4 text-sm" style="color: var(--muted);">短文，无目录</span>}
             </nav>
           </div>
         </aside>
-
-        <article class="min-w-0">
-          <header class="mb-8 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-            {frontmatter.cover && (
-              <div class="aspect-[21/9] overflow-hidden">
-                <img src={frontmatter.cover} alt={frontmatter.title} class="h-full w-full object-cover" loading="eager" />
-              </div>
-            )}
-            <div class="p-8 md:p-10">
-              <div class="mb-6 flex flex-wrap items-center gap-2">
-                {frontmatter.category && (
-                  <span class="rounded-full bg-emerald-500 px-3 py-1 text-xs font-medium text-white">{frontmatter.category}</span>
-                )}
-                {frontmatter.tags.map((tag) => (
-                  <a href={`${base}/tags/${tag}`} class="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600 transition-colors hover:bg-emerald-50 hover:text-emerald-600">
-                    {tag}
-                  </a>
-                ))}
-              </div>
-              <h1 class="mb-6 text-3xl font-bold leading-tight text-stone-900 md:text-4xl lg:text-5xl">{frontmatter.title}</h1>
-              <p class="mb-8 text-lg leading-relaxed text-stone-600">{frontmatter.description}</p>
-              <div class="flex flex-wrap items-center justify-between gap-6 border-t border-stone-100 pt-6">
-                <div class="flex items-center gap-4">
-                  <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-xl font-bold text-white">
-                    {frontmatter.author[0]}
-                  </div>
-                  <div>
-                    <div class="text-lg font-bold text-stone-900">{frontmatter.author}</div>
-                    <div class="text-sm text-stone-500">{frontmatter.category || '技术博客'}</div>
-                  </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-4 text-sm text-stone-500">
-                  <time datetime={frontmatter.pubDate.toISOString()}>{formattedDate}</time>
-                  {updatedDate && <span>更新于 {updatedDate}</span>}
-                </div>
-              </div>
-            </div>
-          </header>
-
-          <section class="mb-8 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-            <div class="p-8 md:p-10">
-              <div class="prose prose-lg prose-stone max-w-none prose-headings:scroll-mt-24 prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md">
-                <slot />
-              </div>
-            </div>
-          </section>
-
-          <section class="mb-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-            <div class="flex flex-wrap items-center justify-center gap-4">
-              <button id="like-btn" class="rounded-xl bg-stone-100 px-6 py-3 font-medium transition-all hover:bg-red-50 hover:text-red-500">
-                点赞 <span id="like-count" class="ml-1 rounded-full bg-stone-200 px-2 py-0.5 text-sm">0</span>
-              </button>
-              <button id="bookmark-btn" class="rounded-xl bg-stone-100 px-6 py-3 font-medium transition-all hover:bg-amber-50 hover:text-amber-500">
-                收藏
-              </button>
-              <div class="relative">
-                <button id="share-btn" class="rounded-xl bg-stone-100 px-6 py-3 font-medium transition-all hover:bg-blue-50 hover:text-blue-500">
-                  分享
-                </button>
-                <div id="share-modal" class="hidden absolute bottom-full left-1/2 mb-2 min-w-[200px] -translate-x-1/2 rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
-                  <div class="flex flex-col gap-2">
-                    <button id="twitter-share-btn" data-share-url={twitterShareURL} class="rounded-lg px-4 py-2 text-left text-sm transition-colors hover:bg-stone-50">Twitter</button>
-                    <button id="copy-link-btn" data-share-url={articleURL} class="rounded-lg px-4 py-2 text-left text-sm transition-colors hover:bg-stone-50">复制链接</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {relatedPosts.length > 0 && (
-            <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm md:p-8">
-              <h2 class="mb-6 text-xl font-bold text-stone-900">相关文章</h2>
-              <div class="grid gap-4 md:grid-cols-2">
-                {relatedPosts.slice(0, 4).map((post) => (
-                  <a href={`${base}/blog/${post.slug}`} class="group block rounded-xl border border-stone-100 p-4 transition-all hover:border-emerald-200 hover:bg-emerald-50/50">
-                    <h3 class="mb-2 line-clamp-2 font-semibold text-stone-900 transition-colors group-hover:text-emerald-600">{post.data.title}</h3>
-                    <p class="mb-2 line-clamp-2 text-sm text-stone-500">{post.data.description}</p>
-                    <span class="text-xs text-stone-400">{post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}</span>
-                  </a>
-                ))}
-              </div>
-            </section>
-          )}
-
-          <GiscusComments />
-        </article>
-
-        <aside class="hidden xl:block">
-          <div class="sticky top-24 space-y-6">
-            <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-              <h2 class="mb-2 text-sm font-bold text-stone-900">作者</h2>
-              <div class="mb-4 flex items-center gap-4">
-                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-xl font-bold text-white">
-                  {frontmatter.author[0]}
-                </div>
-                <div>
-                  <div class="font-bold text-stone-900">{frontmatter.author}</div>
-                  <div class="text-sm text-stone-500">{frontmatter.category || '技术博客'}</div>
-                </div>
-              </div>
-              <a href={`${base}/about`} class="block rounded-lg bg-emerald-500 px-4 py-2.5 text-center text-sm font-medium text-white transition-colors hover:bg-emerald-600">关于作者</a>
-            </section>
-
-            <section class="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-6">
-              <h2 class="mb-2 text-sm font-bold text-stone-900">订阅更新</h2>
-              <p class="mb-4 text-xs text-stone-600">静态站点采用 RSS 订阅，稳定、开放、无需收集邮箱。</p>
-              <a href={`${base}/rss.xml`} class="block rounded-lg bg-emerald-500 px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-emerald-600">打开 RSS</a>
-            </section>
-          </div>
-        </aside>
       </div>
-    </div>
+    </article>
   </main>
-
-  <button id="mobile-toc-btn" class="fixed bottom-6 left-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg transition-colors hover:bg-emerald-600 xl:hidden" aria-label="打开目录">
-    目
-  </button>
-  <div id="mobile-toc-modal" class="hidden fixed inset-0 z-[100] bg-black/50">
-    <div class="absolute bottom-0 left-0 right-0 max-h-[75vh] overflow-y-auto rounded-t-2xl bg-white p-6">
-      <div class="mb-6 flex items-center justify-between">
-        <h2 class="font-bold text-stone-900">目录</h2>
-        <button id="mobile-toc-close" class="rounded-lg p-2 hover:bg-stone-100" aria-label="关闭目录">关闭</button>
-      </div>
-      <nav class="space-y-1">
-        {tocHeadings.map((heading) => (
-          <a href={`#${heading.slug}`} class:list={['toc-link block rounded-lg py-2 px-3 text-sm transition-all', heading.depth === 2 ? 'font-medium text-stone-700' : 'pl-6 text-stone-500']} data-heading={heading.slug}>
-            {heading.text}
-          </a>
-        ))}
-      </nav>
-    </div>
-  </div>
-  <button id="article-back-to-top" class="fixed bottom-6 right-6 z-50 flex h-12 w-12 translate-y-4 items-center justify-center rounded-full bg-stone-900 text-white opacity-0 shadow-lg transition-all hover:bg-stone-800" aria-label="返回顶部">
-    ↑
-  </button>
-
   <Footer />
   <MermaidSupport />
 </Layout>
 
 <script is:inline>
-document.addEventListener('DOMContentLoaded', function() {
-  var progressBar = document.getElementById('reading-progress');
-  var backToTop = document.getElementById('article-back-to-top');
-  var tocLinks = Array.from(document.querySelectorAll('.toc-link'));
-  var headingPairs = tocLinks.map(function(link) {
-    var id = link.getAttribute('data-heading');
-    return { link: link, heading: id ? document.getElementById(id) : null };
-  }).filter(function(item) {
-    return item.heading;
+  const progress = document.getElementById('reading-progress');
+  const tocLinks = [...document.querySelectorAll('.toc-link')];
+  let readingFrame = 0;
+  const updateReadingState = () => {
+    readingFrame = 0;
+    const height = document.documentElement.scrollHeight - innerHeight;
+    const ratio = height > 0 ? Math.min(1, Math.max(0, scrollY / height)) : 0;
+    if (progress) progress.style.transform = `scaleX(${ratio})`;
+    let current = '';
+    tocLinks.forEach((link) => { const heading = document.getElementById(link.dataset.heading || ''); if (heading && heading.offsetTop <= scrollY + 150) current = link.dataset.heading || ''; });
+    tocLinks.forEach((link) => { const active = link.dataset.heading === current; link.style.borderColor = active ? 'var(--brand)' : 'transparent'; link.style.color = active ? 'var(--brand-deep)' : 'var(--muted)'; });
+  };
+  addEventListener('scroll', () => {
+    if (!readingFrame) readingFrame = requestAnimationFrame(updateReadingState);
+  }, { passive: true });
+  updateReadingState();
+  document.getElementById('share-article')?.addEventListener('click', async (event) => {
+    const button = event.currentTarget;
+    const data = { title: button.dataset.shareTitle, url: button.dataset.shareUrl };
+    try {
+      if (navigator.share) await navigator.share(data);
+      else { await navigator.clipboard.writeText(data.url || location.href); const label = document.getElementById('share-label'); if (label) { label.textContent = '链接已复制'; setTimeout(() => label.textContent = '分享文章', 1600); } }
+    } catch (error) { if (error?.name !== 'AbortError') console.warn('分享失败', error); }
   });
-
-  function updateScrollState() {
-    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    var percent = docHeight > 0 ? Math.min(100, Math.max(0, (window.scrollY / docHeight) * 100)) : 0;
-    if (progressBar) progressBar.style.width = percent + '%';
-    if (backToTop) {
-      var visible = window.scrollY > 500;
-      backToTop.classList.toggle('opacity-0', !visible);
-      backToTop.classList.toggle('translate-y-4', !visible);
-      backToTop.classList.toggle('opacity-100', visible);
-      backToTop.classList.toggle('translate-y-0', visible);
-    }
-
-    var current = null;
-    headingPairs.forEach(function(item) {
-      if (item.heading.offsetTop <= window.scrollY + 120) current = item;
-    });
-    tocLinks.forEach(function(link) {
-      link.classList.remove('text-emerald-600', 'bg-emerald-50', 'font-medium');
-      link.classList.add('text-stone-500');
-    });
-    if (current) {
-      current.link.classList.remove('text-stone-500');
-      current.link.classList.add('text-emerald-600', 'bg-emerald-50', 'font-medium');
-    }
-  }
-
-  window.addEventListener('scroll', updateScrollState, { passive: true });
-  updateScrollState();
-
-  if (backToTop) {
-    backToTop.addEventListener('click', function() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  var mobileTocBtn = document.getElementById('mobile-toc-btn');
-  var mobileTocModal = document.getElementById('mobile-toc-modal');
-  var mobileTocClose = document.getElementById('mobile-toc-close');
-  if (mobileTocBtn && mobileTocModal) {
-    mobileTocBtn.addEventListener('click', function() {
-      mobileTocModal.classList.remove('hidden');
-    });
-  }
-  if (mobileTocClose && mobileTocModal) {
-    mobileTocClose.addEventListener('click', function() {
-      mobileTocModal.classList.add('hidden');
-    });
-  }
-  tocLinks.forEach(function(link) {
-    link.addEventListener('click', function() {
-      if (mobileTocModal) mobileTocModal.classList.add('hidden');
-    });
-  });
-
-  var likeBtn = document.getElementById('like-btn');
-  var likeCount = document.getElementById('like-count');
-  if (likeBtn && likeCount) {
-    likeBtn.addEventListener('click', function() {
-      var liked = likeBtn.getAttribute('aria-pressed') === 'true';
-      likeBtn.setAttribute('aria-pressed', String(!liked));
-      likeCount.textContent = liked ? '0' : '1';
-      likeBtn.classList.toggle('bg-red-50', !liked);
-      likeBtn.classList.toggle('text-red-500', !liked);
-    });
-  }
-
-  var bookmarkBtn = document.getElementById('bookmark-btn');
-  if (bookmarkBtn) {
-    bookmarkBtn.addEventListener('click', function() {
-      var active = bookmarkBtn.getAttribute('aria-pressed') === 'true';
-      bookmarkBtn.setAttribute('aria-pressed', String(!active));
-      bookmarkBtn.classList.toggle('bg-amber-50', !active);
-      bookmarkBtn.classList.toggle('text-amber-500', !active);
-    });
-  }
-
-  var shareBtn = document.getElementById('share-btn');
-  var shareModal = document.getElementById('share-modal');
-  if (shareBtn && shareModal) {
-    shareBtn.addEventListener('click', function(event) {
-      event.stopPropagation();
-      shareModal.classList.toggle('hidden');
-    });
-    document.addEventListener('click', function(event) {
-      if (!shareModal.contains(event.target) && event.target !== shareBtn) {
-        shareModal.classList.add('hidden');
-      }
-    });
-  }
-
-  var twitterShareBtn = document.getElementById('twitter-share-btn');
-  if (twitterShareBtn) {
-    twitterShareBtn.addEventListener('click', function() {
-      var url = twitterShareBtn.getAttribute('data-share-url');
-      if (url) window.open(url, '_blank', 'noopener,noreferrer');
-    });
-  }
-
-  var copyLinkBtn = document.getElementById('copy-link-btn');
-  if (copyLinkBtn) {
-    copyLinkBtn.addEventListener('click', function() {
-      var url = copyLinkBtn.getAttribute('data-share-url') || window.location.href;
-      navigator.clipboard.writeText(url).then(function() {
-        copyLinkBtn.textContent = '已复制';
-        setTimeout(function() {
-          copyLinkBtn.textContent = '复制链接';
-        }, 1600);
-      });
-    });
-  }
-});
 </script>

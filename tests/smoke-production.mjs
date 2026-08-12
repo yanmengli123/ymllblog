@@ -21,8 +21,7 @@ const base = (process.env.SMOKE_BASE_URL ?? 'https://ymllblog.pages.dev').replac
 const probes = [
   { path: '/',               mustContain: ['<html', 'YMLL'],  mustNotContain: [] },
   { path: '/blog/',          mustContain: ['<html'],          mustNotContain: [] },
-  { path: '/admin/',         mustContain: ['Sveltia'],        mustNotContain: [] },
-  { path: '/admin/config.yml', mustContain: ['backend', 'collections'], mustNotContain: [] },
+  { path: '/admin/',         mustContain: ['登录内容工作台'], mustNotContain: ['sveltia-cms'] },
   { path: '/sitemap.xml',    mustContain: ['<urlset', '</urlset>'],    mustNotContain: [] },
   { path: '/rss.xml',        mustContain: ['<rss', '</rss>'],          mustNotContain: [] },
 ];
@@ -58,6 +57,12 @@ for (const probe of probes) {
   if (probeOk) summary.push(`✅ ${probe.path}`);
   else failures++;
 }
+
+const protectedPosts = await fetch(`${base}/admin-api/posts`);
+if (protectedPosts.status !== 401) {
+  failures++;
+  summary.push(`❌ /admin-api/posts should return 401, got ${protectedPosts.status}`);
+} else summary.push('✅ /admin-api/posts is protected');
 
 console.log(`\nSmoke test against ${base}\n`);
 for (const line of summary) console.log('  ' + line);

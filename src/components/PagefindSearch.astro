@@ -16,7 +16,7 @@
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
-<script define:vars={{ base }}>
+<script is:inline define:vars={{ base }}>
   // Lazy-load Pagefind only on first search interaction. Avoids 100KB+ on
   // initial page load when the user never searches.
   let pagefindPromise = null;

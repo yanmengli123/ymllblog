@@ -1,0 +1,16 @@
+---
+interface Props {
+  level?: 'expressive' | 'standard' | 'reading';
+}
+
+const { level = 'standard' } = Astro.props;
+---
+
+<div id="motion-grid" class="motion-grid" aria-hidden="true"></div>
+{level === 'expressive' && <div id="cursor-glow" class="cursor-glow" aria-hidden="true"></div>}
+<div id="click-ink-layer" class="click-ink-layer" aria-hidden="true"></div>
+
+<script>
+  import { initializeMotion } from '../../scripts/motion';
+  initializeMotion();
+</script>

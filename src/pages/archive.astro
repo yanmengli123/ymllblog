@@ -1,101 +1,29 @@
 ---
-import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { getPostsByYear } from '../lib/posts';
+import { calculateReadingTime } from '../lib/reading-time';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-
-// 获取所有已发布文章
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const posts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
-
-// 按年份分组
-const postsByYear = new Map<number, typeof posts>();
-posts.forEach(post => {
-  const year = post.data.pubDate.getFullYear();
-  if (!postsByYear.has(year)) {
-    postsByYear.set(year, []);
-  }
-  postsByYear.get(year)!.push(post);
-});
-
-const years = Array.from(postsByYear.keys()).sort((a, b) => b - a);
-const totalPosts = posts.length;
+const postsByYear = await getPostsByYear();
+const total = [...postsByYear.values()].reduce((sum, posts) => sum + posts.length, 0);
 ---
 
-<Layout title="归档 - YMLL Blog" description="按时间线浏览所有文章">
+<Layout title="时间归档｜YMLL Blog" description="按时间浏览 YMLL Blog 的全部文章。">
   <Header />
-
-  <main class="pt-24 pb-16">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- 页面头部 -->
-      <div class="text-center mb-16">
-        <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-4">文章归档</h1>
-        <p class="text-lg text-stone-600">
-          共 <span class="text-emerald-600 font-bold">{totalPosts}</span> 篇文章
-        </p>
-      </div>
-
-      {/* 时间线 */}
-      <div class="relative">
-        {/* 垂直线 */}
-        <div class="absolute left-8 md:left-12 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500 via-emerald-200 to-transparent"></div>
-
-        {years.map(year => {
-          const yearPosts = postsByYear.get(year) || [];
-          return (
-            <div class="mb-16 last:mb-0">
-              {/* 年份标题 */}
-              <div class="flex items-center gap-4 mb-8">
-                <div class="relative z-10 w-16 h-16 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                  <span class="text-white text-2xl md:text-3xl font-bold">{year}</span>
-                </div>
-                <div>
-                  <h2 class="text-2xl font-bold text-stone-900">{year} 年</h2>
-                  <p class="text-stone-500">{yearPosts.length} 篇文章</p>
-                </div>
-              </div>
-
-              {/* 文章列表 */}
-              <div class="space-y-4 pl-20 md:pl-32">
-                {yearPosts.map(post => (
-                  <div class="group relative">
-                    {/* 时间线上的点 */}
-                    <div class="absolute -left-[44px] md:-left-[68px] top-4 w-3 h-3 bg-emerald-500 rounded-full ring-4 ring-white"></div>
-
-                    {/* 文章卡片 */}
-                    <a
-                      href={`${base}/blog/${post.slug}`}
-                      class="block p-5 bg-white rounded-xl border border-stone-200 hover:border-emerald-300 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-                    >
-                      <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                        <time datetime={post.data.pubDate.toISOString()} class="text-sm text-stone-400 shrink-0">
-                          {post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
-                        </time>
-                        <h3 class="text-base font-medium text-stone-800 group-hover:text-emerald-600 transition-colors">
-                          {post.data.title}
-                        </h3>
-                      </div>
-                      {post.data.tags.length > 0 && (
-                        <div class="flex flex-wrap gap-2 mt-3">
-                          {post.data.tags.slice(0, 3).map(tag => (
-                            <span class="px-2 py-1 text-xs bg-stone-100 text-stone-500 rounded-md">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+  <main id="main-content" class="page-shell max-w-5xl">
+    <header class="pb-14" data-reveal><p class="eyebrow">Chronological index</p><h1 class="font-display text-5xl font-black sm:text-6xl">时间归档</h1><p class="mt-5 text-lg" style="color: var(--muted);">{total} 篇记录，按写下它们的时间排列。</p></header>
+    <div class="border-t" style="border-color: var(--line);">
+      {[...postsByYear.entries()].map(([year, posts]) => (
+        <section class="grid gap-6 border-b py-10 sm:grid-cols-[9rem_1fr]" style="border-color: var(--line);">
+          <h2 class="font-display text-4xl font-bold" style="color: var(--brand-deep);" data-reveal>{year}</h2>
+          <ol class="archive-timeline space-y-1" data-reveal>
+            {posts.map((post, index) => <li class="archive-timeline-item" data-timeline-item data-reveal style={`--reveal-order: ${index % 3};`}><a href={`${base}/blog/${post.id}`} class="motion-card group grid gap-2 rounded-2xl px-4 py-4 hover:bg-black/[0.035] dark:hover:bg-white/[0.035] sm:grid-cols-[6rem_1fr_auto] sm:items-center"><time class="text-xs" style="color: var(--muted);">{post.data.pubDate.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}</time><strong class="motion-card-title font-display text-lg group-hover:text-emerald-700 dark:group-hover:text-emerald-300">{post.data.title}</strong><span class="text-xs" style="color: var(--muted);">{calculateReadingTime(post.body ?? '')}</span></a></li>)}
+          </ol>
+        </section>
+      ))}
     </div>
   </main>
-
   <Footer />
 </Layout>

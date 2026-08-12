@@ -7,27 +7,32 @@
     "start": "astro dev",
     "build": "astro build && pagefind --site dist && node scripts/generate-sitemap.mjs",
     "build:pagefind": "pagefind --site dist",
+    "admin:server": "node server/admin-server.mjs",
+    "admin:password": "node scripts/hash-admin-password.mjs",
+    "test": "node --test tests/home-layout.test.mjs tests/runtime-safety.test.mjs tests/admin-server.test.mjs tests/motion-system.test.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "^3.0.0",
-    "@astrojs/rss": "^4.0.18",
-    "@astrojs/tailwind": "^5.0.0",
-    "astro": "^4.0.0",
-    "chart.js": "^4.5.1",
-    "framer-motion": "^11.0.0",
-    "katex": "^0.17.0",
-    "mermaid": "^11.15.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@astrojs/markdown-remark": "^7.2.2",
+    "@astrojs/rss": "^4.0.19",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.1",
+    "katex": "^0.18.4",
+    "mermaid": "^11.16.1",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
-    "tailwindcss": "^3.4.0"
+    "tailwindcss": "^4.3.3",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.0",
-    "pagefind": "^1.4.0",
-    "typescript": "^5.3.0"
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^26.2.0",
+    "pagefind": "^1.5.2",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.1"
+  },
+  "overrides": {
+    "dompurify": "^3.4.13"
   }
 }

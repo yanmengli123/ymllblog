@@ -5,8 +5,7 @@ const base = 'https://yanmengli.cn';
 const probes = [
   { path: '/',                       mustContain: ['<html', 'YMLL'],  desc: 'Homepage' },
   { path: '/blog/',                  mustContain: ['<html'],          desc: 'Blog index' },
-  { path: '/admin/',                 mustContain: ['Sveltia', 'sveltia-cms'], desc: 'CMS admin' },
-  { path: '/admin/config.yml',       mustContain: ['backend', 'collections'], desc: 'CMS config' },
+  { path: '/admin/',                 mustContain: ['登录内容工作台'], desc: 'Admin login' },
   { path: '/sitemap.xml',            mustContain: ['<urlset', '</urlset>'],  desc: 'Sitemap' },
   { path: '/rss.xml',                mustContain: ['<rss', '</rss>'],         desc: 'RSS' },
   { path: '/.well-known/acme-challenge/test', mustContain: [], desc: 'Certbot path (expects 404)' },
@@ -24,6 +23,12 @@ for (const p of probes) {
   summary.push(`${ok ? '✅' : '❌'} ${p.desc.padEnd(25)} HTTP ${r.status}  ${p.path}`);
   if (!ok) failed++;
 }
+
+const adminHealth = await fetch(base + '/admin-api/health');
+const protectedPosts = await fetch(base + '/admin-api/posts');
+console.log(`  ${adminHealth.status === 200 ? '✅' : '❌'} Admin API health (${adminHealth.status})`);
+console.log(`  ${protectedPosts.status === 401 ? '✅' : '❌'} Admin API auth guard (${protectedPosts.status})`);
+if (adminHealth.status !== 200 || protectedPosts.status !== 401) failed++;
 
 console.log('\nSmoke test against', base, '\n');
 for (const s of summary) console.log('  ' + s);

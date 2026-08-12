@@ -24,8 +24,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: node tests/home-layout.test.mjs
-      - run: node tests/runtime-safety.test.mjs
+      - run: npm test
       - run: npx astro check
 
   build:

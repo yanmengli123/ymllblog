@@ -4,75 +4,29 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import PostCard from '../../components/PostCard.astro';
-
+import { calculateReadingTime } from '../../lib/reading-time';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
-
-  // 收集所有标签
-  const tags = new Set<string>();
-  posts.forEach(post => {
-    post.data.tags.forEach(tag => tags.add(tag));
-  });
-
-  return Array.from(tags).map(tag => ({
-    params: { tag },
-    props: {
-      tag,
-      posts: posts
-        .filter(post => post.data.tags.includes(tag))
-        .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()),
-    },
-  }));
+  const all = await getCollection('blog', ({ data }) => !data.draft);
+  const tags = new Set(all.flatMap((post) => post.data.tags));
+  return [...tags].map((tag) => ({ params: { tag }, props: { tag, posts: all.filter((post) => post.data.tags.includes(tag)).sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()) } }));
 }
-
 const { tag, posts } = Astro.props;
 ---
 
-<Layout title={`#${tag} - YMLL Blog`} description={`查看所有关于 ${tag} 的文章`}>
+<Layout title={`#${tag}｜YMLL Blog`} description={`浏览所有关于 ${tag} 的文章。`}>
   <Header />
-
-  <main class="pt-24 pb-16">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- 页面头部 -->
-      <div class="mb-12">
-        <a href={`${base}/tags`} class="text-emerald-600 hover:text-emerald-700 mb-4 inline-flex items-center gap-1">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-          返回标签列表
-        </a>
-        <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mt-4">
-          <span class="text-emerald-600">#</span>{tag}
-        </h1>
-        <p class="text-lg text-stone-600 mt-2">
-          共 {posts.length} 篇文章
-        </p>
-      </div>
-
-      <!-- 文章列表 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map(post => (
-          <PostCard
-            title={post.data.title}
-            description={post.data.description}
-            date={post.data.pubDate.toISOString()}
-            tags={post.data.tags}
-            slug={post.slug}
-            image={post.data.cover}
-            readingTime="5 分钟"
-          />
-        ))}
-      </div>
-
-      {posts.length === 0 && (
-        <div class="text-center py-20">
-          <p class="text-stone-500 text-lg">暂无文章</p>
-        </div>
-      )}
+  <main id="main-content" class="page-shell">
+    <header class="pb-14" data-reveal>
+      <a href={`${base}/tags`} class="text-sm font-semibold" style="color: var(--brand-deep);">← 全部标签</a>
+      <p class="eyebrow mt-10">Topic collection</p>
+      <h1 class="font-display text-5xl font-black sm:text-6xl">#{tag}</h1>
+      <p class="mt-5 text-lg" style="color: var(--muted);">这条阅读路径收录 {posts.length} 篇文章。</p>
+    </header>
+    <div class="grid gap-6 border-t pt-10 md:grid-cols-2 lg:grid-cols-3" style="border-color: var(--line);">
+      {posts.map((post, index) => <PostCard title={post.data.title} description={post.data.description} date={post.data.pubDate.toISOString()} tags={post.data.tags} slug={post.id} image={post.data.cover} category={post.data.category} readingTime={calculateReadingTime(post.body ?? '')} index={index + 1} reveal revealOrder={index % 3} />)}
     </div>
   </main>
-
   <Footer />
 </Layout>

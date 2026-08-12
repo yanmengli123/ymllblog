@@ -1,6 +1,5 @@
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
-import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
@@ -16,13 +15,41 @@ const base = process.env.BASE_URL ?? '/ymllblog';
 //   - Custom domain:    set SITEMAP_SITE_ROOT=https://yourdomain.tld
 const site = process.env.SITEMAP_SITE_ROOT ?? 'https://yanmengli123.github.io/ymllblog';
 
+function adminIndexRedirect(basePath) {
+  const prefix = basePath === '/' ? '' : basePath.replace(/\/$/, '');
+  const adminPath = `${prefix}/admin`;
+  return {
+    name: 'ymll-admin-index-redirect',
+    enforce: 'pre',
+    configureServer(server) {
+      server.middlewares.use((request, response, next) => {
+        const pathname = new URL(request.url || '/', 'http://localhost').pathname;
+        const isAdminDirectory = [adminPath, `${adminPath}/`, '/admin', '/admin/'].includes(pathname);
+        if (!isAdminDirectory) return next();
+        response.statusCode = 302;
+        response.setHeader('Location', `${adminPath}/index.html`);
+        response.end();
+      });
+    },
+  };
+}
+
 export default defineConfig({
   site,
   base,
-  integrations: [
-    tailwind(),
-    react(),
-  ],
+  integrations: [],
+  vite: {
+    plugins: [adminIndexRedirect(base), tailwindcss()],
+    server: {
+      proxy: {
+        '/admin-api': 'http://127.0.0.1:8787',
+        '/ymllblog/admin-api': {
+          target: 'http://127.0.0.1:8787',
+          rewrite: (path) => path.replace(/^\/ymllblog/, ''),
+        },
+      },
+    },
+  },
   output: 'static',
   markdown: {
     remarkPlugins: [remarkMath],

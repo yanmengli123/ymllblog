@@ -33,9 +33,7 @@ jobs:
       - run: npm ci
 
       - name: Contract tests
-        run: |
-          node tests/home-layout.test.mjs
-          node tests/runtime-safety.test.mjs
+        run: npm test
 
       - name: Type check
         run: npx astro check
@@ -74,6 +72,13 @@ jobs:
       url: https://yanmengli.cn
 
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist
+
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
@@ -100,13 +105,37 @@ jobs:
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
             dist/ \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/yanmengli/html/
-          echo "✅ rsync complete"
+          rsync -avzr --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+            server/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/yanmengli/admin-runtime/
+          ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} <<'REMOTE'
+              set -e
+              test -f /etc/ymllblog-admin.env || { echo "Missing /etc/ymllblog-admin.env"; exit 1; }
+              cd /var/www/yanmengli/admin-runtime
+              npm ci --omit=dev
+              sudo cp ymllblog-admin.service /etc/systemd/system/ymllblog-admin.service
+              sudo mkdir -p /etc/nginx/snippets
+              sudo cp ymllblog-security.nginx.conf /etc/nginx/snippets/ymllblog-security.conf
+              sudo cp ymllblog.nginx.conf /etc/nginx/sites-available/yanmengli.cn
+              sudo systemctl daemon-reload
+              sudo systemctl enable ymllblog-admin
+              sudo systemctl restart ymllblog-admin
+              sudo nginx -t
+              sudo systemctl reload nginx
+              curl --fail --silent http://127.0.0.1:8787/admin-api/health
+REMOTE
+          echo "✅ static site and admin service deployed"
 
       - name: Verify deployment
         run: |
           sleep 3
           echo "Verifying https://yanmengli.cn is live..."
           curl -sI https://yanmengli.cn | head -1 || exit 1
+          test "$(curl -s -o /dev/null -w '%{http_code}' https://yanmengli.cn/admin-api/health)" = "200"
+          test "$(curl -s -o /dev/null -w '%{http_code}' https://yanmengli.cn/admin-api/posts)" = "401"
           echo "✅ Production deploy verified"
 
       - name: Notify success

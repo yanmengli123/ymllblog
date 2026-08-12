@@ -4,68 +4,26 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import PostCard from '../../components/PostCard.astro';
+import { calculateReadingTime } from '../../lib/reading-time';
 
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const tagMap = new Map<string, number>();
+posts.forEach((post) => post.data.tags.forEach((tag) => tagMap.set(tag, (tagMap.get(tag) || 0) + 1)));
+const popularTags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-
-// 获取所有已发布的文章
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const posts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
-
-// 获取所有标签
-const tags = ['全部', ...new Set(posts.flatMap(post => post.data.tags))];
 ---
 
-<Layout title="博客文章 - YMLL Blog" description="探索技术与设计的最新见解">
+<Layout title="全部文章｜YMLL Blog" description="浏览 YMLL 关于前端工程、计算生物学与持续学习的全部文章。">
   <Header />
-
-  <main class="pt-24 pb-16">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- 页面头部 -->
-      <div class="mb-12">
-        <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-4">博客文章</h1>
-        <p class="text-lg text-stone-600">
-          共 <span class="text-emerald-600 font-bold">{posts.length}</span> 篇文章，探索技术与设计的最新见解
-        </p>
-      </div>
-
-      <!-- 筛选标签 -->
-      <div class="flex flex-wrap gap-2 mb-10 pb-8 border-b border-stone-200">
-        {tags.map((tag, index) => (
-          <a
-            href={tag === '全部' ? `${base}/blog` : `${base}/tags/${tag}`}
-            class:list={[
-              'px-4 py-2 text-sm font-medium rounded-lg transition-all',
-              index === 0
-                ? 'bg-emerald-500 text-white shadow-sm'
-                : 'bg-white text-stone-600 hover:bg-stone-50 border border-stone-200 hover:border-stone-300'
-            ]}
-          >
-            {tag}
-          </a>
-        ))}
-      </div>
-
-      <!-- 文章网格 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map(post => (
-          <PostCard
-            title={post.data.title}
-            description={post.data.description}
-            date={post.data.pubDate.toISOString()}
-            tags={post.data.tags}
-            slug={post.slug}
-            image={post.data.cover}
-          />
-        ))}
-      </div>
-
-      {posts.length === 0 && (
-        <div class="text-center py-20">
-          <p class="text-stone-500 text-lg">暂无文章</p>
-        </div>
-      )}
+  <main id="main-content" class="page-shell">
+    <header class="grid gap-10 pb-14 lg:grid-cols-[1fr_0.65fr] lg:items-end" data-reveal>
+      <div><p class="eyebrow">Writing archive</p><h1 class="font-display text-5xl font-black sm:text-6xl">全部文章</h1><p class="mt-5 max-w-2xl text-lg leading-8" style="color: var(--muted);">共 {posts.length} 篇公开笔记。关注技术系统如何构建、复杂问题如何解释，以及学习如何转化为长期能力。</p></div>
+      <div class="flex flex-wrap gap-2 lg:justify-end">{popularTags.map(([tag, count]) => <a href={`${base}/tags/${tag}`} class="tag-pill">#{tag} · {count}</a>)}</div>
+    </header>
+    <div class="grid gap-6 border-t pt-10 md:grid-cols-2 lg:grid-cols-3" style="border-color: var(--line);">
+      {posts.map((post, index) => <PostCard title={post.data.title} description={post.data.description} date={post.data.pubDate.toISOString()} tags={post.data.tags} slug={post.id} image={post.data.cover} category={post.data.category} readingTime={calculateReadingTime(post.body ?? '')} index={index + 1} reveal revealOrder={index % 3} />)}
     </div>
+    {posts.length === 0 && <div class="surface rounded-3xl p-12 text-center"><h2 class="font-display text-2xl">内容正在整理中</h2><p class="mt-2" style="color: var(--muted);">稍后再来看看。</p></div>}
   </main>
-
   <Footer />
 </Layout>

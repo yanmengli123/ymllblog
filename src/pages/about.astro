@@ -2,304 +2,33 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-
-// 技能数据 - Matery 风格
-const skills = [
-  { name: 'React / Next.js', level: 95, icon: '⚛️', color: '#61DAFB' },
-  { name: 'TypeScript', level: 90, icon: '📘', color: '#3178C6' },
-  { name: 'Tailwind CSS', level: 92, icon: '🎨', color: '#06B6D4' },
-  { name: 'Node.js', level: 85, icon: '🟢', color: '#339933' },
-  { name: 'Astro', level: 88, icon: '🚀', color: '#FF5D01' },
-  { name: 'Python', level: 80, icon: '🐍', color: '#3776AB' },
-  { name: 'Git', level: 88, icon: '📦', color: '#F05032' },
-  { name: 'Docker', level: 75, icon: '🐳', color: '#2496ED' },
-];
-
-// 项目经历
-const projects = [
-  {
-    icon: '🌐',
-    title: '企业官网重构',
-    description: '使用 Astro + Tailwind 重构企业官网，性能提升 300%',
-    tags: ['Astro', 'Tailwind', 'SEO'],
-    gradient: 'from-purple-500 to-green-500',
-  },
-  {
-    icon: '📊',
-    title: '数据可视化平台',
-    description: '基于 React + ECharts 的实时数据监控大屏',
-    tags: ['React', 'ECharts', 'WebSocket'],
-    gradient: 'from-blue-500 to-cyan-500',
-  },
-  {
-    icon: '🛒',
-    title: '电商小程序',
-    description: '微信小程序商城，支持支付、物流、会员系统',
-    tags: ['WeChat', 'Node.js', 'MongoDB'],
-    gradient: 'from-orange-500 to-red-500',
-  },
-  {
-    icon: '🤖',
-    title: 'AI 聊天助手',
-    description: '基于 GPT API 的智能客服系统',
-    tags: ['Python', 'FastAPI', 'OpenAI'],
-    gradient: 'from-pink-500 to-purple-500',
-  },
-];
-
-// 工作经历
-const experiences = [
-  {
-    period: '2023 - 至今',
-    title: '全栈开发工程师',
-    company: '自由职业',
-    description: '专注于现代 Web 技术栈，为企业和个人提供高质量的网站和应用开发服务。',
-    current: true,
-  },
-  {
-    period: '2021 - 2023',
-    title: '前端开发工程师',
-    company: '某科技公司',
-    description: '负责公司核心产品的前端架构设计和开发，优化用户体验和性能。',
-    current: false,
-  },
-  {
-    period: '2019 - 2021',
-    title: '初级前端开发',
-    company: '创业公司',
-    description: '参与公司 Web 应用的开发，学习并实践现代前端技术。',
-    current: false,
-  },
-];
-
-// 社交链接
-const socialLinks = [
-  { name: 'GitHub', url: 'https://github.com/yanmengli123', icon: 'github' },
-  { name: 'Blog', url: `${base}/`, icon: 'blog' },
-  { name: 'Email', url: 'mailto:contact@example.com', icon: 'email' },
+const principles = [
+  ['01', '先理解问题', '工具会变化，问题的结构更持久。写代码前，我会先澄清边界、约束与验证标准。'],
+  ['02', '用证据迭代', '让数据、测试和真实反馈参与决策，而不是只凭感觉追逐新技术。'],
+  ['03', '为长期维护', '好的系统不仅能运行，还应当可理解、可演进，并对下一位维护者友好。'],
 ];
 ---
 
-<Layout title="关于 - YMLL Blog" description="了解我 - 热爱技术与设计的开发者">
+<Layout title="关于 YMLL｜YMLL Blog" description="认识 YMLL：关注前端工程、计算生物学和长期学习的独立写作者。">
   <Header />
-
-  <main class="pt-20 pb-16">
-    {/* 个人介绍卡片 */}
-    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-      <div class="bg-white rounded-2xl shadow-card overflow-hidden" data-aos="fade-up">
-        {/* 顶部渐变条 */}
-        <div class="h-2 bg-gradient-to-r from-purple-500 to-green-500"></div>
-
-        <div class="p-8 md:p-12">
-          <div class="flex flex-col md:flex-row items-center gap-8">
-            {/* 头像 - Matery 风格圆形头像 */}
-            <div class="relative">
-              <div class="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500 to-green-500 p-1 shadow-lg">
-                <div class="w-full h-full rounded-full bg-white flex items-center justify-center">
-                  <span class="text-5xl">👨‍💻</span>
-                </div>
-              </div>
-              {/* 状态指示器 */}
-              <div class="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white"></div>
-            </div>
-
-            {/* 信息 */}
-            <div class="flex-1 text-center md:text-left">
-              <h1 class="text-3xl md:text-4xl font-bold mb-2">
-                <span class="bg-gradient-to-r from-purple-500 to-green-500 bg-clip-text text-transparent">
-                  YMLL
-                </span>
-              </h1>
-              <p class="text-xl text-stone-600 mb-4">全栈开发工程师 · 技术博主</p>
-              <p class="text-stone-500 leading-relaxed mb-6">
-                热爱技术与设计的全栈开发者。我相信优秀的代码应该像诗一样优雅，好的设计应该像水一样自然。
-                在这里，我记录我的学习、思考和创作。
-              </p>
-
-              {/* 社交链接 - Matery 风格 */}
-              <div class="flex justify-center md:justify-start gap-3">
-                {socialLinks.map(link => (
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-green-500 flex items-center justify-center text-white hover:shadow-lg hover:shadow-purple-500/30 transition-all hover:-translate-y-1"
-                    title={link.name}
-                  >
-                    {link.icon === 'github' && (
-                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
-                      </svg>
-                    )}
-                    {link.icon === 'blog' && (
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                      </svg>
-                    )}
-                    {link.icon === 'email' && (
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    )}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
+  <main id="main-content">
+    <section class="site-shell grid min-h-[680px] items-center gap-14 pb-20 pt-32 lg:grid-cols-[1fr_0.8fr]">
+      <div data-reveal><p class="eyebrow">About the author</p><h1 class="font-display text-5xl font-black leading-tight sm:text-6xl">你好，我是 YMLL。<br /><span style="color: var(--brand-deep);">一个持续提问的人。</span></h1><p class="mt-7 max-w-2xl text-lg leading-9" style="color: var(--muted);">我关注技术如何帮助人理解复杂系统，也关心一个产品如何从想法变成可靠、清晰、可持续维护的现实。这个博客是公开的学习记录，也是我与世界交换想法的方式。</p><div class="mt-9 flex flex-wrap gap-3"><a href={`${base}/blog`} class="button-primary">阅读我的文章</a><a href="https://github.com/yanmengli123" target="_blank" rel="noopener noreferrer" class="button-secondary">GitHub ↗</a></div></div>
+      <div class="motion-card surface relative overflow-hidden rounded-[2rem] p-8 sm:p-10" data-reveal style="--reveal-order: 1;">
+        <span class="absolute -right-8 -top-14 font-display text-[13rem] font-black opacity-[0.05]">Y</span>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--brand);">Focus areas</p>
+        <div class="mt-8 space-y-7">
+          <div><small style="color: var(--muted);">01 / 研究</small><h2 class="mt-2 font-display text-2xl font-bold">计算生物学与动态系统</h2></div>
+          <div class="border-t pt-7" style="border-color: var(--line);"><small style="color: var(--muted);">02 / 工程</small><h2 class="mt-2 font-display text-2xl font-bold">前端架构与产品体验</h2></div>
+          <div class="border-t pt-7" style="border-color: var(--line);"><small style="color: var(--muted);">03 / 表达</small><h2 class="mt-2 font-display text-2xl font-bold">技术写作与知识管理</h2></div>
         </div>
       </div>
     </section>
-
-    {/* 技能展示 - Matery 风格 */}
-    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-      <h2 class="text-2xl font-bold text-stone-900 mb-8 flex items-center gap-2" data-aos="fade-up">
-        <span class="w-2 h-8 bg-gradient-to-b from-purple-500 to-green-500 rounded-full"></span>
-        技能专长
-      </h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {skills.map((skill, index) => (
-          <div
-            class="bg-white rounded-xl p-5 shadow-card hover:shadow-card-hover transition-all"
-            data-aos="fade-up"
-            data-aos-delay={index * 50}
-          >
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-3">
-                <span class="text-2xl">{skill.icon}</span>
-                <span class="font-medium text-stone-900">{skill.name}</span>
-              </div>
-              <span class="text-sm font-bold" style={`color: ${skill.color}`}>{skill.level}%</span>
-            </div>
-            <div class="h-3 bg-stone-100 rounded-full overflow-hidden">
-              <div
-                class="h-full rounded-full transition-all duration-1000"
-                style={`width: ${skill.level}%; background: linear-gradient(to right, ${skill.color}, ${skill.color}dd);`}
-                data-width={skill.level}
-              ></div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    {/* 项目经历 - Matery 风格 */}
-    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-      <h2 class="text-2xl font-bold text-stone-900 mb-8 flex items-center gap-2" data-aos="fade-up">
-        <span class="w-2 h-8 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-full"></span>
-        项目经历
-      </h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {projects.map((project, index) => (
-          <div
-            class="bg-white rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all hover:-translate-y-1"
-            data-aos="zoom-in"
-            data-aos-delay={index * 100}
-          >
-            <div class={`h-2 bg-gradient-to-r ${project.gradient}`}></div>
-            <div class="p-6">
-              <div class="flex items-start gap-4">
-                <div class={`w-12 h-12 rounded-xl bg-gradient-to-br ${project.gradient} flex items-center justify-center text-2xl shadow-md`}>
-                  {project.icon}
-                </div>
-                <div class="flex-1">
-                  <h3 class="font-bold text-stone-900 mb-2">{project.title}</h3>
-                  <p class="text-sm text-stone-600 mb-3">{project.description}</p>
-                  <div class="flex flex-wrap gap-2">
-                    {project.tags.map(tag => (
-                      <span class="px-2 py-1 text-xs bg-stone-100 text-stone-600 rounded-full">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    {/* 工作经历 - Matery 风格时间线 */}
-    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-      <h2 class="text-2xl font-bold text-stone-900 mb-8 flex items-center gap-2" data-aos="fade-up">
-        <span class="w-2 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></span>
-        工作经历
-      </h2>
-
-      <div class="relative">
-        {/* 时间线 */}
-        <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-green-500"></div>
-
-        <div class="space-y-8">
-          {experiences.map((exp, index) => (
-            <div
-              class="relative pl-16"
-              data-aos="fade-up"
-              data-aos-delay={index * 100}
-            >
-              {/* 时间点 */}
-              <div class="absolute left-6 w-4 h-4 rounded-full bg-gradient-to-br from-purple-500 to-green-500 border-4 border-white shadow-md"></div>
-
-              {/* 内容卡片 */}
-              <div class={`bg-white rounded-xl p-6 shadow-card ${exp.current ? 'ring-2 ring-emerald-500' : ''}`}>
-                <div class="flex flex-wrap items-center gap-3 mb-3">
-                  <span class="px-3 py-1 text-sm font-medium bg-gradient-to-r from-purple-500 to-green-500 text-white rounded-full">
-                    {exp.period}
-                  </span>
-                  {exp.current && (
-                    <span class="px-3 py-1 text-sm font-medium bg-emerald-100 text-emerald-700 rounded-full">
-                      当前
-                    </span>
-                  )}
-                </div>
-                <h3 class="text-lg font-bold text-stone-900 mb-1">{exp.title}</h3>
-                <p class="text-stone-600 mb-2">{exp.company}</p>
-                <p class="text-sm text-stone-500">{exp.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    {/* 联系方式 */}
-    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="bg-gradient-to-r from-purple-600 to-green-600 rounded-2xl p-8 md:p-12 text-center text-white" data-aos="fade-up">
-        <h2 class="text-2xl md:text-3xl font-bold mb-4">想和我聊聊？</h2>
-        <p class="text-white/80 mb-8 max-w-md mx-auto">
-          无论是技术问题、合作机会还是只是想打个招呼，都欢迎联系我
-        </p>
-        <div class="flex flex-wrap justify-center gap-4">
-          <a
-            href="https://github.com/yanmengli123"
-            target="_blank"
-            class="px-6 py-3 bg-white text-purple-600 font-bold rounded-btn hover:bg-yellow-300 hover:text-purple-700 transition-all"
-          >
-            GitHub
-          </a>
-          <a
-            href="mailto:contact@example.com"
-            class="px-6 py-3 bg-white/20 text-white font-bold rounded-btn border-2 border-white/50 hover:bg-white/30 transition-all"
-          >
-            发送邮件
-          </a>
-        </div>
-      </div>
+    <section class="site-shell py-20 section-rule">
+      <div data-reveal><p class="eyebrow">Working principles</p><h2 class="font-display text-4xl font-bold sm:text-5xl">我如何工作</h2></div>
+      <div class="mt-10 grid border-l border-t md:grid-cols-3" style="border-color: var(--line);">{principles.map(([number, title, description], index) => <article class="motion-card min-h-64 border-b border-r p-7 sm:p-9" style={`--reveal-order: ${index}; border-color: var(--line);`} data-reveal><span class="text-xs font-semibold" style="color: var(--brand);">{number}</span><h3 class="motion-card-title mt-10 font-display text-2xl font-bold">{title}</h3><p class="mt-4 text-sm leading-7" style="color: var(--muted);">{description}</p></article>)}</div>
     </section>
   </main>
-
   <Footer />
 </Layout>
-
-<style>
-  .shadow-card {
-    box-shadow: 0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07);
-  }
-  .shadow-card-hover:hover {
-    box-shadow: 0 18px 40px rgba(50, 50, 93, .15), 0 8px 20px rgba(0, 0, 0, .1);
-  }
-</style>

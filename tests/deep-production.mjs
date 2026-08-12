@@ -92,20 +92,18 @@ await check('rss.xml has at least 1 item', async () => {
   if (count < 1) throw new Error(`only ${count} items`);
 });
 
-// CMS
-await check('Sveltia CMS index loads', async () => {
+// Admin
+await check('Admin login loads', async () => {
   const r = await fetch(`${base}/admin/`);
   const body = await r.text();
-  if (!body.includes('Sveltia') && !body.includes('sveltia-cms')) {
-    throw new Error('Sveltia CMS script not loaded');
-  }
+  if (!body.includes('登录内容工作台')) throw new Error('admin login is missing');
 });
 
-await check('CMS config.yml has all 12 fields', async () => {
-  const body = await fetch(`${base}/admin/config.yml`).then(r => r.text());
-  const required = ['title', 'description', 'pubDate', 'updatedDate', 'author', 'tags', 'category', 'cover', 'draft', 'featured', 'lang', 'body'];
-  const missing = required.filter(f => !body.includes(f));
-  if (missing.length) throw new Error(`missing fields: ${missing.join(', ')}`);
+await check('Admin API is healthy and protected', async () => {
+  const health = await fetch(`${base}/admin-api/health`);
+  if (health.status !== 200) throw new Error(`health HTTP ${health.status}`);
+  const posts = await fetch(`${base}/admin-api/posts`);
+  if (posts.status !== 401) throw new Error(`posts should be protected, got ${posts.status}`);
 });
 
 // Output

@@ -1,69 +1,10 @@
 ---
-/**
- * GiscusComments.astro
- * Renders the giscus widget at the bottom of blog posts. giscus uses GitHub
- * Discussions as the comment backend — no database, no server, no spam.
- * Chinese comments work natively.
- *
- * Setup (one-time, ~5 minutes):
- *   1. Enable Discussions on https://github.com/yanmengli123/ymllblog/settings
- *      - Check "Allow users with push access to create discussions"
- *      - Install the giscus app: https://github.com/apps/giscus
- *      - Create a "General" or "Comments" category (Discussion category number = 1)
- *   2. Visit https://giscus.app/ and fill in:
- *      - Repository: yanmengli123/ymllblog
- *      - Discussion category: General (or your chosen category)
- *      - Page ↔ Discussion mapping: pathname
- *      - Theme: light (matches the site's default; dark mode handled separately)
- *      - Language: zh-CN
- *   3. Copy the repo-id, category, and category-id values into the props below
- *   4. The widget renders with no further setup
- *
- * No env vars required — the IDs are committed to the repo.
- */
-
-interface Props {
-  repo?: string;
-  repoId?: string;
-  category?: string;
-  categoryId?: string;
-}
-
-const {
-  repo = 'yanmengli123/ymllblog',
-  // TODO: replace with values from https://giscus.app/ after one-time setup
-  repoId = 'R_PLACEHOLDER_REPLACE_AFTER_GISCUS_SETUP',
-  category = 'Announcements',
-  categoryId = 'DIC_PLACEHOLDER_REPLACE_AFTER_GISCUS_SETUP',
-} = Astro.props;
-
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+interface Props { repo?: string; repoId?: string; category?: string; categoryId?: string; }
+const { repo = 'yanmengli123/ymllblog', repoId = 'R_PLACEHOLDER_REPLACE_AFTER_GISCUS_SETUP', category = 'Announcements', categoryId = 'DIC_PLACEHOLDER_REPLACE_AFTER_GISCUS_SETUP' } = Astro.props;
+const configured = !repoId.includes('PLACEHOLDER') && !categoryId.includes('PLACEHOLDER');
 ---
 
-<section class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm md:p-8">
-  <h2 class="mb-6 text-xl font-bold text-stone-900">评论</h2>
-  <script
-    src="https://giscus.app/client.js"
-    data-repo={repo}
-    data-repo-id={repoId}
-    data-category={category}
-    data-category-id={categoryId}
-    data-mapping="pathname"
-    data-strict="1"
-    data-reactions-enabled="1"
-    data-emit-metadata="0"
-    data-input-position="top"
-    data-theme="light"
-    data-lang="zh-CN"
-    data-loading="lazy"
-    crossorigin="anonymous"
-    async
-  ></script>
-  <noscript>
-    <p class="text-sm text-stone-500">
-      评论需要启用 JavaScript。
-      <a class="text-blue-500 underline" href={`${base}/rss.xml`}>通过 RSS 订阅</a>
-      也可以在新文章发布时收到通知。
-    </p>
-  </noscript>
+<section class="mt-16 border-t pt-10" style="border-color: var(--line);">
+  <p class="eyebrow">Discussion</p><h2 class="font-display text-3xl font-bold">评论与交流</h2>
+  {configured ? <div class="surface mt-7 rounded-2xl p-5"><script is:inline src="https://giscus.app/client.js" data-repo={repo} data-repo-id={repoId} data-category={category} data-category-id={categoryId} data-mapping="pathname" data-strict="1" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script></div> : <div class="mt-6 rounded-2xl border border-dashed p-6 text-sm leading-7" style="border-color: var(--line); color: var(--muted);">评论区将在完成 GitHub Discussions 绑定后开放。你也可以通过文章页的分享按钮继续讨论。</div>}
 </section>

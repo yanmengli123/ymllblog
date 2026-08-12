@@ -1,81 +1,19 @@
 ---
-import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-
+import { getAllTagsWithCount } from '../../lib/posts';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-
-// 获取所有文章
-const posts = await getCollection('blog', ({ data }) => !data.draft);
-
-// 统计标签
-const tagMap = new Map<string, number>();
-posts.forEach(post => {
-  post.data.tags.forEach(tag => {
-    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
-  });
-});
-
-const tags = Array.from(tagMap.entries())
-  .map(([name, count]) => ({ name, count }))
-  .sort((a, b) => b.count - a.count);
-
-// 标签颜色
-const tagColors = [
-  'from-emerald-500 to-teal-600',
-  'from-blue-500 to-cyan-600',
-  'from-orange-500 to-red-600',
-  'from-purple-500 to-pink-600',
-  'from-yellow-500 to-orange-600',
-  'from-pink-500 to-rose-600',
-  'from-indigo-500 to-blue-600',
-  'from-green-500 to-emerald-600',
-];
+const tags = await getAllTagsWithCount();
 ---
 
-<Layout title="标签 - YMLL Blog" description="通过标签探索感兴趣的内容">
+<Layout title="主题标签｜YMLL Blog" description="按主题探索 YMLL Blog 的文章。">
   <Header />
-
-  <main class="pt-24 pb-16">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- 页面头部 -->
-      <div class="text-center mb-16">
-        <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-4">探索标签</h1>
-        <p class="text-lg text-stone-600 max-w-2xl mx-auto">
-          通过标签快速定位你感兴趣的内容，共 {tags.length} 个标签
-        </p>
-      </div>
-
-      <!-- 标签网格 -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tags.map((tag, index) => (
-          <a
-            href={`${base}/tags/${tag.name}`}
-            class="group relative bg-white rounded-2xl p-6 border border-stone-200 hover:border-emerald-300 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden"
-          >
-            {/* 图标 */}
-            <div class={`w-12 h-12 rounded-xl bg-gradient-to-br ${tagColors[index % tagColors.length]} flex items-center justify-center mb-4 shadow-lg`}>
-              <span class="text-white text-xl font-bold">{tag.name[0]}</span>
-            </div>
-
-            {/* 内容 */}
-            <h3 class="text-xl font-bold text-stone-900 mb-2 group-hover:text-emerald-600 transition-colors">
-              {tag.name}
-            </h3>
-            <p class="text-sm text-stone-500 mb-4">
-              {tag.count} 篇文章
-            </p>
-
-            {/* 箭头 */}
-            <span class="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
-              查看文章 →
-            </span>
-          </a>
-        ))}
-      </div>
+  <main id="main-content" class="page-shell">
+    <header class="max-w-3xl pb-14" data-reveal><p class="eyebrow">Knowledge map</p><h1 class="font-display text-5xl font-black sm:text-6xl">主题标签</h1><p class="mt-5 text-lg leading-8" style="color: var(--muted);">每个标签都是一条阅读路径。选择一个兴趣点，继续向下探索。</p></header>
+    <div class="grid border-l border-t sm:grid-cols-2 lg:grid-cols-3" style="border-color: var(--line);">
+      {tags.map((tag, index) => <a href={`${base}/tags/${tag.name}`} class="tag-garden-card motion-card group min-h-52 border-b border-r p-7 hover:bg-black/[0.035] dark:hover:bg-white/[0.035]" style={`--reveal-order: ${index % 3}; border-color: var(--line);`} data-reveal><span class="text-xs font-semibold" style="color: var(--brand);">{String(index + 1).padStart(2, '0')}</span><h2 class="motion-card-title mt-8 font-display text-2xl font-bold group-hover:text-emerald-700 dark:group-hover:text-emerald-300">#{tag.name}</h2><p class="tag-count mt-2 text-sm" style="color: var(--muted);">{tag.count} 篇文章</p><span class="motion-arrow mt-7 inline-block">→</span></a>)}
     </div>
   </main>
-
   <Footer />
 </Layout>

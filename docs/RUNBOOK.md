@@ -7,11 +7,11 @@ Step-by-step procedures for routine and incident operations. If something here i
 ### Author a new post (recommended)
 
 1. Open `https://<host>/admin` in your browser.
-2. Log in via GitHub Device Flow (one-time per browser session).
-3. Click "文章管理" → "新建".
+2. Log in with the administrator username and password.
+3. Click "新建文章".
 4. Fill in title, description, pubDate, tags. Pick `featured: true` if it should appear in the homepage FeaturedPosts area.
 5. Write the body in Markdown. Drop images into the editor — they auto-upload to `public/uploads/`.
-6. Click "发布" → Sveltia commits to `main` → CI runs (~30s) → Cloudflare Pages rebuilds (~30s) → post is live at `https://<host>/blog/<slug>/`.
+6. Click "保存文章" → the server commits to `main` through the GitHub Contents API → CI deploys to the VPS → the post becomes live at `https://<host>/blog/<slug>/`.
 
 ### Author a new post (from a local editor)
 
@@ -29,7 +29,7 @@ CI will validate the frontmatter. If `astro check` or the build fails, your comm
 
 ### Edit / delete an existing post
 
-- **Via CMS**: open the post → edit → publish. Delete via the post's "Delete" button.
+- **Via admin**: open the post → edit → save. Delete via the post's "删除" button.
 - **Via Git**: `git rm src/content/blog/some-post.md && git commit -m "content: 删除 some-post" && git push`.
 
 ## Weekly operations
@@ -94,6 +94,7 @@ When (if) you outgrow pure-static:
 
 | Feature | Cost-free option | When to upgrade |
 |---------|------------------|------------------|
+| Admin | Node.js session API + GitHub Contents API on the VPS | Add multiple accounts/RBAC only when the editorial team grows |
 | Comments | [giscus](https://giscus.app/) (GitHub Discussions) | Never — works for years |
 | Search | [Pagefind](https://pagefind.app/) (build-time static index) | When >5,000 posts; switch to Algolia |
 | Email subscription | Buttondown / Substack redirect (link out) | When >1,000 subscribers; self-host Listmonk on $5 VPS |

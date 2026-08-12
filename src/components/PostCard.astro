@@ -9,123 +9,47 @@ export interface Props {
   slug: string;
   image?: string;
   readingTime?: string;
+  category?: string;
   featured?: boolean;
+  index?: number;
+  reveal?: boolean;
+  revealOrder?: number;
 }
 
-const {
-  title,
-  description,
-  date,
-  tags = [],
-  slug,
-  image,
-  readingTime,
-  featured = false
-} = Astro.props;
-
-const formattedDate = new Date(date).toLocaleDateString('zh-CN', {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-});
-
-// dlog.com.cn 紫色风格标签颜色
-const tagColors = [
-  '#e9e4f0', '#f3f0f9', '#d4c9e2', '#e8f5e9', '#fef9e7',
-  '#c8e6c9', '#d7bde2', '#a3e4d7', '#85c1e9', '#f8c471'
-];
+const { title, description, date, tags = [], slug, image, readingTime = '约 5 分钟', category, featured = false, index = 1, reveal = false, revealOrder = 0 } = Astro.props;
+const formattedDate = new Date(date).toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
 ---
 
-<article class:list={[
-  'group relative bg-white rounded-card overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-500 hover:-translate-y-2',
-  featured ? 'md:col-span-2 md:grid md:grid-cols-2' : '',
-]}>
-  {/* Image - 紫色渐变风格 */}
-  <div class:list={[
-    'relative overflow-hidden',
-    featured ? 'aspect-[4/3] md:aspect-auto' : 'aspect-[16/10]'
-  ]}>
-    {image ? (
-      <img
-        src={image}
-        alt={title}
-        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        loading="lazy"
-      />
-    ) : (
-      <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, #8163bd, #0f9d58);">
-        <span class="text-6xl opacity-30">📝</span>
+<article
+  class:list={['motion-card group relative overflow-hidden rounded-3xl surface', featured && 'lg:grid lg:grid-cols-[1.1fr_0.9fr]']}
+  data-reveal={reveal ? '' : undefined}
+  style={`--reveal-order: ${revealOrder};`}
+>
+  {image ? (
+    <a href={`${base}/blog/${slug}`} class:list={['block overflow-hidden', featured ? 'aspect-[16/10] lg:aspect-auto' : 'aspect-[16/9]']} tabindex="-1" aria-hidden="true">
+      <img src={image} alt="" class="motion-card-media h-full w-full object-cover saturate-[0.82] group-hover:scale-[1.02] group-hover:saturate-100" loading={featured ? 'eager' : 'lazy'} />
+    </a>
+  ) : (
+    <a href={`${base}/blog/${slug}`} class:list={['relative block overflow-hidden', featured ? 'min-h-64' : 'aspect-[16/9]']} tabindex="-1" aria-hidden="true" style="background: var(--brand-soft);">
+      <span class="absolute left-6 top-5 text-[11px] font-semibold uppercase tracking-[0.2em]" style="color: var(--brand-deep);">FIELD NOTE / {String(index).padStart(2, '0')}</span>
+      <span class="absolute -bottom-8 right-5 font-display text-[9rem] font-black leading-none opacity-[0.08]">{String(index).padStart(2, '0')}</span>
+      <span class="absolute bottom-6 left-6 h-px w-20" style="background: var(--brand);"></span>
+    </a>
+  )}
+  <div class:list={['flex flex-col p-6 sm:p-7', featured && 'justify-center lg:p-10']}>
+    <div class="mb-4 flex items-start justify-between gap-4 text-xs" style="color: var(--muted);">
+      <div class="flex flex-wrap items-center gap-3">
+        {category && <span class="font-semibold uppercase tracking-[0.12em]" style="color: var(--brand-deep);">{category}</span>}
+        <time datetime={date}>{formattedDate}</time>
+        <span aria-hidden="true">·</span>
+        <span>{readingTime}</span>
       </div>
-    )}
-    {/* 渐变覆盖层 */}
-    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-  </div>
-
-  {/* Content */}
-  <div class:list={[
-    'p-6',
-    featured ? 'flex flex-col justify-center' : '',
-  ]}>
-    {/* Tags - 紫色风格标签 */}
-    {tags.length > 0 && (
-      <div class="flex flex-wrap gap-2 mb-4">
-        {tags.slice(0, 3).map((tag, index) => (
-          <span
-            class="px-3 py-1 text-xs font-medium rounded-chip transition-all hover:scale-105"
-            style={`background: ${tagColors[index % tagColors.length]}; color: #333;`}
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-    )}
-
-    {/* Title */}
-    <h3 class:list={[
-      'font-bold group-hover:transition-colors duration-300 mb-3',
-      featured ? 'text-2xl md:text-3xl' : 'text-lg'
-    ]} style="color: var(--text-primary);">
-      <a href={`${base}/blog/${slug}`} class="after:absolute after:inset-0 hover:text-purple-600">
-        {title}
-      </a>
-    </h3>
-
-    {/* Description */}
-    <p class:list={[
-      'mb-4 leading-relaxed',
-      featured ? 'text-base line-clamp-3' : 'text-sm line-clamp-2'
-    ]} style="color: var(--text-secondary);">
-      {description}
-    </p>
-
-    {/* Meta */}
-    <div class="flex items-center gap-4 text-sm" style="color: var(--text-secondary);">
-      <time datetime={date} class="flex items-center gap-1.5">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        {formattedDate}
-      </time>
-      {readingTime && (
-        <span class="flex items-center gap-1.5">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {readingTime}
-        </span>
-      )}
+      <span class="motion-arrow shrink-0 text-base" aria-hidden="true" style="color: var(--brand-deep);">↗</span>
     </div>
+    <h3 class:list={['font-display font-bold leading-tight', featured ? 'text-3xl sm:text-4xl' : 'text-2xl']}>
+      <a href={`${base}/blog/${slug}`} class="motion-card-title after:absolute after:inset-0 group-hover:text-emerald-700 dark:group-hover:text-emerald-300">{title}</a>
+    </h3>
+    <p class:list={['mt-4 leading-relaxed', featured ? 'line-clamp-3 text-base' : 'line-clamp-2 text-sm']} style="color: var(--muted);">{description}</p>
+    {tags.length > 0 && <div class="relative z-10 mt-6 flex flex-wrap gap-2">{tags.slice(0, 3).map((tag) => <a href={`${base}/tags/${tag}`} class="tag-pill">#{tag}</a>)}</div>}
   </div>
-
-  {/* 紫色边框动画 */}
-  <div class="absolute inset-0 rounded-card border-2 border-transparent group-hover:border-purple-400/30 transition-all duration-500 pointer-events-none"></div>
 </article>
-
-<style>
-  .shadow-card {
-    box-shadow: 0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07);
-  }
-  .shadow-card-hover:hover {
-    box-shadow: 0 18px 40px rgba(50, 50, 93, .15), 0 8px 20px rgba(0, 0, 0, .1);
-  }
-</style>

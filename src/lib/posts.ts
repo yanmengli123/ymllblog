@@ -40,7 +40,7 @@ export async function getRecentPosts(count: number = 5): Promise<BlogPost[]> {
  */
 export async function getPostBySlug(slug: string): Promise<BlogPost | undefined> {
   const posts = await getAllPosts();
-  return posts.find(post => post.slug === slug);
+  return posts.find(post => post.id === slug);
 }
 
 /**
@@ -94,14 +94,14 @@ export async function getPostsByYear(): Promise<Map<number, BlogPost[]>> {
  * 获取相关文章（基于标签匹配）
  */
 export async function getRelatedPosts(
-  currentPost: { slug: string; data: { tags: string[] } },
+  currentPost: { id: string; data: { tags: string[] } },
   count: number = 3
 ): Promise<BlogPost[]> {
   const posts = await getPublishedPosts();
   const currentTags = new Set(currentPost.data.tags.map(t => t.toLowerCase()));
 
   const scored = posts
-    .filter(post => post.slug !== currentPost.slug)
+    .filter(post => post.id !== currentPost.id)
     .map(post => {
       const matchingTags = post.data.tags.filter(t =>
         currentTags.has(t.toLowerCase())

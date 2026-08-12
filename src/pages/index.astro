@@ -3,163 +3,104 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import HeroSection from '../components/HeroSection.astro';
-import FeaturedPosts from '../components/FeaturedPosts.astro';
-import TagsSection from '../components/TagsSection.astro';
-import SettingsPanel from '../components/SettingsPanel.astro';
+import PostCard from '../components/PostCard.astro';
 import MusicPlayer from '../components/MusicPlayer.astro';
-import Announcement from '../components/Announcement.astro';
-import ProfileCard from '../components/ProfileCard.astro';
-import SiteStatsCard from '../components/SiteStatsCard.astro';
-import PostCalendarCard from '../components/PostCalendarCard.astro';
-import OfficialWidgetsCard from '../components/OfficialWidgetsCard.astro';
-import ParticlesBg from '../components/ParticlesBg.astro';
+import { calculateReadingTime } from '../lib/reading-time';
 
-// 获取精选文章
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const featuredPosts = allPosts
-  .filter(post => post.data.featured)
-  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
-  .slice(0, 5);
-
-// 格式化文章数据
-const formattedPosts = featuredPosts.map(post => ({
-  title: post.data.title,
-  description: post.data.description,
-  date: post.data.pubDate.toISOString(),
-  tags: post.data.tags,
-  slug: post.slug,
-  image: post.data.cover,
-  readingTime: '5 分钟',
-}));
-
-// 获取标签统计
-const tagMap = new Map<string, number>();
-allPosts.forEach(post => {
-  post.data.tags.forEach(tag => {
-    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
-  });
-});
-const tags = Array.from(tagMap.entries())
-  .map(([name, count]) => ({ name, count }))
-  .sort((a, b) => b.count - a.count)
-  .slice(0, 8);
-
-const HomeSidebarLayout = 'home-sidebar-layout';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const featured = posts.find((post) => post.data.featured) ?? posts[0];
+const recent = posts.filter((post) => post.id !== featured?.id).slice(0, 5);
+const tagCount = new Set(posts.flatMap((post) => post.data.tags)).size;
+const categoryMap = new Map<string, number>();
+posts.forEach((post) => { const name = post.data.category || '随笔'; categoryMap.set(name, (categoryMap.get(name) || 0) + 1); });
+const categories = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
+const years = posts.length ? Math.max(1, new Date().getFullYear() - Math.min(...posts.map((post) => post.data.pubDate.getFullYear())) + 1) : 1;
 ---
 
-<Layout title="YMLL Blog - 首页" description="探索技术与设计的交汇点，记录成长与思考">
-  {/* 粒子背景层 */}
-  <ParticlesBg />
-
+<Layout motion="expressive">
   <Header />
-
-  <main>
-    {/* 全屏 Hero */}
-    <HeroSection />
-
-    {/* 毛玻璃内容面板 - dlog.com.cn 风格 */}
-    <div class="relative z-10" style="margin-top: -2rem;">
-      <div class="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-        <div id="board" class={`glass-board ${HomeSidebarLayout}`}>
-          <aside id="home-left-sidebar" class="home-sidebar home-sidebar-left" aria-label="左侧信息栏">
-            <ProfileCard />
-            <Announcement variant="sidebar" />
-            <MusicPlayer variant="sidebar" />
-          </aside>
-
-          <main id="home-feed" class="min-w-0">
-            <FeaturedPosts posts={formattedPosts} title="精选文章" />
-            <TagsSection tags={tags} />
-          </main>
-
-          <aside id="home-right-sidebar" class="home-sidebar home-sidebar-right" aria-label="右侧工具栏">
-            <SiteStatsCard />
-            <PostCalendarCard />
-            <OfficialWidgetsCard />
-            <SettingsPanel variant="sidebar" />
-          </aside>
+  <main id="main-content">
+    <section class="site-shell grid min-h-[720px] items-center gap-14 pb-20 pt-32 lg:grid-cols-[1.15fr_0.85fr] lg:pt-24">
+      <div class="hero-stage">
+        <p class="eyebrow" data-hero style="--hero-order: 0;">Independent research & engineering</p>
+        <h1 class="max-w-4xl font-display text-5xl font-black leading-[1.08] sm:text-6xl lg:text-7xl" data-hero data-hero-primary style="--hero-order: 1;">
+          写代码，也写下<br /><span style="color: var(--brand-deep);">问题背后的方法。</span>
+        </h1>
+        <p class="mt-7 max-w-2xl text-lg leading-8 sm:text-xl" data-hero style="--hero-order: 2; color: var(--muted);">你好，我是 YMLL。这里是我的数字花园：围绕前端工程、计算生物学与长期学习，分享可复用的实践和仍在生长的思考。</p>
+        <div class="mt-9 flex flex-wrap gap-3" data-hero style="--hero-order: 3;">
+          <a href={`${base}/blog`} class="button-primary">开始阅读 <span class="ml-2" aria-hidden="true">→</span></a>
+          <a href={`${base}/about`} class="button-secondary">关于我</a>
+        </div>
+        <div class="mt-12 grid max-w-xl grid-cols-3 gap-5 border-t pt-6" data-hero style="--hero-order: 4; border-color: var(--line);">
+          <div><strong class="font-display text-2xl" data-count={posts.length} aria-label={`${posts.length} 篇`}>{String(posts.length).padStart(2, '0')}</strong><span class="mt-1 block text-xs" style="color: var(--muted);">公开文章</span></div>
+          <div><strong class="font-display text-2xl" data-count={tagCount} aria-label={`${tagCount} 个`}>{String(tagCount).padStart(2, '0')}</strong><span class="mt-1 block text-xs" style="color: var(--muted);">研究主题</span></div>
+          <div><strong class="font-display text-2xl" data-count={years} aria-label={`${years} 年`}>{String(years).padStart(2, '0')}</strong><span class="mt-1 block text-xs" style="color: var(--muted);">持续年份</span></div>
         </div>
       </div>
-    </div>
+
+      <aside class="hero-stage relative mx-auto w-full max-w-lg" aria-label="当前关注方向">
+        <div class="hero-parallax absolute inset-0 -z-10 rotate-2 rounded-[2.5rem] sm:-inset-4" style="background: var(--brand-soft);"></div>
+        <div class="surface rounded-[2rem] p-7 sm:p-9" data-hero style="--hero-order: 3;">
+          <div class="flex items-center justify-between border-b pb-5" style="border-color: var(--line);">
+            <span class="text-xs font-semibold uppercase tracking-[0.2em]">Now / 2026</span>
+            <span class="flex items-center gap-2 text-xs" style="color: var(--brand-deep);"><i class="now-pulse h-2 w-2 rounded-full" style="background: var(--brand);"></i>持续探索</span>
+          </div>
+          <div class="py-8">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em]" style="color: var(--muted);">当前研究问题</p>
+            <h2 class="mt-4 font-display text-3xl font-bold leading-snug">如何让计算模型更好地解释生命系统的动态变化？</h2>
+            <p class="mt-5 text-sm leading-7" style="color: var(--muted);">从 ODE、最优传输到单细胞轨迹推断，也持续关注把复杂系统做成易用产品的工程方法。</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            {['Computational Biology', 'Frontend Systems', 'Open Source', 'Writing'].map((topic, index) => (
+              <div class="rounded-2xl border p-4" style="border-color: var(--line);">
+                <span class="text-[10px] font-semibold" style="color: var(--brand);">0{index + 1}</span>
+                <span class="mt-2 block text-sm font-medium">{topic}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    {featured && <section class="site-shell py-20 section-rule" data-reveal>
+      <div class="mb-9 flex items-end justify-between gap-5">
+        <div><p class="eyebrow">Selected writing</p><h2 class="font-display text-4xl font-bold sm:text-5xl">编辑精选</h2></div>
+        <a href={`${base}/blog`} class="hidden text-sm font-semibold sm:block" style="color: var(--brand-deep);">查看全部文章 →</a>
+      </div>
+      <PostCard title={featured.data.title} description={featured.data.description} date={featured.data.pubDate.toISOString()} tags={featured.data.tags} slug={featured.id} image={featured.data.cover} category={featured.data.category} readingTime={calculateReadingTime(featured.body ?? '')} featured index={1} />
+    </section>}
+
+    <section class="site-shell py-20 section-rule">
+      <div class="grid gap-12 lg:grid-cols-[0.7fr_1.3fr]">
+        <div class="lg:sticky lg:top-28 lg:self-start" data-reveal>
+          <p class="eyebrow">Latest notes</p>
+          <h2 class="font-display text-4xl font-bold sm:text-5xl">最近更新</h2>
+          <p class="mt-5 max-w-sm leading-7" style="color: var(--muted);">从实践中提炼结论，也保留推导过程。每篇文章都力求让读者带走一个可用的方法。</p>
+          <a href={`${base}/archive`} class="button-secondary mt-7">查看时间归档</a>
+        </div>
+        <div class="grid gap-5 sm:grid-cols-2">
+          {recent.map((post, index) => <PostCard title={post.data.title} description={post.data.description} date={post.data.pubDate.toISOString()} tags={post.data.tags} slug={post.id} image={post.data.cover} category={post.data.category} readingTime={calculateReadingTime(post.body ?? '')} index={index + 2} reveal revealOrder={index} />)}
+        </div>
+      </div>
+    </section>
+
+    <MusicPlayer />
+
+    <section class="site-shell py-20 section-rule">
+      <div class="surface overflow-hidden rounded-[2rem]" data-reveal>
+        <div class="grid lg:grid-cols-[0.8fr_1.2fr]">
+          <div class="p-8 sm:p-12" style="background: var(--ink); color: var(--surface);">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] opacity-60">Browse by field</p>
+            <h2 class="mt-5 font-display text-4xl font-bold">沿着兴趣<br />继续探索。</h2>
+            <p class="mt-5 max-w-sm text-sm leading-7 opacity-70">标签不是抽屉，而是不同知识之间的路径。</p>
+          </div>
+          <div class="grid sm:grid-cols-2">
+            {categories.map(([name, count], index) => <a href={`${base}/blog`} class="motion-card group flex min-h-36 items-end justify-between border-b p-7 hover:bg-black/[0.03] dark:hover:bg-white/[0.03] sm:border-l" style="border-color: var(--line);"><span><small class="block text-xs" style="color: var(--muted);">0{index + 1} / {count} 篇</small><strong class="motion-card-title mt-2 block font-display text-xl">{name}</strong></span><span class="motion-arrow">→</span></a>)}
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
-
   <Footer />
-
-  {/* 滚动动画脚本 */}
-  <script>
-    // 卡片滚动动画 - dlog.com.cn 风格
-    document.addEventListener('DOMContentLoaded', function() {
-      const cards = document.querySelectorAll('.post-card-animate');
-      if (cards.length === 0) return;
-
-      const coefficient = window.innerWidth > 768 ? 0.5 : 0.3;
-      const origin = window.innerHeight - (cards[0] as HTMLElement).getBoundingClientRect().height * coefficient;
-
-      function throttle(fn: Function, wait: number) {
-        let timer: ReturnType<typeof setTimeout> | null = null;
-        return function(this: any, ...args: any[]) {
-          if (!timer) {
-            timer = setTimeout(function() {
-              fn.apply(this, args);
-              timer = null;
-            }, wait);
-          }
-        };
-      }
-
-      function handle() {
-        cards.forEach(card => {
-          const rect = (card as HTMLElement).getBoundingClientRect();
-          const state = (rect.top - origin) < 0 ? 1 : 0;
-          (card as HTMLElement).style.setProperty('--state', String(state));
-        });
-      }
-
-      window.addEventListener('scroll', throttle(handle, 100));
-      handle(); // 初始触发
-    });
-
-    // 视差效果
-    document.addEventListener('DOMContentLoaded', function() {
-      const banner = document.getElementById('hero-banner');
-      const board = document.getElementById('board');
-
-      if (!banner || !board) return;
-
-      function parallax() {
-        const scrollTop = window.scrollY;
-        const pxv = scrollTop / 5;
-        const offset = parseInt(getComputedStyle(board).marginTop) || 0;
-        const max = 96 + offset;
-        const translate = Math.min(pxv, max);
-
-        banner.style.transform = `translate3d(0, ${translate}px, 0)`;
-      }
-
-      window.addEventListener('scroll', parallax);
-    });
-
-    // 主题初始应用
-    (function() {
-      try {
-        const settings = JSON.parse(localStorage.getItem('ymll_user_settings') || 'null');
-        const body = document.body;
-        // 始终先清除所有背景类
-        body.classList.remove('theme-bg-aurora', 'theme-bg-gradient', 'theme-bg-waves', 'theme-bg-mesh', 'theme-bg-stars', 'theme-bg-image', 'theme-bg-solid', 'theme-bg-particles');
-        if (settings && settings.backgroundMode) {
-          body.classList.add('theme-bg-' + settings.backgroundMode);
-          if (settings.backgroundMode === 'image' && settings.customBackground) {
-            body.style.setProperty('--custom-bg-image', `url('${settings.customBackground}')`);
-          }
-        } else {
-          // 默认使用蓝紫渐变
-          body.classList.add('theme-bg-gradient');
-        }
-      } catch (e) {
-        // 默认使用蓝紫渐变
-        document.body.classList.add('theme-bg-gradient');
-      }
-    })();
-  </script>
 </Layout>

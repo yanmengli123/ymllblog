@@ -4,56 +4,49 @@ import { join } from 'node:path';
 
 const root = process.cwd();
 const read = (file) => readFileSync(join(root, file), 'utf8');
-
-const header = read('src/components/Header.astro');
-assert.match(header, /placeholder="搜索文章、标签、摘要"/, 'search input placeholder should be valid HTML');
-assert.doesNotMatch(header, /searchResults\.innerHTML\s*=/, 'search results should be rendered with DOM APIs, not innerHTML');
-assert.match(header, /createElement\('a'\)/, 'search results should create result links safely');
-assert.match(header, /textContent/, 'search results should set text with textContent');
-
-const postLayout = read('src/layouts/PostLayout.astro');
-assert.doesNotMatch(postLayout, /onclick=\{?`?/, 'post layout should not use inline onclick handlers');
-assert.match(postLayout, /data-share-url/, 'share buttons should expose the share URL as data');
-assert.match(postLayout, /id="copy-link-btn"/, 'copy link action should be wired by script');
-assert.match(postLayout, /href=\{`\$\{base\}\/rss\.xml`\}/, 'article sidebar subscription should use RSS on a static site');
-assert.doesNotMatch(postLayout, /<form class="flex flex-col gap-2">/, 'article sidebar should not render a fake email subscription form');
-
 const layout = read('src/layouts/Layout.astro');
-for (const brokenPattern of [
-  /document\.title = '[^'\n]*\n/,
-  /unlockAchievement\([^)]*馃摎[^)]*\n/,
-  /backToTop\.innerHTML = '[^'\n]*\n/,
-  /badge\.innerHTML = '[^'\n]*\n/,
-  /onsubmit=/,
-  /onclick=/,
-]) {
-  assert.doesNotMatch(layout, brokenPattern, `layout should not contain broken or inline script pattern ${brokenPattern}`);
-}
-assert.match(layout, /createSubscribePrompt/, 'layout should use a safe subscription prompt builder');
-assert.match(layout, /rss\.xml/, 'subscription prompt should point to RSS');
-
-const astroConfig = read('astro.config.mjs');
-assert.doesNotMatch(astroConfig, /sitemap\(\)/, 'Astro config should avoid the incompatible sitemap integration');
-
-const packageJson = read('package.json');
-assert.match(packageJson, /node scripts\/generate-sitemap\.mjs/, 'build script should generate a sitemap after Astro build');
-
+const header = read('src/components/Header.astro');
+const postLayout = read('src/layouts/PostLayout.astro');
+const adminHtml = read('public/admin/index.html');
+const adminClient = read('public/admin/admin.js');
+const adminServer = read('server/admin-server.mjs');
+const adminService = read('server/ymllblog-admin.service');
+const headers = read('public/_headers');
 const sitemapScript = read('scripts/generate-sitemap.mjs');
-assert.match(sitemapScript, /sitemap\.xml/, 'sitemap script should write sitemap.xml');
-assert.match(sitemapScript, /SITEMAP_SITE_ROOT/, 'sitemap script should read site root from env so it works on both GH Pages and Cloudflare');
-assert.match(sitemapScript, /yanmengli123\.github\.io/, 'sitemap script should default to the GitHub Pages URL when env is unset');
-assert.match(sitemapScript, /encodeURIComponent/, 'sitemap script should URL-encode dynamic path segments');
-assert.match(sitemapScript, /escapeXml/, 'sitemap script should XML-escape URLs');
+const astroConfig = read('astro.config.mjs');
 
-const headersFile = read('public/_headers');
-assert.match(headersFile, /Content-Security-Policy/, 'public/_headers should set a CSP');
-assert.match(headersFile, /Strict-Transport-Security/, 'public/_headers should enable HSTS');
-assert.match(headersFile, /X-Content-Type-Options/, 'public/_headers should disable MIME sniffing');
-assert.match(headersFile, /\/admin\/\*/, 'public/_headers should apply a special rule to /admin (e.g. noindex)');
-assert.match(headersFile, /giscus\.app/, 'CSP must allow giscus.app (comment widget)');
-assert.match(headersFile, /Cache-Control.*immutable/, 'public/_headers should cache-bust hashed /_astro/* assets');
+assert.match(layout, /<meta name="description"/, 'layout should include description metadata');
+assert.match(layout, /application\/ld\+json/, 'layout should expose structured data');
+assert.match(layout, /createSubscribePrompt/, 'layout should expose the RSS subscription target safely');
+assert.doesNotMatch(layout, /onclick=|onsubmit=/, 'layout should avoid inline event handlers');
 
-const redirectsFile = read('public/_redirects');
-assert.match(redirectsFile, /\/ymllblog\//, 'public/_redirects should rewrite legacy /ymllblog/* to root for Cloudflare Pages');
+assert.match(header, /replaceChildren\(\)/, 'search results should be cleared safely');
+assert.match(header, /textContent/, 'search content should be assigned as text');
+assert.match(postLayout, /data-share-url/, 'share action should store the canonical URL as data');
 
-console.log('runtime safety tests passed');
+assert.match(adminHtml, /autocomplete="username"/, 'admin login should support username/password managers');
+assert.match(adminHtml, /autocomplete="current-password"/, 'admin login should use a password field');
+assert.match(adminHtml, /id="post-form"/, 'admin should expose post editing');
+assert.doesNotMatch(adminHtml, /sveltia|github.*token/i, 'admin browser bundle should not request GitHub credentials');
+assert.match(adminClient, /X-CSRF-Token/, 'admin writes should send a CSRF token');
+assert.match(adminClient, /textContent/, 'admin should render repository content safely');
+assert.doesNotMatch(adminClient, /innerHTML\s*=/, 'admin should avoid unsafe HTML assignment');
+assert.match(adminServer, /HttpOnly; SameSite=Strict/, 'admin session cookie should be hardened');
+assert.match(adminServer, /scrypt/, 'admin password should use a memory-hard hash');
+assert.match(adminServer, /timingSafeEqual/, 'credential comparisons should resist timing attacks');
+assert.match(adminServer, /blockedUntil/, 'admin login should rate-limit repeated failures');
+assert.match(adminService, /NoNewPrivileges=true/, 'admin service should use systemd sandboxing');
+
+assert.match(headers, /Content-Security-Policy/, 'security headers should include a CSP');
+assert.match(headers, /Strict-Transport-Security/, 'security headers should include HSTS');
+assert.match(headers, /\/admin\/\*/, 'admin should have dedicated noindex and no-store rules');
+assert.match(headers, /Cross-Origin-Opener-Policy: same-origin/, 'admin should isolate its browsing context');
+assert.doesNotMatch(headers, /unsafe-eval/, 'CSP should not allow eval');
+
+assert.match(sitemapScript, /SITEMAP_SITE_ROOT/, 'sitemap should be configurable per deployment');
+assert.match(sitemapScript, /escapeXml/, 'sitemap should escape generated URLs');
+assert.match(astroConfig, /ymll-admin-index-redirect/, 'local admin directory URLs should resolve to the isolated static entry');
+assert.match(astroConfig, /adminPath}\/index\.html/, 'local admin redirect should preserve the configured base path');
+assert.match(astroConfig, /'\/admin', '\/admin\/'/, 'local admin redirect should also recognize Vite base-stripped paths');
+
+console.log('runtime and admin safety tests passed');

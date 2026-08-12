@@ -33,6 +33,8 @@ REPO_URL="${REPO_URL:-https://github.com/yanmengli123/ymllblog.git}"
 WEB_DIR="/var/www/yanmengli"
 REPO_DIR="$WEB_DIR/repo"
 HTML_DIR="$WEB_DIR/html"
+ADMIN_RUNTIME_DIR="$WEB_DIR/admin-runtime"
+ADMIN_ENV_FILE="/etc/ymllblog-admin.env"
 
 echo "============================================================"
 echo "  Enterprise deploy: $DOMAIN ($SERVER_IP)"
@@ -113,7 +115,7 @@ export BASE_URL="/"
 export SITEMAP_SITE_ROOT="https://$DOMAIN"
 export CI=true
 
-npm install
+npm ci
 npm run build
 
 echo ""
@@ -124,6 +126,51 @@ cp -r dist/* "$HTML_DIR/"
 chown -R www-data:www-data "$HTML_DIR"
 chmod -R 755 "$HTML_DIR"
 echo "已部署 $(find "$HTML_DIR" -type f | wc -l) 个文件到 $HTML_DIR"
+
+echo "正在安装管理员 API 运行时..."
+mkdir -p "$ADMIN_RUNTIME_DIR"
+rsync -a --delete "$REPO_DIR/server/" "$ADMIN_RUNTIME_DIR/"
+cd "$ADMIN_RUNTIME_DIR"
+npm ci --omit=dev
+chown -R root:root "$ADMIN_RUNTIME_DIR"
+chmod -R go-w "$ADMIN_RUNTIME_DIR"
+
+if [ ! -f "$ADMIN_ENV_FILE" ]; then
+  if [ ! -t 0 ]; then
+    echo "❌ 缺少 $ADMIN_ENV_FILE。请先根据 server/admin.env.example 配置后台凭据。"
+    exit 1
+  fi
+  echo "首次部署需要创建管理员凭据（不会写入仓库）。"
+  read -r -p "管理员用户名 [admin]: " ADMIN_USERNAME_VALUE
+  ADMIN_USERNAME_VALUE="${ADMIN_USERNAME_VALUE:-admin}"
+  read -r -s -p "管理员强密码（至少12位）: " ADMIN_PASSWORD_VALUE
+  echo ""
+  read -r -s -p "再次输入密码: " ADMIN_PASSWORD_CONFIRM
+  echo ""
+  if [ "$ADMIN_PASSWORD_VALUE" != "$ADMIN_PASSWORD_CONFIRM" ]; then echo "❌ 两次密码不一致"; exit 1; fi
+  ADMIN_PASSWORD_HASH_VALUE="$(node "$REPO_DIR/scripts/hash-admin-password.mjs" "$ADMIN_PASSWORD_VALUE")"
+  unset ADMIN_PASSWORD_VALUE ADMIN_PASSWORD_CONFIRM
+  read -r -s -p "GitHub fine-grained Token（仅 Contents 读写）: " GITHUB_TOKEN_VALUE
+  echo ""
+  if [ -z "$GITHUB_TOKEN_VALUE" ]; then echo "❌ GitHub Token 不能为空"; exit 1; fi
+  SESSION_SECRET_VALUE="$(openssl rand -base64 48 | tr -d '\n')"
+  umask 077
+  {
+    printf 'ADMIN_USERNAME=%s\n' "$ADMIN_USERNAME_VALUE"
+    printf "ADMIN_PASSWORD_HASH='%s'\n" "$ADMIN_PASSWORD_HASH_VALUE"
+    printf "SESSION_SECRET='%s'\n" "$SESSION_SECRET_VALUE"
+    printf 'SESSION_TTL_SECONDS=43200\n'
+    printf 'GITHUB_REPOSITORY=yanmengli123/ymllblog\n'
+    printf 'GITHUB_BRANCH=main\n'
+    printf "GITHUB_TOKEN='%s'\n" "$GITHUB_TOKEN_VALUE"
+  } > "$ADMIN_ENV_FILE"
+  unset ADMIN_PASSWORD_HASH_VALUE GITHUB_TOKEN_VALUE SESSION_SECRET_VALUE
+fi
+chmod 600 "$ADMIN_ENV_FILE"
+cp "$ADMIN_RUNTIME_DIR/ymllblog-admin.service" /etc/systemd/system/ymllblog-admin.service
+systemctl daemon-reload
+systemctl enable --now ymllblog-admin
+systemctl restart ymllblog-admin
 
 echo ""
 echo "🚀 [8/9] 正在配置 Nginx（临时 HTTP 配置用于证书申请）..."
@@ -166,160 +213,10 @@ fi
 systemctl enable certbot.timer >/dev/null 2>&1 || true
 systemctl start certbot.timer
 
-# 切到完整 HTTPS 配置
-echo "切换到完整 HTTPS 配置（含 SSL + 安全头）..."
-cat > /etc/nginx/sites-available/"$DOMAIN" << 'NGINX_FULL_EOF'
-server {
-    listen 80;
-    listen [::]:80;
-    server_name yanmengli.cn www.yanmengli.cn;
-
-    location /.well-known/acme-challenge/ {
-        root /var/www/yanmengli/html;
-    }
-
-    location / {
-        return 301 https://$host$request_uri;
-    }
-}
-
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name yanmengli.cn www.yanmengli.cn;
-
-    root /var/www/yanmengli/html;
-    index index.html;
-
-    ssl_certificate     /etc/letsencrypt/live/yanmengli.cn/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/yanmengli.cn/privkey.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 1d;
-    ssl_session_tickets off;
-
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net https://music.163.com https://*.music.126.net https://*.netease.com https://giscus.app https://*.giscus.app; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://unpkg.com https://giscus.app; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https: blob: https://*.githubusercontent.com; media-src 'self' https://*.music.126.net https://music.163.com; frame-src https://music.163.com https://*.music.126.net https://open.spotify.com https://www.youtube.com https://giscus.app; connect-src 'self' https://api.github.com https://*.githubusercontent.com https://giscus.app https://*.giscus.app; worker-src 'self' blob:; manifest-src 'self'" always;
-
-    location ^~ /ymllblog/ {
-        rewrite ^/ymllblog/(.*)$ /$1 permanent;
-    }
-
-    location ~ /\. { deny all; }
-
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-        expires 1y;
-        add_header Cache-Control "public, max-age=31536000, immutable";
-    }
-
-    location ~* /(sitemap\.xml|rss\.xml|robots\.txt)$ {
-        expires 1h;
-        add_header Cache-Control "public, max-age=3600";
-    }
-
-    location ^~ /admin/ {
-        add_header X-Robots-Tag "noindex, nofollow" always;
-        add_header Cache-Control "no-store" always;
-    }
-
-    gzip on;
-    gzip_vary on;
-    gzip_min_length 1024;
-    gzip_proxied any;
-    gzip_comp_level 6;
-    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/javascript application/json application/xml image/svg+xml;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-}
-NGINX_FULL_EOF
-
-nginx -t && systemctl restart nginx
-echo "✅ nginx 完整 HTTPS 配置已生效"
-
-# 切到完整 HTTPS 配置（含 SSL 证书 + 安全头 + /ymllblog/ 重定向）
-cat > /etc/nginx/sites-available/"$DOMAIN" << 'NGINX_FULL_EOF'
-server {
-    listen 80;
-    listen [::]:80;
-    server_name yanmengli.cn www.yanmengli.cn;
-
-    location /.well-known/acme-challenge/ {
-        root /var/www/yanmengli/html;
-    }
-
-    location / {
-        return 301 https://$host$request_uri;
-    }
-}
-
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name yanmengli.cn www.yanmengli.cn;
-
-    root /var/www/yanmengli/html;
-    index index.html;
-
-    ssl_certificate     /etc/letsencrypt/live/yanmengli.cn/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/yanmengli.cn/privkey.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 1d;
-    ssl_session_tickets off;
-
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net https://music.163.com https://*.music.126.net https://*.netease.com https://giscus.app https://*.giscus.app; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://unpkg.com https://giscus.app; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https: blob: https://*.githubusercontent.com; media-src 'self' https://*.music.126.net https://music.163.com; frame-src https://music.163.com https://*.music.126.net https://open.spotify.com https://www.youtube.com https://giscus.app; connect-src 'self' https://api.github.com https://*.githubusercontent.com https://giscus.app https://*.giscus.app; worker-src 'self' blob:; manifest-src 'self'" always;
-
-    location ^~ /ymllblog/ {
-        rewrite ^/ymllblog/(.*)$ /$1 permanent;
-    }
-
-    location ~ /\. { deny all; }
-
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-        expires 1y;
-        add_header Cache-Control "public, max-age=31536000, immutable";
-    }
-
-    location ~* /(sitemap\.xml|rss\.xml|robots\.txt)$ {
-        expires 1h;
-        add_header Cache-Control "public, max-age=3600";
-    }
-
-    location ^~ /admin/ {
-        add_header X-Robots-Tag "noindex, nofollow" always;
-        add_header Cache-Control "no-store" always;
-    }
-
-    gzip on;
-    gzip_vary on;
-    gzip_min_length 1024;
-    gzip_proxied any;
-    gzip_comp_level 6;
-    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/javascript application/json application/xml image/svg+xml;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-}
-NGINX_FULL_EOF
-
+echo "切换到完整 HTTPS 配置（含管理员 API、SSL 和安全头）..."
+mkdir -p /etc/nginx/snippets
+cp "$REPO_DIR/server/ymllblog-security.nginx.conf" /etc/nginx/snippets/ymllblog-security.conf
+cp "$REPO_DIR/server/ymllblog.nginx.conf" /etc/nginx/sites-available/"$DOMAIN"
 nginx -t
 systemctl restart nginx
 echo "nginx 完整 HTTPS 配置已生效"
@@ -329,7 +226,7 @@ echo "============================================================"
 echo "  ✅ 部署完成！"
 echo ""
 echo "  网站:  https://$DOMAIN"
-echo "  管理:  https://$DOMAIN/admin/  (Sveltia CMS, GitHub Device Flow)"
+echo "  管理:  https://$DOMAIN/admin/  (用户名/密码会话登录)"
 echo "  RSS:   https://$DOMAIN/rss.xml"
 echo "  Sitemap: https://$DOMAIN/sitemap.xml"
 echo ""

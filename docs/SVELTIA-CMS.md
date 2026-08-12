@@ -1,70 +1,60 @@
-# Sveltia CMS — install & upgrade
+# YMLL Blog 管理后台
 
-This file documents how the CMS is set up. If you are setting it up from scratch, follow steps 1–3 in order. For day-to-day editing, see [RUNBOOK.md](RUNBOOK.md) § "Author a new post".
+后台地址为站点的 `/admin/`。当前版本使用自有管理员会话服务，不再由浏览器直接连接 GitHub，因此日常使用只需要输入管理员用户名和密码。
 
-## What is Sveltia CMS?
+## 工作方式
 
-A browser-based, Git-backed content management UI. It runs entirely in the browser — there is no backend server. Authentication uses the **GitHub Device Flow** (you see a code on the CMS page, paste it into github.com/login/device, done). All edits commit directly to your repo.
+- 管理界面：`public/admin/`，提供文章列表、搜索、新建、编辑、删除、草稿、精选、标签、分类和封面上传。
+- 管理 API：`server/admin-server.mjs`，只监听 VPS 本机 `127.0.0.1:8787`，由 Nginx 代理 `/admin-api/`。
+- 内容存储：API 通过服务端保存的最小权限 GitHub Token 修改 `src/content/blog/*.md`，保留 Git 版本历史并自动触发现有部署流程。
+- 本地开发：`CONTENT_BACKEND=local` 时直接读写项目内的 Markdown，便于完整测试。
 
-It is a modern fork of Decap CMS with a better editor, native i18n, and no need for an OAuth proxy.
+## 安全边界
 
-## Install (already done in this repo)
+- 密码使用 scrypt 哈希，仓库中不保存明文密码。
+- 登录成功后只下发 `HttpOnly + Secure + SameSite=Strict` 会话 Cookie。
+- 创建、修改、删除和上传均验证 CSRF Token。
+- 同一来源 15 分钟内连续失败 5 次会被临时锁定；Nginx 另有接口限流。
+- GitHub Token 仅存放在 VPS 的 `/etc/ymllblog-admin.env`，浏览器无法读取。
+- 服务使用 systemd 沙箱运行，并只监听回环地址，不直接暴露 8787 端口。
 
-Files live under `public/admin/`. Astro copies `public/*` to `dist/*` verbatim during build, so the CMS is reachable at `${BASE_URL}/admin/` automatically — no route config needed.
+## 首次配置
 
-```
-public/admin/
-├── index.html   # Entry point. Loads Sveltia via ESM CDN.
-└── config.yml   # Field definitions. MUST mirror src/content.config.ts.
-```
+在项目目录生成密码哈希：
 
-### Upgrading Sveltia
-
-The version is pinned in `public/admin/index.html`:
-
-```html
-<script type="module">
-  const sveltiaUrl = 'https://unpkg.com/@sveltia/cms@0.110.0/dist/sveltia-cms.js';
-  ...
-</script>
+```bash
+npm run admin:password -- '你的至少12位强密码'
 ```
 
-When Dependabot opens a PR for `@sveltia/cms` (after you add it to package.json or just bump the URL manually):
+在 VPS 生成会话密钥：
 
-1. Check [Sveltia's CHANGELOG](https://github.com/sveltia/sveltia-cms/blob/main/packages/cms/CHANGELOG.md) for breaking changes.
-2. Update the URL.
-3. Bump the version in this doc.
-4. Open a PR — CI will build, and you can click the Cloudflare Pages preview URL to verify the CMS loads.
+```bash
+openssl rand -base64 48
+```
 
-## Field parity with `src/content.config.ts`
+复制 `server/admin.env.example` 为 VPS 的 `/etc/ymllblog-admin.env`，填入：
 
-| Zod schema field (source of truth) | Sveltia widget | Required? |
-|-------------------------------------|----------------|-----------|
-| `title` | `string` | yes |
-| `description` | `text` | yes |
-| `pubDate` | `datetime` | yes |
-| `updatedDate` | `datetime` | optional |
-| `author` | `string` (default "YMLL") | optional |
-| `tags` | `list` of strings | optional |
-| `category` | `string` | optional |
-| `cover` | `image` | optional |
-| `draft` | `boolean` (default false) | optional |
-| `featured` | `boolean` (default false) | optional |
-| `lang` | `select` (default "zh-CN") | optional |
-| `body` | `markdown` | yes |
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD_HASH`
+- `SESSION_SECRET`
+- `GITHUB_TOKEN`：fine-grained personal access token，只授权 `yanmengli123/ymllblog` 的 Contents 读写权限
 
-If you add a new field to either side, add it to the other in the same PR. A drift will fail the next `astro check` run.
+然后执行：
 
-## Authentication notes
+```bash
+chmod 600 /etc/ymllblog-admin.env
+bash scripts/deploy-vps.sh
+```
 
-- GitHub Device Flow does NOT require you to register an OAuth app — it uses the standard GitHub endpoint.
-- Each browser session asks for re-auth (token lifetime is short). This is intentional for security.
-- For multi-author setups, add each GitHub user as a repository collaborator. The CMS will then commit under their GitHub identity.
+不要把环境文件、Token、密码或密码哈希发到聊天、截图或提交进 Git。
 
-## Why not Decap CMS?
+## 本地测试
 
-Decap needs a separate OAuth proxy server (`decap-server` or Netlify Identity) to handle GitHub login. That violates the "zero backend" constraint. Sveltia uses the GitHub Device Flow directly — no proxy required.
+使用临时开发密码启动 API：
 
-## Why not TinaCMS?
+```powershell
+$env:ADMIN_DEV_PASSWORD='仅限本机的临时密码'
+npm run admin:server
+```
 
-Tina's free self-hosted tier still requires you to run a Node.js backend. Sveltia is purely static + browser.
+另开终端运行 `npm run dev`，再打开 `http://localhost:4321/ymllblog/admin/`。开发服务器会精确重定向到独立静态后台入口；本地模式直接修改当前项目的 Markdown 文件，因此测试创建和删除时要注意工作区变化。用户名和密码从本地环境配置读取。
