@@ -1,0 +1,14 @@
+---
+interface Props { years: [number, number][]; }
+const { years } = Astro.props;
+const max = Math.max(1, ...years.map(([, count]) => count));
+---
+
+<section class="site-shell py-20 section-rule" aria-labelledby="growth-heading" data-reveal>
+  <div class="growth-card surface rounded-[2rem] p-7 sm:p-10">
+    <div class="section-heading-row"><div><p class="eyebrow">Garden growth</p><h2 id="growth-heading" class="font-display text-4xl font-bold">花园成长轨迹</h2></div><p class="section-intro">按照文章发布日期自动生成的年度时间线。时间让零散笔记变成可观察的长期积累。</p></div>
+    <div class="garden-growth-timeline mt-10">
+      {years.map(([year, count], index) => <div class="garden-growth-year"><div><strong>{year}</strong><span>{count} 篇公开文章</span></div><div class="garden-growth-track"><i class="garden-growth-fill" style={`--growth: ${count / max}; --growth-delay: ${index * 80}ms;`}></i></div></div>)}
+    </div>
+  </div>
+</section>

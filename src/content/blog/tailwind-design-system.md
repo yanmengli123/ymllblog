@@ -8,6 +8,11 @@ category: "前端工程"
 cover: "https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&q=80"
 draft: false
 featured: true
+featuredOrder: 3
+maturity: growing
+growthLog:
+  - date: 2026-07-16
+    summary: 补充设计令牌与组件分层实践
 lang: "zh-CN"
 ---
 

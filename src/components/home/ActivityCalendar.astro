@@ -1,0 +1,57 @@
+---
+import type { ActivityItem } from '../../lib/garden';
+
+interface Props { activity: ActivityItem[]; }
+const { activity } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const firstDay = activity[0] ? new Date(`${activity[0].date}T12:00:00`) : new Date();
+const leading = (firstDay.getDay() + 6) % 7;
+const cells = [
+  ...Array.from({ length: leading }, () => null),
+  ...activity,
+];
+const formatDate = (date: string) => new Date(`${date}T12:00:00`).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+const itemsFor = (day: ActivityItem) => [
+  ...day.publications.map((post) => ({ title: post.data.title, url: `${base}/blog/${post.id}`, action: '发布' })),
+  ...day.cultivations.map((post) => ({ title: post.data.title, url: `${base}/blog/${post.id}`, action: '培育' })),
+];
+const monthLabels = activity.reduce<string[]>((labels, day) => {
+  const month = new Date(`${day.date}T12:00:00`).toLocaleDateString('zh-CN', { month: 'short' });
+  if (labels.at(-1) !== month) labels.push(month);
+  return labels;
+}, []);
+---
+
+<section class="site-shell py-20 section-rule" aria-labelledby="activity-heading" data-reveal>
+  <div class="section-heading-row">
+    <div><p class="eyebrow">Learning activity</p><h2 id="activity-heading" class="font-display text-4xl font-bold sm:text-5xl">一年的知识生长</h2></div>
+    <p class="section-intro">每一次发布与后续培育，都会在这里留下一个可追溯的节点。</p>
+  </div>
+  <div class="activity-card surface mt-10 rounded-[2rem] p-5 sm:p-8">
+    <div class="activity-months" aria-hidden="true">{monthLabels.map((month) => <span>{month}</span>)}</div>
+    <div class="activity-layout">
+      <div class="activity-days" aria-hidden="true"><span>一</span><span>三</span><span>五</span><span>日</span></div>
+      <div class="activity-scroll">
+        <div class="activity-grid" role="grid" aria-label="最近 365 天内容活动">
+          {cells.map((day, index) => day ? (
+            <button
+              class="activity-cell"
+              type="button"
+              role="gridcell"
+              data-level={Math.min(4, day.count)}
+              data-mobile-hidden={index - leading < activity.length - 119 ? 'true' : 'false'}
+              data-activity-date={day.date}
+              data-activity-items={JSON.stringify(itemsFor(day))}
+              aria-label={`${formatDate(day.date)}，${day.count} 次内容活动`}
+              title={`${formatDate(day.date)} · ${day.count} 次活动`}
+            ></button>
+          ) : <span class="activity-cell activity-cell--empty" aria-hidden="true"></span>)}
+        </div>
+      </div>
+    </div>
+    <div class="activity-footer">
+      <div id="activity-detail" class="activity-detail" aria-live="polite"><strong>选择一个日期</strong><span>查看当天发布或培育的内容</span></div>
+      <div class="activity-legend" aria-label="活动强度图例"><span>少</span>{[0, 1, 2, 3, 4].map((level) => <i data-level={level}></i>)}<span>多</span></div>
+    </div>
+  </div>
+</section>

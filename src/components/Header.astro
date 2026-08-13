@@ -2,7 +2,11 @@
 import { getCollection } from 'astro:content';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const posts = await getCollection('blog', ({ data }) => !data.draft);
+const [posts, projects, research] = await Promise.all([
+  getCollection('blog', ({ data }) => !data.draft),
+  getCollection('projects'),
+  getCollection('research'),
+]);
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const navItems = [
   { label: '文章', href: `${base}/blog` },
@@ -16,7 +20,16 @@ const searchIndex = posts.map((post) => ({
   description: post.data.description,
   tags: post.data.tags,
   url: `${base}/blog/${post.id}`,
+  kind: '文章',
 }));
+const commandIndex = [
+  { title: '浏览全部文章', description: '进入按时间排列的公开文章列表', tags: ['文章', 'blog'], url: `${base}/blog`, kind: '导航' },
+  { title: '探索主题花园', description: '按主题标签浏览知识网络', tags: ['标签', '主题'], url: `${base}/tags`, kind: '导航' },
+  { title: '查看年度归档', description: '沿着时间查看内容积累', tags: ['归档', 'timeline'], url: `${base}/archive`, kind: '导航' },
+  { title: '随机漫游一篇笔记', description: '让花园选择一条意外的阅读路径', tags: ['随机', 'random'], url: searchIndex[0]?.url ?? `${base}/blog`, kind: '命令', action: 'random' },
+  ...projects.map((project) => ({ title: project.data.title, description: project.data.summary, tags: project.data.technologies, url: project.data.relatedPost ? `${base}/blog/${project.data.relatedPost}` : project.data.repository || `${base}/`, kind: '项目' })),
+  ...research.filter((entry) => entry.data.relatedPost).map((entry) => ({ title: entry.data.title, description: entry.data.topic, tags: [entry.data.topic, entry.data.status], url: `${base}/blog/${entry.data.relatedPost}`, kind: '研究' })),
+];
 ---
 
 <header id="site-header" data-site-header data-condensed="false" class="fixed inset-x-0 top-0 z-50 border-b backdrop-blur-xl" style="border-color: var(--line); background: color-mix(in srgb, var(--paper) 88%, transparent);">
@@ -66,14 +79,16 @@ const searchIndex = posts.map((post) => ({
   <div class="w-full max-w-2xl rounded-3xl border p-4 shadow-2xl" style="border-color: var(--line); background: var(--surface-strong);">
     <div class="flex items-center gap-3">
       <h2 id="search-modal-title" class="sr-only">站内搜索</h2>
-      <input id="site-search-input" type="search" autocomplete="off" placeholder="搜索文章、标签、摘要" class="min-w-0 flex-1 rounded-2xl border bg-transparent px-4 py-3 text-sm outline-none" style="border-color: var(--line);" />
+      <span class="pl-2 text-lg" aria-hidden="true">⌘</span>
+      <input id="site-search-input" type="search" autocomplete="off" placeholder="搜索文章、项目，或输入命令" class="min-w-0 flex-1 rounded-2xl border bg-transparent px-4 py-3 text-sm outline-none" style="border-color: var(--line);" />
       <button id="search-close" class="rounded-xl px-3 py-2 text-sm" style="color: var(--muted);" aria-label="关闭搜索">关闭</button>
     </div>
-    <div id="search-results" class="mt-4 max-h-[60vh] space-y-2 overflow-y-auto"></div>
+    <div id="search-results" class="mt-4 max-h-[60vh] space-y-2 overflow-y-auto" role="listbox" aria-label="命令与搜索结果"></div>
+    <div class="command-hints mt-3 flex items-center gap-4 px-2 text-[10px]" style="color: var(--muted);"><span><kbd>↑↓</kbd> 选择</span><span><kbd>Enter</kbd> 打开</span><span><kbd>Esc</kbd> 关闭</span></div>
   </div>
 </div>
 
-<script is:inline define:vars={{ searchIndex }}>
+<script is:inline define:vars={{ searchIndex, commandIndex }}>
   const mobileBtn = document.getElementById('mobile-menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
   mobileBtn?.addEventListener('click', () => {
@@ -92,6 +107,17 @@ const searchIndex = posts.map((post) => ({
   const modal = document.getElementById('search-modal');
   const searchInput = document.getElementById('site-search-input');
   const results = document.getElementById('search-results');
+  let activeResult = 0;
+  function selectResult(index) {
+    const links = [...(results?.querySelectorAll('[data-command-result]') || [])];
+    if (!links.length) return;
+    activeResult = (index + links.length) % links.length;
+    links.forEach((link, current) => {
+      link.dataset.selected = String(current === activeResult);
+      link.setAttribute('aria-selected', String(current === activeResult));
+    });
+    links[activeResult]?.scrollIntoView({ block: 'nearest' });
+  }
   function render(items) {
     if (!results) return;
     results.replaceChildren();
@@ -102,23 +128,45 @@ const searchIndex = posts.map((post) => ({
       results.appendChild(empty);
       return;
     }
-    items.slice(0, 8).forEach((post) => {
+    items.slice(0, 9).forEach((post, index) => {
       const link = document.createElement('a');
       link.href = post.url;
-      link.className = 'search-result-link block rounded-2xl border border-black/10 p-4 hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5';
+      link.className = 'search-result-link flex items-start gap-4 rounded-2xl border border-black/10 p-4 hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5';
+      link.dataset.commandResult = '';
+      link.dataset.selected = String(index === 0);
+      link.setAttribute('role', 'option');
+      link.setAttribute('aria-selected', String(index === 0));
+      if (post.action) link.dataset.action = post.action;
+      const kind = document.createElement('span');
+      kind.className = 'command-kind shrink-0 rounded-lg px-2 py-1 text-[10px] font-semibold';
+      kind.textContent = post.kind || '文章';
+      const copy = document.createElement('span');
+      copy.className = 'min-w-0 flex-1';
       const title = document.createElement('strong');
       title.className = 'block font-display text-base';
       title.textContent = post.title;
       const desc = document.createElement('span');
       desc.className = 'mt-1 block text-sm opacity-60';
       desc.textContent = post.description || '暂无摘要';
-      link.append(title, desc);
+      copy.append(title, desc);
+      const arrow = document.createElement('span');
+      arrow.className = 'motion-arrow opacity-50';
+      arrow.textContent = '↗';
+      link.append(kind, copy, arrow);
+      link.addEventListener('click', (event) => {
+        if (link.dataset.action !== 'random') return;
+        event.preventDefault();
+        const random = searchIndex[Math.floor(Math.random() * searchIndex.length)];
+        if (random) location.assign(random.url);
+      });
       results.appendChild(link);
     });
+    activeResult = 0;
   }
   function renderSearchResults(query) {
     const q = query.trim().toLowerCase();
-    render(q ? searchIndex.filter((post) => [post.title, post.description, ...(post.tags || [])].join(' ').toLowerCase().includes(q)) : searchIndex.slice(0, 5));
+    const allItems = [...commandIndex, ...searchIndex];
+    render(q ? allItems.filter((post) => [post.title, post.description, ...(post.tags || []), post.kind].join(' ').toLowerCase().includes(q)) : commandIndex.slice(0, 6));
   }
   async function handleSearch(query) {
     if (query.trim() && window.__ymll_pagefind) {
@@ -130,9 +178,20 @@ const searchIndex = posts.map((post) => ({
   function openSearch() { modal?.classList.remove('hidden'); modal?.classList.add('flex'); renderSearchResults(''); requestAnimationFrame(() => searchInput?.focus()); }
   function closeSearch() { modal?.classList.add('hidden'); modal?.classList.remove('flex'); }
   document.getElementById('search-btn')?.addEventListener('click', openSearch);
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('[data-open-command]')) openSearch();
+  });
   document.getElementById('search-close')?.addEventListener('click', closeSearch);
   modal?.addEventListener('click', (event) => { if (event.target === modal) closeSearch(); });
   searchInput?.addEventListener('input', (event) => handleSearch(event.target.value));
+  searchInput?.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown') { event.preventDefault(); selectResult(activeResult + 1); }
+    if (event.key === 'ArrowUp') { event.preventDefault(); selectResult(activeResult - 1); }
+    if (event.key === 'Enter') {
+      const selected = results?.querySelector('[data-command-result][data-selected="true"]');
+      if (selected) { event.preventDefault(); selected.click(); }
+    }
+  });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closeSearch();
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openSearch(); }

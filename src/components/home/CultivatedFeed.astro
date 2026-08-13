@@ -1,0 +1,40 @@
+---
+import type { GardenPost } from '../../lib/garden';
+import { latestCultivatedAt } from '../../lib/garden';
+
+interface Props { published: GardenPost[]; cultivated: GardenPost[]; }
+const { published, cultivated } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const formatDate = (date: Date) => date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+const maturity = { seedling: '🌱 幼苗', growing: '🌿 生长', evergreen: '🌳 常青' };
+---
+
+<section class="site-shell py-20 section-rule" aria-labelledby="cultivated-heading">
+  <div class="grid gap-10 lg:grid-cols-[0.64fr_1.36fr]">
+    <div data-reveal>
+      <p class="eyebrow">Recently cultivated</p>
+      <h2 id="cultivated-heading" class="font-display text-4xl font-bold sm:text-5xl">最近培育</h2>
+      <p class="mt-5 max-w-sm leading-7" style="color: var(--muted);">知识不是一次发布后就完成。这里同时展示新文章和最近被重新整理的旧笔记。</p>
+      <div class="feed-tabs mt-8" role="tablist" aria-label="最近内容类型">
+        <button type="button" role="tab" aria-selected="true" aria-controls="published-feed" data-feed-tab="published">最新发布</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="cultivated-feed" data-feed-tab="cultivated">最近培育</button>
+      </div>
+    </div>
+    <div class="cultivated-feeds surface overflow-hidden rounded-[2rem]" data-reveal>
+      <div id="published-feed" role="tabpanel" data-feed-panel="published">
+        {published.map((post, index) => <a href={`${base}/blog/${post.id}`} class="cultivated-row motion-card group">
+          <span class="cultivated-index">{String(index + 1).padStart(2, '0')}</span>
+          <span class="min-w-0"><strong class="motion-card-title">{post.data.title}</strong><small>{post.data.category || '随笔'} · {maturity[post.data.maturity]}</small></span>
+          <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time><span class="motion-arrow" aria-hidden="true">↗</span>
+        </a>)}
+      </div>
+      <div id="cultivated-feed" role="tabpanel" data-feed-panel="cultivated" hidden>
+        {cultivated.map((post, index) => <a href={`${base}/blog/${post.id}`} class="cultivated-row motion-card group">
+          <span class="cultivated-index">{String(index + 1).padStart(2, '0')}</span>
+          <span class="min-w-0"><strong class="motion-card-title">{post.data.title}</strong><small>{post.data.growthLog.at(-1)?.summary || '更新了内容结构与论述'}</small></span>
+          <time datetime={latestCultivatedAt(post).toISOString()}>{formatDate(latestCultivatedAt(post))}</time><span class="motion-arrow" aria-hidden="true">↗</span>
+        </a>)}
+      </div>
+    </div>
+  </div>
+</section>

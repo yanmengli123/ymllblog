@@ -245,6 +245,15 @@
     transform-origin: left center;
     will-change: transform;
   }
+
+  [data-revealed="true"] .garden-growth-fill {
+    transform: scaleX(var(--growth));
+    transition: transform 720ms var(--ease-out) var(--growth-delay, 0ms);
+  }
+
+  .random-orbit { animation: garden-orbit 18s linear infinite; }
+  .activity-cell { transition: transform var(--motion-fast) var(--ease-standard), outline-color var(--motion-fast), background-color var(--motion-fast); }
+  .feed-tabs button { transition: color var(--motion-fast), background-color var(--motion-fast), transform var(--motion-fast); }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -258,6 +267,8 @@
   .motion-card:hover .motion-card-title { background-size: 100% 1px; }
   .motion-card:hover .motion-arrow { transform: translateX(var(--motion-xs)); }
   .tag-garden-card:hover .tag-count { color: var(--brand-deep); transform: translateY(-2px); }
+  .activity-cell:hover { transform: scale(1.42); }
+  .feed-tabs button:hover { transform: translateY(-1px); }
 }
 
 @media (min-width: 768px) {
@@ -273,6 +284,7 @@
 @keyframes hero-enter { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes hero-primary-enter { from { transform: translateY(7px); } to { transform: translateY(0); } }
 @keyframes now-breathe { 0%, 100% { opacity: .7; box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 22%, transparent); } 50% { opacity: 1; box-shadow: 0 0 0 6px transparent; } }
+@keyframes garden-orbit { to { transform: rotate(360deg); } }
 
 @media (max-width: 767px), (hover: none), (pointer: coarse) {
   .cursor-glow { display: none; }
@@ -285,7 +297,8 @@
   .cursor-glow, .click-ink-layer { display: none !important; }
   .motion-grid, .hero-parallax { transform: none !important; }
   .motion-ready [data-reveal] { opacity: 1 !important; transform: none !important; }
-  .hero-stage > [data-hero], .now-pulse { animation: none !important; }
+  .hero-stage > [data-hero], .now-pulse, .random-orbit { animation: none !important; }
+  .garden-growth-fill { transform: scaleX(var(--growth)) !important; transition: none !important; }
   .motion-card:hover,
   .button-primary:hover,
   .button-secondary:hover { transform: none !important; }

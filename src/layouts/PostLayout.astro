@@ -9,7 +9,7 @@ import { getPageURL } from '../lib/seo';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 interface Props {
-  frontmatter: { title: string; description: string; pubDate: Date; updatedDate?: Date; author: string; tags: string[]; category?: string; cover?: string; draft: boolean; featured: boolean; lang: string; };
+  frontmatter: { title: string; description: string; pubDate: Date; updatedDate?: Date; author: string; tags: string[]; category?: string; cover?: string; draft: boolean; featured: boolean; featuredOrder: number; maturity: 'seedling' | 'growing' | 'evergreen'; growthLog: { date: Date; summary: string }[]; lang: string; };
   headings: { depth: number; slug: string; text: string; }[];
   slug: string;
 }
@@ -19,6 +19,7 @@ const related = await getRelatedPosts({ id: slug, data: { tags: frontmatter.tags
 const articleURL = getPageURL(`/blog/${slug}`);
 const date = frontmatter.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 const updated = frontmatter.updatedDate?.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+const maturityLabel = { seedling: '🌱 幼苗笔记', growing: '🌿 生长中', evergreen: '🌳 常青文章' }[frontmatter.maturity];
 ---
 
 <Layout motion="reading" title={`${frontmatter.title}｜YMLL Blog`} description={frontmatter.description} image={frontmatter.cover} type="article" publishedTime={frontmatter.pubDate} updatedTime={frontmatter.updatedDate} author={frontmatter.author} tags={frontmatter.tags}>
@@ -29,6 +30,7 @@ const updated = frontmatter.updatedDate?.toLocaleDateString('zh-CN', { year: 'nu
       <header class="site-shell max-w-5xl py-10 sm:py-16" data-reveal>
         <a href={`${base}/blog`} class="text-sm font-semibold" style="color: var(--brand-deep);">← 返回文章</a>
         <div class="mt-10 flex flex-wrap items-center gap-3 text-xs" style="color: var(--muted);">
+          <span class="maturity-badge" data-maturity={frontmatter.maturity}>{maturityLabel}</span>
           {frontmatter.category && <span class="font-semibold uppercase tracking-[0.15em]" style="color: var(--brand-deep);">{frontmatter.category}</span>}
           <time datetime={frontmatter.pubDate.toISOString()}>{date}</time>
           {updated && <span>更新于 {updated}</span>}

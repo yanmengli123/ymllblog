@@ -1,0 +1,19 @@
+- id: dashboard
+  status: researching
+  timezone: Asia/Shanghai
+  headline: 如何让计算模型更好地解释生命系统的动态变化？
+  summary: 从 ODE、最优传输到单细胞轨迹推断，同时持续构建可靠、清晰、可维护的数字产品。
+  exploring:
+    - Computational Biology
+    - Astro
+    - AI Engineering
+    - Systems Design
+  building:
+    title: ymllblog · Digital Garden
+    detail: 动态首页、内容生长模型与发布工作流
+    progress: 76
+  reading:
+    title: Designing Data-Intensive Applications
+    detail: 分布式数据系统与可靠性设计
+    progress: 38
+  updatedAt: 2026-08-13

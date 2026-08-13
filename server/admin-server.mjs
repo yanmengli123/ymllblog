@@ -20,12 +20,16 @@ const branch = process.env.GITHUB_BRANCH || 'main';
 const githubToken = process.env.GITHUB_TOKEN || '';
 const projectRoot = resolve(process.env.PROJECT_ROOT || process.cwd());
 const postsDir = resolve(projectRoot, 'src/content/blog');
+const gardenFile = resolve(projectRoot, 'src/content/garden.yml');
+const projectsDir = resolve(projectRoot, 'src/content/projects');
+const researchDir = resolve(projectRoot, 'src/content/research');
+const readingFile = resolve(projectRoot, 'src/content/reading.yml');
 const uploadsDir = resolve(projectRoot, 'public/uploads');
 const cookieName = production ? '__Host-ymll_admin' : 'ymll_admin';
 const loginAttempts = new Map();
 const maxJsonBytes = 2 * 1024 * 1024;
 const maxUploadBytes = 5 * 1024 * 1024;
-const editableFields = ['title', 'description', 'pubDate', 'updatedDate', 'author', 'tags', 'category', 'cover', 'draft', 'featured', 'lang'];
+const editableFields = ['title', 'description', 'pubDate', 'updatedDate', 'author', 'tags', 'category', 'cover', 'draft', 'featured', 'featuredOrder', 'maturity', 'growthLog', 'lang'];
 
 if (!username || !sessionSecret || (production && !passwordHash)) {
   throw new Error('生产环境必须配置 ADMIN_USERNAME、ADMIN_PASSWORD_HASH 和 SESSION_SECRET');
@@ -176,6 +180,19 @@ function serializePost(input) {
   data.tags = Array.isArray(data.tags) ? data.tags.map(String).map((tag) => tag.trim()).filter(Boolean) : [];
   data.draft = Boolean(data.draft);
   data.featured = Boolean(data.featured);
+  data.featuredOrder = Math.max(0, Number(data.featuredOrder ?? 99));
+  data.maturity = ['seedling', 'growing', 'evergreen'].includes(data.maturity) ? data.maturity : 'growing';
+  data.growthLog = Array.isArray(data.growthLog) ? data.growthLog
+    .map((entry) => ({ date: String(entry?.date || '').slice(0, 10), summary: String(entry?.summary || '').trim() }))
+    .filter((entry) => /^\d{4}-\d{2}-\d{2}$/.test(entry.date) && entry.summary) : [];
+  if (input.recordGrowth) {
+    const date = new Date().toISOString().slice(0, 10);
+    const summary = String(input.growthSummary || '持续整理文章内容').trim();
+    const existingIndex = data.growthLog.findIndex((entry) => entry.date === date);
+    if (existingIndex >= 0) data.growthLog[existingIndex] = { date, summary };
+    else data.growthLog.push({ date, summary });
+    data.updatedDate = new Date().toISOString();
+  }
   data.lang = String(data.lang || 'zh-CN');
   if (!data.title || !data.description || !data.pubDate) throw Object.assign(new Error('标题、摘要和发布日期为必填项'), { status: 400 });
   return `---\n${stringifyYaml(data, { lineWidth: 0 }).trim()}\n---\n\n${String(input.body || '').trim()}\n`;
@@ -189,8 +206,79 @@ const summary = (post) => ({
   updatedDate: post.updatedDate || '',
   draft: Boolean(post.draft),
   featured: Boolean(post.featured),
+  featuredOrder: Number(post.featuredOrder ?? 99),
+  maturity: post.maturity || 'growing',
+  growthLog: Array.isArray(post.growthLog) ? post.growthLog : [],
   category: post.category || '',
 });
+
+function serializeFrontmatter(data, body = '') {
+  return `---\n${stringifyYaml(data, { lineWidth: 0 }).trim()}\n---\n\n${String(body || '').trim()}\n`;
+}
+
+function projectData(input) {
+  const data = {
+    title: String(input.title || '').trim(),
+    summary: String(input.summary || '').trim(),
+    status: ['active', 'building', 'experiment', 'maintained', 'paused', 'archived'].includes(input.status) ? input.status : 'building',
+    technologies: Array.isArray(input.technologies) ? input.technologies.map(String).map((item) => item.trim()).filter(Boolean) : [],
+    updatedAt: String(input.updatedAt || new Date().toISOString()),
+    order: Math.max(0, Number(input.order ?? 99)),
+    featured: input.featured !== false,
+  };
+  for (const field of ['repository', 'website', 'relatedPost']) if (input[field]) data[field] = String(input[field]).trim();
+  if (!data.title || !data.summary) throw Object.assign(new Error('项目名称和摘要为必填项'), { status: 400 });
+  return data;
+}
+
+function researchData(input) {
+  const data = {
+    title: String(input.title || '').trim(),
+    date: String(input.date || new Date().toISOString()),
+    topic: String(input.topic || '').trim(),
+    status: ['question', 'exploring', 'validated', 'parked'].includes(input.status) ? input.status : 'exploring',
+  };
+  if (input.relatedPost) data.relatedPost = String(input.relatedPost).trim();
+  if (!data.title || !data.topic) throw Object.assign(new Error('研究问题和主题为必填项'), { status: 400 });
+  return data;
+}
+
+function gardenData(input) {
+  const allowedStatus = ['available', 'building', 'writing', 'researching'];
+  const section = (value, fallback) => ({
+    title: String(value?.title || '').trim(),
+    detail: String(value?.detail || '').trim(),
+    progress: Math.min(100, Math.max(0, Number(value?.progress ?? 0))),
+    ...fallback,
+  });
+  const data = {
+    id: 'dashboard',
+    status: allowedStatus.includes(input.status) ? input.status : 'building',
+    timezone: String(input.timezone || 'Asia/Shanghai'),
+    headline: String(input.headline || '').trim(),
+    summary: String(input.summary || '').trim(),
+    exploring: Array.isArray(input.exploring) ? input.exploring.map(String).map((item) => item.trim()).filter(Boolean) : [],
+    building: section(input.building),
+    reading: section(input.reading),
+    updatedAt: new Date().toISOString(),
+  };
+  if (!data.headline || !data.summary || !data.building.title || !data.reading.title) throw Object.assign(new Error('NOW 标题、摘要、构建项和阅读项为必填项'), { status: 400 });
+  return data;
+}
+
+function readingData(input) {
+  const data = {
+    id: normalizeSlug(input.id),
+    title: String(input.title || '').trim(),
+    creator: String(input.creator || '').trim(),
+    kind: ['book', 'paper', 'course', 'documentation'].includes(input.kind) ? input.kind : 'book',
+    status: ['reading', 'queued', 'completed'].includes(input.status) ? input.status : 'reading',
+    progress: Math.min(100, Math.max(0, Number(input.progress ?? 0))),
+  };
+  for (const field of ['url', 'note']) if (input[field]) data[field] = String(input[field]).trim();
+  if (!data.title || !data.creator) throw Object.assign(new Error('阅读条目的名称和作者为必填项'), { status: 400 });
+  return data;
+}
 
 async function github(path, options = {}) {
   const response = await fetch(`https://api.github.com/repos/${repository}/${path}`, {
@@ -209,6 +297,100 @@ async function github(path, options = {}) {
     throw Object.assign(new Error(details.message || `GitHub API 返回 ${response.status}`), { status: response.status });
   }
   return response.status === 204 ? null : response.json();
+}
+
+async function readManagedFile(relativePath, absolutePath) {
+  if (mode === 'local') {
+    try {
+      return { content: await fs.readFile(absolutePath, 'utf8'), sha: true };
+    } catch (error) {
+      if (error.code === 'ENOENT') return null;
+      throw error;
+    }
+  }
+  const file = await github(`contents/${relativePath}?ref=${encodeURIComponent(branch)}`);
+  return file ? { content: Buffer.from(file.content, 'base64').toString('utf8'), sha: file.sha } : null;
+}
+
+async function writeManagedFile(relativePath, absolutePath, content, existingSha, message) {
+  if (mode === 'local') {
+    await fs.mkdir(dirname(absolutePath), { recursive: true });
+    await fs.writeFile(absolutePath, content, { encoding: 'utf8', flag: existingSha ? 'w' : 'wx' });
+    return;
+  }
+  await github(`contents/${relativePath}`, {
+    method: 'PUT',
+    body: JSON.stringify({ message, content: Buffer.from(content).toString('base64'), branch, ...(existingSha ? { sha: existingSha } : {}) }),
+  });
+}
+
+async function removeManagedFile(relativePath, absolutePath, sha, message) {
+  if (mode === 'local') return fs.unlink(absolutePath);
+  await github(`contents/${relativePath}`, { method: 'DELETE', body: JSON.stringify({ message, sha, branch }) });
+}
+
+async function listManagedMarkdown(relativeDirectory, absoluteDirectory) {
+  let names = [];
+  if (mode === 'local') {
+    try {
+      names = (await fs.readdir(absoluteDirectory)).filter((name) => /\.mdx?$/.test(name));
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+  } else {
+    const entries = await github(`contents/${relativeDirectory}?ref=${encodeURIComponent(branch)}`) || [];
+    names = entries.filter((entry) => entry.type === 'file' && /\.mdx?$/.test(entry.name)).map((entry) => entry.name);
+  }
+  return Promise.all(names.map(async (name) => {
+    const slug = name.replace(/\.mdx?$/, '');
+    const file = await readManagedFile(`${relativeDirectory}/${name}`, join(absoluteDirectory, name));
+    return file ? { ...parsePost(file.content, slug), sha: file.sha } : null;
+  })).then((items) => items.filter(Boolean));
+}
+
+async function getManagedMarkdown(kind, slug) {
+  const settings = kind === 'projects'
+    ? { relative: 'src/content/projects', absolute: projectsDir }
+    : { relative: 'src/content/research', absolute: researchDir };
+  const file = await readManagedFile(`${settings.relative}/${slug}.md`, join(settings.absolute, `${slug}.md`));
+  return file ? { ...parsePost(file.content, slug), sha: file.sha } : null;
+}
+
+async function saveManagedMarkdown(kind, slug, data, body, existingSha) {
+  const settings = kind === 'projects'
+    ? { relative: 'src/content/projects', absolute: projectsDir, label: '项目' }
+    : { relative: 'src/content/research', absolute: researchDir, label: '研究日志' };
+  await writeManagedFile(
+    `${settings.relative}/${slug}.md`,
+    join(settings.absolute, `${slug}.md`),
+    serializeFrontmatter(data, body),
+    existingSha,
+    `content: ${existingSha ? '更新' : '新建'}${settings.label} ${slug}`,
+  );
+}
+
+async function deleteManagedMarkdown(kind, slug, sha) {
+  const settings = kind === 'projects'
+    ? { relative: 'src/content/projects', absolute: projectsDir, label: '项目' }
+    : { relative: 'src/content/research', absolute: researchDir, label: '研究日志' };
+  await removeManagedFile(
+    `${settings.relative}/${slug}.md`,
+    join(settings.absolute, `${slug}.md`),
+    sha,
+    `content: 删除${settings.label} ${slug}`,
+  );
+}
+
+async function getYamlList(relativePath, absolutePath) {
+  const file = await readManagedFile(relativePath, absolutePath);
+  if (!file) return { items: [], sha: undefined };
+  const items = parseYaml(file.content) || [];
+  if (!Array.isArray(items)) throw Object.assign(new Error(`${relativePath} 必须使用 YAML 列表格式`), { status: 500 });
+  return { items, sha: file.sha };
+}
+
+async function saveYamlList(relativePath, absolutePath, items, sha, message) {
+  await writeManagedFile(relativePath, absolutePath, `${stringifyYaml(items, { lineWidth: 0 }).trim()}\n`, sha, message);
 }
 
 async function listPosts() {
@@ -301,6 +483,73 @@ async function handler(req, res) {
     if (req.method === 'POST' && path === '/admin-api/logout') {
       if (!requireAuth(req, res, true)) return;
       return json(res, 200, { ok: true }, { 'Set-Cookie': sessionCookie('', 0) });
+    }
+    if (req.method === 'GET' && path === '/admin-api/garden') {
+      if (!requireAuth(req, res)) return;
+      const { items } = await getYamlList('src/content/garden.yml', gardenFile);
+      return json(res, 200, { garden: items[0] || null });
+    }
+    if (req.method === 'PUT' && path === '/admin-api/garden') {
+      if (!requireAuth(req, res, true)) return;
+      const input = await readJson(req);
+      const current = await getYamlList('src/content/garden.yml', gardenFile);
+      await saveYamlList('src/content/garden.yml', gardenFile, [gardenData(input)], current.sha, 'content: 更新首页 NOW 状态');
+      return json(res, 200, { ok: true });
+    }
+    if (req.method === 'GET' && path === '/admin-api/reading') {
+      if (!requireAuth(req, res)) return;
+      const { items } = await getYamlList('src/content/reading.yml', readingFile);
+      return json(res, 200, { reading: items });
+    }
+    if (req.method === 'PUT' && path === '/admin-api/reading') {
+      if (!requireAuth(req, res, true)) return;
+      const input = await readJson(req);
+      if (!Array.isArray(input.reading)) return json(res, 400, { error: '阅读书架必须是一个列表' });
+      const items = input.reading.map(readingData);
+      if (new Set(items.map((item) => item.id)).size !== items.length) return json(res, 409, { error: '阅读条目的文件标识不能重复' });
+      const current = await getYamlList('src/content/reading.yml', readingFile);
+      await saveYamlList('src/content/reading.yml', readingFile, items, current.sha, 'content: 更新阅读书架');
+      return json(res, 200, { ok: true, reading: items });
+    }
+    const managedMatch = path.match(/^\/admin-api\/(projects|research)\/([a-z0-9-]+)$/);
+    const managedKind = managedMatch?.[1];
+    const managedSlug = managedMatch ? normalizeSlug(managedMatch[2]) : '';
+    if (req.method === 'GET' && (path === '/admin-api/projects' || path === '/admin-api/research')) {
+      if (!requireAuth(req, res)) return;
+      const kind = path.endsWith('projects') ? 'projects' : 'research';
+      const entries = await listManagedMarkdown(
+        kind === 'projects' ? 'src/content/projects' : 'src/content/research',
+        kind === 'projects' ? projectsDir : researchDir,
+      );
+      const normalized = entries.map(({ sha: _sha, ...entry }) => entry);
+      normalized.sort((left, right) => String(right.updatedAt || right.date || '').localeCompare(String(left.updatedAt || left.date || '')) || Number(left.order || 99) - Number(right.order || 99));
+      return json(res, 200, { [kind]: normalized });
+    }
+    if (req.method === 'GET' && managedMatch) {
+      if (!requireAuth(req, res)) return;
+      const entry = await getManagedMarkdown(managedKind, managedSlug);
+      if (!entry) return json(res, 404, { error: managedKind === 'projects' ? '项目不存在' : '研究日志不存在' });
+      const { sha: _sha, ...cleanEntry } = entry;
+      return json(res, 200, { entry: cleanEntry });
+    }
+    if ((req.method === 'POST' && (path === '/admin-api/projects' || path === '/admin-api/research')) || (req.method === 'PUT' && managedMatch)) {
+      if (!requireAuth(req, res, true)) return;
+      const input = await readJson(req);
+      const kind = managedKind || (path.endsWith('projects') ? 'projects' : 'research');
+      const slug = managedSlug || normalizeSlug(input.slug);
+      const existing = await getManagedMarkdown(kind, slug);
+      if (req.method === 'POST' && existing) return json(res, 409, { error: '该文件标识已经存在' });
+      if (req.method === 'PUT' && !existing) return json(res, 404, { error: kind === 'projects' ? '项目不存在' : '研究日志不存在' });
+      const data = kind === 'projects' ? projectData(input) : researchData(input);
+      await saveManagedMarkdown(kind, slug, data, input.body, existing?.sha);
+      return json(res, req.method === 'POST' ? 201 : 200, { ok: true, slug });
+    }
+    if (req.method === 'DELETE' && managedMatch) {
+      if (!requireAuth(req, res, true)) return;
+      const existing = await getManagedMarkdown(managedKind, managedSlug);
+      if (!existing) return json(res, 404, { error: managedKind === 'projects' ? '项目不存在' : '研究日志不存在' });
+      await deleteManagedMarkdown(managedKind, managedSlug, existing.sha);
+      return json(res, 200, { ok: true });
     }
     if (req.method === 'GET' && path === '/admin-api/posts') {
       if (!requireAuth(req, res)) return;

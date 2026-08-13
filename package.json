@@ -9,7 +9,7 @@
     "build:pagefind": "pagefind --site dist",
     "admin:server": "node server/admin-server.mjs",
     "admin:password": "node scripts/hash-admin-password.mjs",
-    "test": "node --test tests/home-layout.test.mjs tests/runtime-safety.test.mjs tests/admin-server.test.mjs tests/motion-system.test.mjs",
+    "test": "node --test tests/home-layout.test.mjs tests/runtime-safety.test.mjs tests/admin-server.test.mjs tests/motion-system.test.mjs tests/garden-data.test.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

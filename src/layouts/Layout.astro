@@ -30,7 +30,7 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImage = image ? getImageURL(image) : getPageURL('/favicon.svg');
+const ogImage = image ? getImageURL(image) : getPageURL('/og.png');
 const siteURL = getPageURL('');
 const jsonLD = generateJSONLD({ title, description, image, canonicalURL, type, publishedTime, updatedTime, author, tags });
 ---

@@ -1,0 +1,22 @@
+- id: designing-data-intensive-applications
+  title: Designing Data-Intensive Applications
+  creator: Martin Kleppmann
+  kind: book
+  status: reading
+  progress: 38
+  note: 用系统视角重新理解可靠性、扩展性和可维护性。
+- id: astro-content-collections
+  title: Astro Content Collections
+  creator: Astro Documentation
+  kind: documentation
+  status: reading
+  progress: 72
+  url: https://docs.astro.build/en/guides/content-collections/
+  note: 研究内容驱动网站的构建时与实时数据边界。
+- id: optimal-transport
+  title: Computational Optimal Transport
+  creator: Gabriel Peyré · Marco Cuturi
+  kind: book
+  status: queued
+  progress: 12
+  note: 建立最优传输理论与计算实践的系统框架。

@@ -47,10 +47,19 @@
           <a class="brand" href="../"><span>YL</span><b>内容工作台</b></a>
           <button id="close-sidebar" class="icon-button mobile-only" type="button" aria-label="关闭文章列表">×</button>
         </div>
-        <button id="new-post" class="button button--primary button--wide" type="button"><span>＋</span> 新建文章</button>
-        <label class="search-field"><span aria-hidden="true">⌕</span><input id="post-search" type="search" placeholder="搜索标题或分类" /></label>
-        <div class="list-meta"><span>文章</span><b id="post-count">0</b></div>
-        <nav id="post-list" class="post-list" aria-label="文章列表"></nav>
+        <nav class="content-nav" aria-label="内容类型">
+          <button class="is-active" type="button" data-admin-section="articles"><span>文</span>文章</button>
+          <button type="button" data-admin-section="garden"><span>今</span>首页状态</button>
+          <button type="button" data-admin-section="projects"><span>项</span>项目</button>
+          <button type="button" data-admin-section="research"><span>研</span>研究日志</button>
+          <button type="button" data-admin-section="reading"><span>读</span>阅读书架</button>
+        </nav>
+        <div id="article-sidebar" class="article-sidebar">
+          <button id="new-post" class="button button--primary button--wide" type="button"><span>＋</span> 新建文章</button>
+          <label class="search-field"><span aria-hidden="true">⌕</span><input id="post-search" type="search" placeholder="搜索标题或分类" /></label>
+          <div class="list-meta"><span>文章</span><b id="post-count">0</b></div>
+          <nav id="post-list" class="post-list" aria-label="文章列表"></nav>
+        </div>
         <div class="sidebar-bottom"><span class="status-dot"></span><span id="session-user">管理员</span><button id="logout" type="button">退出</button></div>
       </aside>
 
@@ -64,11 +73,12 @@
           </div>
         </header>
 
-        <div id="empty-state" class="empty-state">
-          <span>✦</span><h2>开始一次新的写作</h2><p>从左侧选择文章继续编辑，或创建一篇新文章。</p><button class="button button--primary" type="button" data-new-post>新建文章</button>
-        </div>
+        <div id="articles-section" class="admin-section">
+          <div id="empty-state" class="empty-state">
+            <span>✦</span><h2>开始一次新的写作</h2><p>从左侧选择文章继续编辑，或创建一篇新文章。</p><button class="button button--primary" type="button" data-new-post>新建文章</button>
+          </div>
 
-        <form id="post-form" class="editor" hidden>
+          <form id="post-form" class="editor" hidden>
           <section class="editor-main">
             <label class="field field--title"><span>文章标题</span><input id="post-title" name="title" required placeholder="清晰表达文章要回答的问题" /></label>
             <div class="field-grid">
@@ -84,23 +94,80 @@
               <div class="settings-title"><h2>发布设置</h2><span id="save-status">未保存</span></div>
               <label class="switch-row"><span><b>草稿</b><small>草稿不会出现在公开站点</small></span><input id="post-draft" name="draft" type="checkbox" role="switch" /></label>
               <label class="switch-row"><span><b>首页精选</b><small>展示在首页编辑精选区域</small></span><input id="post-featured" name="featured" type="checkbox" role="switch" /></label>
+              <label class="field"><span>精选排序</span><input id="post-featured-order" name="featuredOrder" type="number" min="0" value="99" /><small>数字越小越靠前。</small></label>
             </section>
             <section class="settings-card">
               <h2>文章属性</h2>
+              <label class="field"><span>内容成熟度</span><select id="post-maturity" name="maturity"><option value="seedling">🌱 幼苗 · 初步想法</option><option value="growing">🌿 生长 · 持续完善</option><option value="evergreen">🌳 常青 · 稳定知识</option></select></label>
               <label class="field"><span>分类</span><select id="post-category" name="category"><option value="">未分类</option><option>前端工程</option><option>计算生物学</option><option>开发工具</option><option>设计与产品</option><option>成长与思考</option></select></label>
               <label class="field"><span>标签</span><input id="post-tags" name="tags" placeholder="Astro, 性能优化, 前端" /><small>多个标签使用英文逗号分隔。</small></label>
               <div class="field"><span>封面图片</span><div class="media-field"><input id="post-cover" name="cover" placeholder="https://… 或 /uploads/…" /><label class="upload-button">上传<input id="cover-upload" type="file" accept="image/png,image/jpeg,image/gif,image/webp" /></label></div><div id="cover-preview" class="cover-preview" hidden><img alt="文章封面预览" /></div></div>
               <label class="field"><span>作者</span><input id="post-author" name="author" value="YMLL" /></label>
               <label class="field"><span>语言</span><select id="post-lang" name="lang"><option value="zh-CN">简体中文</option><option value="en">English</option></select></label>
               <label class="field"><span>更新日期</span><input id="post-updated" name="updatedDate" type="datetime-local" /></label>
+              <label class="switch-row"><span><b>记录本次培育</b><small>保存时写入今日成长记录</small></span><input id="post-record-growth" name="recordGrowth" type="checkbox" role="switch" /></label>
+              <label class="field"><span>培育说明</span><input id="post-growth-summary" name="growthSummary" placeholder="补充示例与结构说明" /></label>
             </section>
           </aside>
+          </form>
+        </div>
+
+        <form id="garden-form" class="admin-section content-editor" data-section="garden" hidden>
+          <section class="content-card content-card--wide">
+            <div class="content-card-heading"><div><p class="eyebrow">LIVE NOW</p><h2>首页动态状态</h2><p>这里的内容会驱动首页首屏、NOW 模块与本地时钟。</p></div><button class="button button--primary" type="submit">保存首页状态</button></div>
+            <div class="field-grid field-grid--three">
+              <label class="field"><span>当前状态</span><select id="garden-status"><option value="available">可交流</option><option value="building">构建中</option><option value="writing">写作中</option><option value="researching">研究中</option></select></label>
+              <label class="field"><span>时区</span><input id="garden-timezone" value="Asia/Shanghai" /></label>
+              <label class="field"><span>探索主题</span><input id="garden-exploring" placeholder="Astro, AI Engineering" /></label>
+            </div>
+            <label class="field"><span>当前核心问题</span><input id="garden-headline" required /></label>
+            <label class="field"><span>状态说明</span><textarea id="garden-summary" rows="3" required></textarea></label>
+            <div class="now-editor-grid">
+              <fieldset><legend>正在构建</legend><label class="field"><span>名称</span><input id="garden-building-title" required /></label><label class="field"><span>说明</span><input id="garden-building-detail" /></label><label class="field"><span>进度</span><input id="garden-building-progress" type="range" min="0" max="100" /></label></fieldset>
+              <fieldset><legend>正在阅读</legend><label class="field"><span>名称</span><input id="garden-reading-title" required /></label><label class="field"><span>说明</span><input id="garden-reading-detail" /></label><label class="field"><span>进度</span><input id="garden-reading-progress" type="range" min="0" max="100" /></label></fieldset>
+            </div>
+          </section>
+        </form>
+
+        <section id="projects-section" class="admin-section content-editor" data-section="projects" hidden>
+          <div class="manager-layout">
+            <aside class="collection-panel"><div class="collection-heading"><div><p class="eyebrow">PROJECTS</p><h2>项目</h2></div><button class="icon-button" id="new-project" type="button" aria-label="新建项目">＋</button></div><nav id="project-list" class="collection-list"></nav></aside>
+            <form id="project-form" class="content-card" hidden>
+              <div class="content-card-heading"><div><p class="eyebrow">PROJECT EDITOR</p><h2 id="project-heading">编辑项目</h2></div><div class="content-actions"><button id="delete-project" class="button button--danger" type="button">删除</button><button class="button button--primary" type="submit">保存项目</button></div></div>
+              <div class="field-grid"><label class="field"><span>文件标识</span><input id="project-slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label><label class="field"><span>状态</span><select id="project-status"><option value="active">活跃</option><option value="building">构建中</option><option value="experiment">实验</option><option value="maintained">维护中</option><option value="paused">暂停</option><option value="archived">归档</option></select></label></div>
+              <label class="field"><span>项目名称</span><input id="project-title" required /></label><label class="field"><span>一句话摘要</span><textarea id="project-summary" rows="3" required></textarea></label>
+              <div class="field-grid"><label class="field"><span>技术栈</span><input id="project-technologies" placeholder="Astro, TypeScript" /></label><label class="field"><span>排序</span><input id="project-order" type="number" min="0" value="99" /></label></div>
+              <div class="field-grid"><label class="field"><span>代码仓库</span><input id="project-repository" type="url" /></label><label class="field"><span>项目网站</span><input id="project-website" type="url" /></label></div>
+              <label class="field"><span>关联文章 slug</span><input id="project-related-post" /></label><label class="field"><span>项目说明（Markdown）</span><textarea id="project-body" rows="10"></textarea></label>
+              <label class="switch-row"><span><b>首页展示</b><small>加入首页 Selected Projects</small></span><input id="project-featured" type="checkbox" role="switch" /></label>
+            </form>
+          </div>
+        </section>
+
+        <section id="research-section" class="admin-section content-editor" data-section="research" hidden>
+          <div class="manager-layout">
+            <aside class="collection-panel"><div class="collection-heading"><div><p class="eyebrow">RESEARCH</p><h2>研究日志</h2></div><button class="icon-button" id="new-research" type="button" aria-label="新建研究日志">＋</button></div><nav id="research-list" class="collection-list"></nav></aside>
+            <form id="research-form" class="content-card" hidden>
+              <div class="content-card-heading"><div><p class="eyebrow">RESEARCH EDITOR</p><h2 id="research-heading">编辑研究日志</h2></div><div class="content-actions"><button id="delete-research" class="button button--danger" type="button">删除</button><button class="button button--primary" type="submit">保存日志</button></div></div>
+              <div class="field-grid"><label class="field"><span>文件标识</span><input id="research-slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" /></label><label class="field"><span>日期</span><input id="research-date" type="date" required /></label></div>
+              <label class="field"><span>研究问题</span><input id="research-title" required /></label><div class="field-grid"><label class="field"><span>主题</span><input id="research-topic" required /></label><label class="field"><span>状态</span><select id="research-status"><option value="question">问题</option><option value="exploring">探索中</option><option value="validated">已验证</option><option value="parked">暂存</option></select></label></div>
+              <label class="field"><span>关联文章 slug</span><input id="research-related-post" /></label><label class="field"><span>研究记录（Markdown）</span><textarea id="research-body" rows="15"></textarea></label>
+            </form>
+          </div>
+        </section>
+
+        <form id="reading-form" class="admin-section content-editor" data-section="reading" hidden>
+          <section class="content-card content-card--wide">
+            <div class="content-card-heading"><div><p class="eyebrow">READING SHELF</p><h2>阅读书架</h2><p>维护正在读、待读与已完成的书籍、论文、课程和文档。</p></div><div class="content-actions"><button id="add-reading" class="button button--quiet" type="button">＋ 添加</button><button class="button button--primary" type="submit">保存书架</button></div></div>
+            <div id="reading-list" class="reading-editor-list"></div>
+          </section>
         </form>
       </section>
     </div>
 
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
     <dialog id="delete-dialog" class="dialog"><form method="dialog"><p class="eyebrow">CONFIRM DELETE</p><h2>删除这篇文章？</h2><p>删除会生成 Git 提交，因此仍可从版本历史恢复。</p><div><button class="button button--quiet" value="cancel">取消</button><button id="confirm-delete" class="button button--danger" value="confirm">确认删除</button></div></form></dialog>
-    <script src="./admin.js" defer></script>
+    <script src="./admin.js?v=20260813-garden2" defer></script>
+    <script src="./garden-admin.js?v=20260813-garden2" defer></script>
   </body>
 </html>

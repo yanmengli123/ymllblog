@@ -14,10 +14,12 @@ export interface Props {
   index?: number;
   reveal?: boolean;
   revealOrder?: number;
+  maturity?: 'seedling' | 'growing' | 'evergreen';
 }
 
-const { title, description, date, tags = [], slug, image, readingTime = '约 5 分钟', category, featured = false, index = 1, reveal = false, revealOrder = 0 } = Astro.props;
+const { title, description, date, tags = [], slug, image, readingTime = '约 5 分钟', category, featured = false, index = 1, reveal = false, revealOrder = 0, maturity = 'growing' } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
+const maturityLabel = { seedling: '🌱 幼苗', growing: '🌿 生长', evergreen: '🌳 常青' }[maturity];
 ---
 
 <article
@@ -39,6 +41,7 @@ const formattedDate = new Date(date).toLocaleDateString('zh-CN', { year: 'numeri
   <div class:list={['flex flex-col p-6 sm:p-7', featured && 'justify-center lg:p-10']}>
     <div class="mb-4 flex items-start justify-between gap-4 text-xs" style="color: var(--muted);">
       <div class="flex flex-wrap items-center gap-3">
+        <span class="maturity-badge" data-maturity={maturity}>{maturityLabel}</span>
         {category && <span class="font-semibold uppercase tracking-[0.12em]" style="color: var(--brand-deep);">{category}</span>}
         <time datetime={date}>{formattedDate}</time>
         <span aria-hidden="true">·</span>

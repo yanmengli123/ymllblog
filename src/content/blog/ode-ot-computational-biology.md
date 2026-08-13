@@ -7,6 +7,15 @@ tags: ["计算生物学", "单细胞", "ODE", "最优传输", "生物信息学"]
 category: "计算生物学"
 draft: false
 featured: true
+featuredOrder: 1
+maturity: evergreen
+growthLog:
+  - date: 2026-06-18
+    summary: 补充 ODE 与最优传输的建模边界
+  - date: 2026-07-22
+    summary: 增加单细胞轨迹推断的实践说明
+  - date: 2026-08-11
+    summary: 重构全文论证结构并更新研究方向
 lang: "zh-CN"
 ---
 

@@ -45,7 +45,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         return {
           url: `${base}${data.url}`,
           title: data.meta?.title ?? '未命名文章',
-          excerpt: data.excerpt ?? '',
+          description: String(data.excerpt ?? '').replace(/<[^>]*>/g, ''),
+          kind: '全文',
         };
       })
     );

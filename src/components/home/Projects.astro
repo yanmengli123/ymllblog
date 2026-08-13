@@ -1,0 +1,23 @@
+---
+import type { CollectionEntry } from 'astro:content';
+interface Props { projects: CollectionEntry<'projects'>[]; }
+const { projects } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const statusLabel = { active: '活跃', building: '构建中', experiment: '实验', maintained: '维护中', paused: '暂停', archived: '归档' };
+---
+
+<section class="site-shell py-20 section-rule" aria-labelledby="projects-heading">
+  <div class="section-heading-row" data-reveal><div><p class="eyebrow">Selected projects</p><h2 id="projects-heading" class="font-display text-4xl font-bold sm:text-5xl">正在构建</h2></div><p class="section-intro">将研究、工程与写作连接起来的长期项目，而不只是一次性的作品展示。</p></div>
+  <div class="projects-grid mt-10">
+    {projects.map((project, index) => <article class="project-card motion-card" data-reveal style={`--reveal-order: ${index};`}>
+      <div class="project-card-top"><span>{String(index + 1).padStart(2, '0')}</span><span class="project-status"><i></i>{statusLabel[project.data.status]}</span></div>
+      <h3>{project.data.title}</h3><p>{project.data.summary}</p>
+      <div class="project-tech">{project.data.technologies.map((technology) => <span>{technology}</span>)}</div>
+      <div class="project-links">
+        {project.data.relatedPost && <a href={`${base}/blog/${project.data.relatedPost}`}>阅读记录 →</a>}
+        {project.data.repository && <a href={project.data.repository} target="_blank" rel="noopener noreferrer">GitHub ↗</a>}
+        {project.data.website && <a href={project.data.website} target="_blank" rel="noopener noreferrer">访问项目 ↗</a>}
+      </div>
+    </article>)}
+  </div>
+</section>

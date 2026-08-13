@@ -11,7 +11,8 @@
     status: $('#save-status'), toast: $('#toast'), dialog: $('#delete-dialog'), sidebar: $('#sidebar'),
     fields: {
       title: $('#post-title'), slug: $('#post-slug'), pubDate: $('#post-date'), updatedDate: $('#post-updated'), description: $('#post-description'), body: $('#post-body'),
-      draft: $('#post-draft'), featured: $('#post-featured'), category: $('#post-category'), tags: $('#post-tags'), cover: $('#post-cover'), author: $('#post-author'), lang: $('#post-lang'),
+      draft: $('#post-draft'), featured: $('#post-featured'), featuredOrder: $('#post-featured-order'), maturity: $('#post-maturity'), category: $('#post-category'), tags: $('#post-tags'), cover: $('#post-cover'), author: $('#post-author'), lang: $('#post-lang'),
+      recordGrowth: $('#post-record-growth'), growthSummary: $('#post-growth-summary'),
     },
   };
 
@@ -38,6 +39,7 @@
     elements.loginView.hidden = true;
     elements.appView.hidden = false;
     await loadPosts();
+    dispatchEvent(new CustomEvent('ymll-admin-ready'));
   }
 
   function toast(message, error = false) {
@@ -115,11 +117,15 @@
     elements.fields.body.value = post.body || '';
     elements.fields.draft.checked = Boolean(post.draft);
     elements.fields.featured.checked = Boolean(post.featured);
+    elements.fields.featuredOrder.value = String(post.featuredOrder ?? 99);
+    elements.fields.maturity.value = post.maturity || 'growing';
     elements.fields.category.value = post.category || '';
     elements.fields.tags.value = Array.isArray(post.tags) ? post.tags.join(', ') : '';
     elements.fields.cover.value = post.cover || '';
     elements.fields.author.value = post.author || 'YMLL';
     elements.fields.lang.value = post.lang || 'zh-CN';
+    elements.fields.recordGrowth.checked = false;
+    elements.fields.growthSummary.value = '';
     elements.view.href = `${basePrefix}/blog/${post.slug}`;
     updateCoverPreview();
     updateBodyStats();
@@ -130,7 +136,7 @@
 
   function newPost() {
     if (!confirmDiscard()) return;
-    showEditor({ draft: true, featured: false, author: 'YMLL', lang: 'zh-CN', tags: [] }, true);
+    showEditor({ draft: true, featured: false, featuredOrder: 99, maturity: 'growing', author: 'YMLL', lang: 'zh-CN', tags: [] }, true);
     elements.fields.title.focus();
   }
 
@@ -149,7 +155,8 @@
       slug: f.slug.value.trim(), title: f.title.value.trim(), description: f.description.value.trim(),
       pubDate: f.pubDate.value, updatedDate: f.updatedDate.value || undefined, author: f.author.value.trim() || 'YMLL',
       tags: f.tags.value.split(',').map((tag) => tag.trim()).filter(Boolean), category: f.category.value || undefined,
-      cover: f.cover.value.trim() || undefined, draft: f.draft.checked, featured: f.featured.checked, lang: f.lang.value, body: f.body.value,
+      cover: f.cover.value.trim() || undefined, draft: f.draft.checked, featured: f.featured.checked, featuredOrder: Number(f.featuredOrder.value || 99), maturity: f.maturity.value,
+      recordGrowth: f.recordGrowth.checked, growthSummary: f.growthSummary.value.trim() || undefined, lang: f.lang.value, body: f.body.value,
     };
   }
 
@@ -262,6 +269,8 @@
   $('#open-sidebar').addEventListener('click', () => elements.sidebar.classList.add('is-open'));
   $('#close-sidebar').addEventListener('click', closeSidebar);
   addEventListener('beforeunload', (event) => { if (state.dirty) event.preventDefault(); });
+
+  window.ymllAdmin = Object.freeze({ request, toast, closeSidebar, basePrefix });
 
   request('/session').then(showApp).catch(showLogin);
 })();

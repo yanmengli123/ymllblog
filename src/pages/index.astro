@@ -1,106 +1,110 @@
 ---
-import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import PostCard from '../components/PostCard.astro';
 import MusicPlayer from '../components/MusicPlayer.astro';
+import ActivityCalendar from '../components/home/ActivityCalendar.astro';
+import CultivatedFeed from '../components/home/CultivatedFeed.astro';
+import TopicGarden from '../components/home/TopicGarden.astro';
+import Projects from '../components/home/Projects.astro';
+import ResearchShelf from '../components/home/ResearchShelf.astro';
+import GardenGrowth from '../components/home/GardenGrowth.astro';
+import GardenInteractions from '../components/home/GardenInteractions.astro';
+import { getGardenDashboard } from '../lib/garden';
 import { calculateReadingTime } from '../lib/reading-time';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
-const featured = posts.find((post) => post.data.featured) ?? posts[0];
-const recent = posts.filter((post) => post.id !== featured?.id).slice(0, 5);
-const tagCount = new Set(posts.flatMap((post) => post.data.tags)).size;
-const categoryMap = new Map<string, number>();
-posts.forEach((post) => { const name = post.data.category || '随笔'; categoryMap.set(name, (categoryMap.get(name) || 0) + 1); });
-const categories = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
-const years = posts.length ? Math.max(1, new Date().getFullYear() - Math.min(...posts.map((post) => post.data.pubDate.getFullYear())) + 1) : 1;
+const dashboard = await getGardenDashboard();
+const { posts, garden, featured, recentlyPublished, recentlyCultivated, topics, activity, projects, research, reading, years, stats } = dashboard;
+const lead = featured[0];
+const otherFeatured = featured.slice(1);
+const statusLabel = { available: '可交流', building: '构建中', writing: '写作中', researching: '研究中' };
+const status = garden?.status ?? 'building';
+const wordLabel = stats.words >= 10_000 ? `${(stats.words / 10_000).toFixed(1)} 万` : stats.words.toLocaleString('zh-CN');
+const randomNotes = posts.map((post) => ({ title: post.data.title, url: `${base}/blog/${post.id}` }));
 ---
 
-<Layout motion="expressive">
+<Layout motion="expressive" title="YMLL Digital Garden｜工程、研究与长期思考" description="一个持续生长的个人数字花园：记录前端工程、计算生物学、研究问题、项目与阅读。">
   <Header />
   <main id="main-content">
-    <section class="site-shell grid min-h-[720px] items-center gap-14 pb-20 pt-32 lg:grid-cols-[1.15fr_0.85fr] lg:pt-24">
-      <div class="hero-stage">
-        <p class="eyebrow" data-hero style="--hero-order: 0;">Independent research & engineering</p>
-        <h1 class="max-w-4xl font-display text-5xl font-black leading-[1.08] sm:text-6xl lg:text-7xl" data-hero data-hero-primary style="--hero-order: 1;">
-          写代码，也写下<br /><span style="color: var(--brand-deep);">问题背后的方法。</span>
-        </h1>
-        <p class="mt-7 max-w-2xl text-lg leading-8 sm:text-xl" data-hero style="--hero-order: 2; color: var(--muted);">你好，我是 YMLL。这里是我的数字花园：围绕前端工程、计算生物学与长期学习，分享可复用的实践和仍在生长的思考。</p>
-        <div class="mt-9 flex flex-wrap gap-3" data-hero style="--hero-order: 3;">
-          <a href={`${base}/blog`} class="button-primary">开始阅读 <span class="ml-2" aria-hidden="true">→</span></a>
-          <a href={`${base}/about`} class="button-secondary">关于我</a>
-        </div>
-        <div class="mt-12 grid max-w-xl grid-cols-3 gap-5 border-t pt-6" data-hero style="--hero-order: 4; border-color: var(--line);">
-          <div><strong class="font-display text-2xl" data-count={posts.length} aria-label={`${posts.length} 篇`}>{String(posts.length).padStart(2, '0')}</strong><span class="mt-1 block text-xs" style="color: var(--muted);">公开文章</span></div>
-          <div><strong class="font-display text-2xl" data-count={tagCount} aria-label={`${tagCount} 个`}>{String(tagCount).padStart(2, '0')}</strong><span class="mt-1 block text-xs" style="color: var(--muted);">研究主题</span></div>
-          <div><strong class="font-display text-2xl" data-count={years} aria-label={`${years} 年`}>{String(years).padStart(2, '0')}</strong><span class="mt-1 block text-xs" style="color: var(--muted);">持续年份</span></div>
-        </div>
+    <section class="garden-hero site-shell pb-20 pt-32 lg:pt-28">
+      <div class="today-strip" data-hero style="--hero-order: 0;">
+        <span class="today-status"><i class="now-pulse"></i>{statusLabel[status]}</span>
+        <span data-garden-clock data-timezone={garden?.timezone ?? 'Asia/Shanghai'}>正在读取本地时间</span>
+        <span class="today-location">YMLL · Digital Garden</span>
       </div>
-
-      <aside class="hero-stage relative mx-auto w-full max-w-lg" aria-label="当前关注方向">
-        <div class="hero-parallax absolute inset-0 -z-10 rotate-2 rounded-[2.5rem] sm:-inset-4" style="background: var(--brand-soft);"></div>
-        <div class="surface rounded-[2rem] p-7 sm:p-9" data-hero style="--hero-order: 3;">
-          <div class="flex items-center justify-between border-b pb-5" style="border-color: var(--line);">
-            <span class="text-xs font-semibold uppercase tracking-[0.2em]">Now / 2026</span>
-            <span class="flex items-center gap-2 text-xs" style="color: var(--brand-deep);"><i class="now-pulse h-2 w-2 rounded-full" style="background: var(--brand);"></i>持续探索</span>
+      <div class="grid items-start gap-14 pt-14 lg:grid-cols-[1.12fr_0.88fr] lg:gap-20">
+        <div class="hero-stage">
+          <p class="eyebrow" data-hero style="--hero-order: 1;">Independent research & engineering</p>
+          <h1 class="max-w-5xl font-display text-5xl font-black leading-[1.06] sm:text-6xl lg:text-[4.7rem]" data-hero data-hero-primary style="--hero-order: 2;">
+            写代码，也记录<br /><span class="garden-hero-accent">知识如何生长。</span>
+          </h1>
+          <p class="mt-8 max-w-2xl text-lg leading-8 sm:text-xl" data-hero style="--hero-order: 3; color: var(--muted);">你好，我是 YMLL。这里不是静态作品集，而是一座持续更新的数字花园：把工程实践、研究问题、项目和阅读连接成可追溯的知识网络。</p>
+          <div class="mt-9 flex flex-wrap gap-3" data-hero style="--hero-order: 4;">
+            <a href={`${base}/blog`} class="button-primary">进入花园 <span class="ml-2" aria-hidden="true">→</span></a>
+            <button class="button-secondary" type="button" data-open-command>搜索知识库 <kbd>⌘ K</kbd></button>
+            <button class="button-secondary" type="button" data-random-note data-random-note={JSON.stringify(randomNotes)}>随机一篇</button>
           </div>
-          <div class="py-8">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em]" style="color: var(--muted);">当前研究问题</p>
-            <h2 class="mt-4 font-display text-3xl font-bold leading-snug">如何让计算模型更好地解释生命系统的动态变化？</h2>
-            <p class="mt-5 text-sm leading-7" style="color: var(--muted);">从 ODE、最优传输到单细胞轨迹推断，也持续关注把复杂系统做成易用产品的工程方法。</p>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            {['Computational Biology', 'Frontend Systems', 'Open Source', 'Writing'].map((topic, index) => (
-              <div class="rounded-2xl border p-4" style="border-color: var(--line);">
-                <span class="text-[10px] font-semibold" style="color: var(--brand);">0{index + 1}</span>
-                <span class="mt-2 block text-sm font-medium">{topic}</span>
-              </div>
-            ))}
-          </div>
+          <dl class="garden-stats mt-12" data-hero style="--hero-order: 5;">
+            <div><dt>公开笔记</dt><dd data-count={stats.notes}>{String(stats.notes).padStart(2, '0')}</dd></div>
+            <div><dt>知识主题</dt><dd data-count={stats.topics}>{String(stats.topics).padStart(2, '0')}</dd></div>
+            <div><dt>活跃项目</dt><dd data-count={stats.projects}>{String(stats.projects).padStart(2, '0')}</dd></div>
+            <div><dt>累计字数</dt><dd>{wordLabel}</dd></div>
+          </dl>
         </div>
-      </aside>
+
+        {garden && <aside class="now-card hero-stage" aria-labelledby="now-heading">
+          <div class="hero-parallax now-card-back" aria-hidden="true"></div>
+          <div class="surface relative rounded-[2rem] p-7 sm:p-9" data-hero style="--hero-order: 3;">
+            <div class="now-card-header"><span>NOW / {new Date(garden.updatedAt).getFullYear()}</span><span><i class="now-pulse"></i>{statusLabel[garden.status]}</span></div>
+            <div class="py-8">
+              <p class="now-label">当前核心问题</p>
+              <h2 id="now-heading" class="mt-4 font-display text-3xl font-bold leading-snug">{garden.headline}</h2>
+              <p class="mt-5 text-sm leading-7" style="color: var(--muted);">{garden.summary}</p>
+            </div>
+            <div class="now-progress-list">
+              <div><div><span>正在构建</span><strong>{garden.building.title}</strong><small>{garden.building.detail}</small></div><b>{garden.building.progress}%</b><i><em style={`--progress: ${garden.building.progress / 100};`}></em></i></div>
+              <div><div><span>正在阅读</span><strong>{garden.reading.title}</strong><small>{garden.reading.detail}</small></div><b>{garden.reading.progress}%</b><i><em style={`--progress: ${garden.reading.progress / 100};`}></em></i></div>
+            </div>
+            <div class="now-topics">{garden.exploring.map((topic) => <span>{topic}</span>)}</div>
+          </div>
+        </aside>}
+      </div>
     </section>
 
-    {featured && <section class="site-shell py-20 section-rule" data-reveal>
-      <div class="mb-9 flex items-end justify-between gap-5">
-        <div><p class="eyebrow">Selected writing</p><h2 class="font-display text-4xl font-bold sm:text-5xl">编辑精选</h2></div>
-        <a href={`${base}/blog`} class="hidden text-sm font-semibold sm:block" style="color: var(--brand-deep);">查看全部文章 →</a>
+    {lead && <section class="site-shell py-20 section-rule" aria-labelledby="featured-heading">
+      <div class="section-heading-row" data-reveal><div><p class="eyebrow">Featured writing</p><h2 id="featured-heading" class="font-display text-4xl font-bold sm:text-5xl">编辑精选</h2></div><a href={`${base}/blog`} class="section-link">查看全部文章 →</a></div>
+      <div class="featured-layout mt-10">
+        <PostCard title={lead.data.title} description={lead.data.description} date={lead.data.pubDate.toISOString()} tags={lead.data.tags} slug={lead.id} image={lead.data.cover} category={lead.data.category} readingTime={calculateReadingTime(lead.body ?? '')} maturity={lead.data.maturity} featured index={1} />
+        {otherFeatured.length > 0 && <div class="featured-side">
+          {otherFeatured.map((post, index) => <PostCard title={post.data.title} description={post.data.description} date={post.data.pubDate.toISOString()} tags={post.data.tags} slug={post.id} image={post.data.cover} category={post.data.category} readingTime={calculateReadingTime(post.body ?? '')} maturity={post.data.maturity} index={index + 2} reveal revealOrder={index} />)}
+        </div>}
       </div>
-      <PostCard title={featured.data.title} description={featured.data.description} date={featured.data.pubDate.toISOString()} tags={featured.data.tags} slug={featured.id} image={featured.data.cover} category={featured.data.category} readingTime={calculateReadingTime(featured.body ?? '')} featured index={1} />
     </section>}
 
-    <section class="site-shell py-20 section-rule">
-      <div class="grid gap-12 lg:grid-cols-[0.7fr_1.3fr]">
-        <div class="lg:sticky lg:top-28 lg:self-start" data-reveal>
-          <p class="eyebrow">Latest notes</p>
-          <h2 class="font-display text-4xl font-bold sm:text-5xl">最近更新</h2>
-          <p class="mt-5 max-w-sm leading-7" style="color: var(--muted);">从实践中提炼结论，也保留推导过程。每篇文章都力求让读者带走一个可用的方法。</p>
-          <a href={`${base}/archive`} class="button-secondary mt-7">查看时间归档</a>
+    <ActivityCalendar activity={activity} />
+    <CultivatedFeed published={recentlyPublished} cultivated={recentlyCultivated} />
+    <TopicGarden topics={topics} />
+    <Projects projects={projects} />
+
+    <section class="site-shell py-20 section-rule" aria-label="随机探索与内容统计">
+      <div class="discovery-grid">
+        <div class="random-note-card" data-reveal>
+          <span class="random-orbit" aria-hidden="true">✦</span><p class="eyebrow">Serendipity</p><h2>让一篇旧笔记<br />重新遇见你。</h2><p>有些连接不会出现在时间顺序里。让花园随机选择下一条阅读路径。</p>
+          <button type="button" data-random-note data-random-note={JSON.stringify(randomNotes)}>随机漫游 <span aria-hidden="true">↗</span></button>
         </div>
-        <div class="grid gap-5 sm:grid-cols-2">
-          {recent.map((post, index) => <PostCard title={post.data.title} description={post.data.description} date={post.data.pubDate.toISOString()} tags={post.data.tags} slug={post.id} image={post.data.cover} category={post.data.category} readingTime={calculateReadingTime(post.body ?? '')} index={index + 2} reveal revealOrder={index} />)}
+        <div class="content-metrics surface" data-reveal style="--reveal-order: 1;">
+          <p class="eyebrow">Content metrics</p><h2>不是流量仪表盘，<br />而是积累的证据。</h2>
+          <dl><div><dt>公开内容</dt><dd>{stats.notes}<small> 篇</small></dd></div><div><dt>累计字数</dt><dd>{wordLabel}</dd></div><div><dt>主题节点</dt><dd>{stats.topics}<small> 个</small></dd></div><div><dt>成长年份</dt><dd>{years.length}<small> 年</small></dd></div></dl>
         </div>
       </div>
     </section>
 
+    <ResearchShelf research={research} reading={reading} />
+    <GardenGrowth years={years} />
     <MusicPlayer />
-
-    <section class="site-shell py-20 section-rule">
-      <div class="surface overflow-hidden rounded-[2rem]" data-reveal>
-        <div class="grid lg:grid-cols-[0.8fr_1.2fr]">
-          <div class="p-8 sm:p-12" style="background: var(--ink); color: var(--surface);">
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] opacity-60">Browse by field</p>
-            <h2 class="mt-5 font-display text-4xl font-bold">沿着兴趣<br />继续探索。</h2>
-            <p class="mt-5 max-w-sm text-sm leading-7 opacity-70">标签不是抽屉，而是不同知识之间的路径。</p>
-          </div>
-          <div class="grid sm:grid-cols-2">
-            {categories.map(([name, count], index) => <a href={`${base}/blog`} class="motion-card group flex min-h-36 items-end justify-between border-b p-7 hover:bg-black/[0.03] dark:hover:bg-white/[0.03] sm:border-l" style="border-color: var(--line);"><span><small class="block text-xs" style="color: var(--muted);">0{index + 1} / {count} 篇</small><strong class="motion-card-title mt-2 block font-display text-xl">{name}</strong></span><span class="motion-arrow">→</span></a>)}
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
   <Footer />
+  <GardenInteractions />
 </Layout>

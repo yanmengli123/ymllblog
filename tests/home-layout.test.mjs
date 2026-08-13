@@ -12,10 +12,14 @@ const motionStyles = read('src/styles/motion.css');
 const postLayout = read('src/layouts/PostLayout.astro');
 
 assert.match(index, /id="main-content"/, 'home page should expose a skip-link target');
-assert.match(index, /写代码，也写下/, 'home hero should communicate the author positioning');
-assert.match(index, /Selected writing/, 'home should include editorially selected writing');
-assert.match(index, /Latest notes/, 'home should include recent posts');
-assert.match(index, /Browse by field/, 'home should expose category exploration');
+assert.match(index, /写代码，也记录/, 'home hero should communicate the digital garden positioning');
+assert.match(index, /Featured writing/, 'home should include editorially selected writing');
+assert.match(index, /ActivityCalendar/, 'home should include the dynamic activity calendar');
+assert.match(index, /CultivatedFeed/, 'home should distinguish publishing from cultivation');
+assert.match(index, /TopicGarden/, 'home should expose the topic garden');
+assert.match(index, /ResearchShelf/, 'home should include research and reading data');
+assert.match(index, /GardenGrowth/, 'home should include the annual growth timeline');
+assert.match(index, /data-random-note/, 'home should support random discovery');
 assert.match(index, /<MusicPlayer\s*\/>/, 'home should include the official music section');
 assert.doesNotMatch(index, /ParticlesBg|SettingsPanel/, 'home should avoid distracting novelty widgets');
 
@@ -31,7 +35,8 @@ assert.match(styles, /article-prose/, 'article typography should have a dedicate
 
 assert.match(header, /aria-label="主导航"/, 'header navigation should be labelled');
 assert.match(header, /aria-current=/, 'active navigation should be announced');
-assert.match(header, /placeholder="搜索文章、标签、摘要"/, 'search should have a useful prompt');
+assert.match(header, /placeholder="搜索文章、项目，或输入命令"/, 'command palette should have a useful prompt');
+assert.match(header, /ArrowDown/, 'command palette should support keyboard navigation');
 assert.match(header, /localStorage\.setItem\('theme'/, 'theme should persist');
 assert.match(header, /searchInput\?\.addEventListener\('input'/, 'search input should be interactive');
 assert.doesNotMatch(header, /searchResults\.innerHTML\s*=/, 'search results should use safe DOM construction');

@@ -9,6 +9,11 @@ category: "前端工程"
 cover: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80"
 draft: false
 featured: true
+featuredOrder: 2
+maturity: evergreen
+growthLog:
+  - date: 2026-08-02
+    summary: 更新 Astro 内容层与发布工作流说明
 lang: "zh-CN"
 ---
 

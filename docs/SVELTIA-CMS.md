@@ -4,9 +4,9 @@
 
 ## 工作方式
 
-- 管理界面：`public/admin/`，提供文章列表、搜索、新建、编辑、删除、草稿、精选、标签、分类和封面上传。
+- 管理界面：`public/admin/`，提供文章、首页 NOW、项目、研究日志和阅读书架五类内容入口。文章支持增删改查、草稿、精选排序、成熟度、培育日志、标签、分类和封面上传；项目与研究日志支持独立 CRUD；首页状态与阅读书架支持结构化维护。
 - 管理 API：`server/admin-server.mjs`，只监听 VPS 本机 `127.0.0.1:8787`，由 Nginx 代理 `/admin-api/`。
-- 内容存储：API 通过服务端保存的最小权限 GitHub Token 修改 `src/content/blog/*.md`，保留 Git 版本历史并自动触发现有部署流程。
+- 内容存储：API 通过服务端保存的最小权限 GitHub Token 修改 `src/content/blog/*.md`、`src/content/projects/*.md`、`src/content/research/*.md`、`src/content/garden.yml` 与 `src/content/reading.yml`，保留 Git 版本历史并自动触发现有部署流程。
 - 本地开发：`CONTENT_BACKEND=local` 时直接读写项目内的 Markdown，便于完整测试。
 
 ## 安全边界

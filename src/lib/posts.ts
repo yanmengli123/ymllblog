@@ -58,17 +58,18 @@ export async function getPostsByTag(tag: string): Promise<BlogPost[]> {
  */
 export async function getAllTagsWithCount(): Promise<{ name: string; count: number }[]> {
   const posts = await getPublishedPosts();
-  const tagMap = new Map<string, number>();
+  const tagMap = new Map<string, { name: string; count: number }>();
 
   posts.forEach(post => {
     post.data.tags.forEach(tag => {
       const normalizedTag = tag.toLowerCase();
-      tagMap.set(normalizedTag, (tagMap.get(normalizedTag) || 0) + 1);
+      const current = tagMap.get(normalizedTag) ?? { name: tag, count: 0 };
+      current.count += 1;
+      tagMap.set(normalizedTag, current);
     });
   });
 
-  return Array.from(tagMap.entries())
-    .map(([name, count]) => ({ name, count }))
+  return Array.from(tagMap.values())
     .sort((a, b) => b.count - a.count);
 }
 

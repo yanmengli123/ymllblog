@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+interface Props { research: CollectionEntry<'research'>[]; reading: CollectionEntry<'reading'>[]; }
+const { research, reading } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const researchStatus = { question: '问题', exploring: '探索中', validated: '已验证', parked: '暂存' };
+const readingStatus = { reading: '正在读', queued: '待读', completed: '已完成' };
+---
+
+<section class="site-shell py-20 section-rule" aria-labelledby="research-heading">
+  <div class="grid gap-6 lg:grid-cols-2">
+    <div class="garden-panel surface rounded-[2rem] p-7 sm:p-9" data-reveal>
+      <p class="eyebrow">Research log</p><h2 id="research-heading" class="font-display text-3xl font-bold">研究中的问题</h2>
+      <div class="research-list mt-8">
+        {research.slice(0, 4).map((entry) => <article>
+          <div><span data-research-status={entry.data.status}>{researchStatus[entry.data.status]}</span><time datetime={entry.data.date.toISOString()}>{entry.data.date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}</time></div>
+          <h3>{entry.data.title}</h3><p>{entry.data.topic}</p>
+          {entry.data.relatedPost && <a href={`${base}/blog/${entry.data.relatedPost}`}>关联文章 →</a>}
+        </article>)}
+      </div>
+    </div>
+    <div class="garden-panel surface rounded-[2rem] p-7 sm:p-9" data-reveal style="--reveal-order: 1;">
+      <p class="eyebrow">Reading shelf</p><h2 class="font-display text-3xl font-bold">阅读书架</h2>
+      <div class="reading-shelf mt-8">
+        {reading.slice(0, 4).map((item) => <article>
+          <div class="reading-book-mark" data-kind={item.data.kind}></div>
+          <div class="min-w-0"><span>{readingStatus[item.data.status]} · {item.data.progress}%</span><h3>{item.data.url ? <a href={item.data.url} target="_blank" rel="noopener noreferrer">{item.data.title}</a> : item.data.title}</h3><p>{item.data.creator}</p><div class="progress-track"><i style={`--progress: ${item.data.progress / 100};`}></i></div></div>
+        </article>)}
+      </div>
+    </div>
+  </div>
+</section>

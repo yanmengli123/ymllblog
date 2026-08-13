@@ -54,6 +54,9 @@ The reader-facing application is static Astro HTML with two small client runtime
 | `src/scripts/motion.ts` | Owns one shared observer, the pointer frame loop, counters and live capability/reduced-motion state |
 | `src/styles/motion.css` | Owns motion tokens, page/component states, hover capability queries and reduced-motion fallbacks |
 | `public/admin/` | Separate static application; does not import public layout, theme or motion assets |
+| `src/lib/garden.ts` | Build-time aggregation for activity, topic relationships, recently cultivated content, projects, research, reading and growth statistics |
+| `src/content/garden.yml` | Singleton NOW status that drives the dynamic home hero |
+| `src/content/projects/`, `src/content/research/`, `src/content/reading.yml` | Structured digital-garden collections managed by the authenticated admin API |
 
 Normal navigation, static content and admin CRUD remain functional without native View Transition support. Fine-pointer-only effects are disabled for coarse/touch input, and `prefers-reduced-motion: reduce` removes non-essential motion.
 
